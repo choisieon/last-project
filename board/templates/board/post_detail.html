@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ post.title }} | 청설모{% endblock %}
+{% block nav_community_active %}active{% endblock %}
+
+{% block content %}
+<div class="post-detail">
+  <div class="post-item">
+    <h4>{{ post.title }}</h4>
+    <div class="post-meta">
+      <span>작성자: {{ post.author }}</span> | 
+      <span>작성일: {{ post.created_at|date:"Y-m-d H:i" }}</span>
+    </div>
+    <div class="post-content">
+      {{ post.content|linebreaksbr }}
+    </div>
+    <div class="post-actions">
+      <a href="{% url 'post_list' %}" class="write-btn">목록으로</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_style %}
+<style>
+  .post-detail .post-item {
+    padding: 20px;
+    margin-top: 20px;
+  }
+
+  .post-content {
+    margin: 15px 0;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .post-actions {
+    margin-top: 20px;
+  }
+</style>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}커뮤니티 | 청설모{% endblock %}
+{% block nav_community_active %}active{% endblock %}
+
+{% block category_bar %}
+<div class="category-bar">
+  <button class="active">전체</button>
+  <button>후기</button>
+  <button>궁금해</button>
+  <button>자료공유</button>
+  <button>잡담</button>
+</div>
+{% endblock %}
+
+{% block search_bar %}
+<div class="search-bar">
+  <input type="text" placeholder="검색어를 입력하세요" />
+  <button type="submit"></button>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="post-list">
+  {% if posts %}
+    {% for post in posts %}
+      <div class="post-item">
+        <h4><a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h4>
+        <p>{{ post.content|truncatechars:50 }}</p>
+        <span>작성자: {{ post.author }} | {{ post.created_at|date:"Y-m-d H:i" }}</span>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="post-item">
+      <p>게시글이 없습니다.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
