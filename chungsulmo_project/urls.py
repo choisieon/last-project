@@ -20,4 +20,5 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('community.urls')),
+    path('mentor/', include('mentor.urls')),  # 멘토멘티 연결 추가
 ]
