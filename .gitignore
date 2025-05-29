@@ -1,0 +1,101 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django DB
+db.sqlite3
+
+# Django 환경 설정
+*.log
+.env
+*.pot
+*.pyc
+*.pyo
+
+# Django Migrations (원하면 유지 가능)
+**/migrations/
+!**/migrations/__init__.py
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# VSCode, PyCharm
+.vscode/
+.idea/
+
+# Python environments (venv)
+venv/
+env/
+ENV/
+.venv/
+
+# Media/Static files
+media/
+staticfiles/
+
+# Output
+*.sqlite3
+*.db
+*.bak
+*.swp
+
+# Node.js (만약 JS 빌드 도구 사용 시)
+node_modules/
+build/
+dist/
+
+# Secret config
+secrets.json
+*.pem
+
+# OS-specific files
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django
+db.sqlite3
+*.log
+.env
+*.pot
+*.pyc
+*.pyo
+**/migrations/
+!**/migrations/__init__.py
+
+# Virtual Environments
+venv/
+.venv/
+ENV/
+env/
+
+# Editor folders
+.vscode/
+.idea/
+
+# Static and media files
+staticfiles/
+media/
+
+# Node (if using npm/yarn)
+node_modules/
+dist/
+build/
+
+# Others
+*.bak
+*.swp
+*.db
+*.pem
