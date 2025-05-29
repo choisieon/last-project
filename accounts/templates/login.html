@@ -1,3 +1,5 @@
+{% load socialaccount %}
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="ko">
@@ -144,7 +146,14 @@
     </form>
 
     <div class="sns-label">SNS로 로그인</div>
-    <button class="sns-button kakao">KAKAO 로그인</button>
+
+    <a href="/social/login/">
+      <button class="sns-button kakao">KAKAO 로그인</button>
+    </a>
+
+
+
+
     <button class="sns-button naver">NAVER 로그인</button>
     <button class="sns-button google">GOOGLE 로그인</button>
 

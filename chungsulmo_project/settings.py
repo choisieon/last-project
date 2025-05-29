@@ -39,6 +39,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'community',
     'accounts',
+
+    'django.contrib.sites',  # 필수
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.kakao',  # 카카오 로그인
 ]
 
 MIDDLEWARE = [
@@ -49,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware'
 ]
 
 ROOT_URLCONF = 'chungsulmo_project.urls'
@@ -125,9 +132,21 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATIC_URL = '/static/'
 
-# 개발 시 static 파일 경로
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
+# # 개발 시 static 파일 경로
+# STATICFILES_DIRS = [
+#     BASE_DIR / "static",
+# ]
 
 AUTH_USER_MODEL = 'accounts.User'
+
+
+
+SITE_ID = 1
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+
+LOGIN_REDIRECT_URL = '/'   # 로그인 성공 시 이동 경로
+LOGOUT_REDIRECT_URL = '/'  # 로그아웃 시 이동 경로
