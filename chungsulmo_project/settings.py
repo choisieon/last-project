@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'community',
+    'accounts',
 ]
 
 MIDDLEWARE = [
@@ -129,3 +130,4 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
+AUTH_USER_MODEL = 'accounts.User'
