@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ post.title }} | 청설모{% endblock %}
+{% block nav_community_active %}active{% endblock %}
+
+{% block content %}
+<div class="post-detail">
+  <div class="post-item">
+    <h4>{{ post.title }}</h4>
+    <!-- 게시글 상단: 작성자, 작성일, 조회수, 좋아요 -->
+    <div class="post-meta">
+      <span>작성자: {{ post.author }}</span> | 
+      <span>작성일: {{ post.created_at|date:"Y-m-d H:i" }}</span> |
+      <span>조회수: {{ post.views }}</span> |
+      <span>좋아요: {{ post.likes.count }}</span>
+      <a href="{% url 'post_like' post.pk %}" class="like-btn">
+        {% if request.user in post.likes.all %}
+          ❤️ 취소
+        {% else %}
+          🤍 좋아요
+        {% endif %}
+      </a>
+    </div>
+    <div class="post-content">
+      {{ post.content|linebreaksbr }}
+    </div>
+    <div class="post-actions">
+      <a href="{% url 'post_list' %}">목록으로</a>
+    </div>
+  </div>
+
+  <!-- 댓글 입력 폼 -->
+  <div class="comment-form">
+    <form method="post">
+      {% csrf_token %}
+      {{ comment_form.content }}
+      <button type="submit" class="write-btn">댓글 작성</button>
+    </form>
+  </div>
+
+  <!-- 댓글 목록 -->
+  <div class="comment-list">
+    {% for comment in post.comments.all %}
+      <div class="comment">
+        <strong>{{ comment.author }}</strong>
+        <span>{{ comment.created_at|date:"Y-m-d H:i" }}</span>
+        <p>{{ comment.content }}</p>
+      </div>
+    {% empty %}
+      <div class="comment-empty">아직 댓글이 없습니다.</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_style %}
+<style>
+  .post-detail .post-item {
+    padding: 20px;
+    margin-top: 20px;
+    background: rgba(250,235,180,0.93);
+    background-image: url("{% static 'images/pixel-paper.png' %}");
+    background-size: 4px 4px;
+    border: 2px solid #5a4a2f;
+    box-shadow: 2px 2px 0 #b9a782;
+    border-radius: 8px;
+  }
+  .post-detail h4 {
+    font-size: 1.4rem;
+    color: #1976d2;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  .post-meta {
+    margin-bottom: 15px;
+    font-size: 0.97rem;
+    color: #4a3b28;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+  .like-btn {
+    margin-left: 10px;
+    text-decoration: none;
+    font-weight: bold;
+    color: #e53935;
+    font-size: 1.05rem;
+    transition: color 0.2s;
+  }
+  .like-btn:hover {
+    color: #1976d2;
+  }
+  .post-content {
+    margin: 15px 0;
+    font-size: 1.07rem;
+    line-height: 1.7;
+    color: #222831;
+  }
+  .post-actions {
+    margin-top: 20px;
+    text-align: right;
+  }
+  .post-actions a {
+    color: #007aff;
+    font-weight: bold;
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: 1.5px solid #007aff;
+    background: #fff;
+    transition: background 0.2s, color 0.2s;
+  }
+  .post-actions a:hover {
+    background: #007aff;
+    color: #fff;
+  }
+  .comment-form {
+    margin: 30px 0 18px 0;
+    background: rgba(250,235,180,0.92);
+    border: 1.5px solid #5a4a2f;
+    border-radius: 6px;
+    padding: 18px 16px;
+  }
+  .comment-form textarea,
+  .comment-form input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 1.5px solid #5a4a2f;
+    background: #fff;
+    font-size: 1rem;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+  }
+  .comment-form .write-btn {
+    background: #007aff;
+    color: #fff;
+    border: 1.5px solid #5a4a2f;
+    border-radius: 4px;
+    padding: 8px 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .comment-form .write-btn:hover {
+    background: #005bb5;
+  }
+  .comment-list {
+    margin: 0 0 10px 0;
+    padding: 0;
+  }
+  .comment {
+    background: #fffbe6;
+    border: 1px solid #e9c46a;
+    border-radius: 4px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+  }
+  .comment strong {
+    color: #1976d2;
+    font-weight: bold;
+    margin-right: 8px;
+  }
+  .comment span {
+    color: #888;
+    font-size: 0.95rem;
+    margin-left: 4px;
+  }
+  .comment-empty {
+    color: #aaa;
+    text-align: center;
+    margin: 20px 0;
+    font-size: 1rem;
+  }
+</style>
+{% endblock %}

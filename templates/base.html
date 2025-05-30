@@ -1,0 +1,186 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>{% block title %}청설모{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    @font-face {
+      font-family: 'MyCustomFont';
+      src: url("{% static 'fonts/픽셀.woff2' %}") format('woff2');
+      font-weight: 400;
+      font-style: normal;
+    }
+    body {
+      font-family: 'MyCustomFont', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: url("{% static 'images/Frame 13.png' %}") no-repeat center center fixed;
+      background-size: cover;
+      background-color: #cde4c7;
+    }
+    .wrapper {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 30px 20px;
+    }
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px;
+      margin-bottom: 20px;
+    }
+    .menu-left, .menu-right {
+      display: flex;
+      gap: 12px;
+    }
+    .menu-box {
+      background-color: rgba(250, 235, 180, 0.9);
+      background-image: url("{% static 'images/pixel-paper.png' %}");
+      background-size: 4px 4px;
+      background-repeat: repeat;
+      border: 2.5px solid #5a4a2f;
+      box-shadow: 3px 3px 0 #b9a782;
+      padding: 6px 12px;
+      font-weight: bold;
+      color: #3c2e1e;
+      font-size: 14px;
+      text-decoration: none;
+    }
+    .menu-box.active {
+      color: #007aff;
+      font-weight: bold;
+    }
+    .write-btn {
+      background-color: #007aff;
+      color: white;
+      padding: 6px 12px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 14px;
+      border: 2px solid #5a4a2f;
+      box-shadow: 3px 3px 0 #b9a782;
+    }
+    .login-info {
+      background-color: rgba(250, 235, 180, 0.9);
+      background-image: url("{% static 'images/pixel-paper.png' %}");
+      background-size: 4px 4px;
+      background-repeat: repeat;
+      padding: 6px 12px;
+      border: 2.5px solid #5a4a2f;
+      box-shadow: 3px 3px 0 #b9a782;
+      font-size: 14px;
+      color: #3c2e1e;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+    }
+    .category-bar {
+      margin-top: 20px;
+      margin-bottom: 15px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .category-bar button {
+      background-color: rgba(250, 235, 180, 0.9);
+      background-image: url("{% static 'images/pixel-paper.png' %}");
+      background-size: 4px 4px;
+      background-repeat: repeat;
+      border: 2px solid #5a4a2f;
+      box-shadow: 2px 2px 0 #b9a782;
+      font-family: 'MyCustomFont';
+      font-size: 13px;
+      font-weight: bold;
+      padding: 6px 10px;
+      cursor: pointer;
+      color: #4a3b28;
+    }
+    .category-bar .active {
+      background-color: #007aff;
+      color: white;
+    }
+    .search-bar {
+      display: flex;
+      width: 100%;
+      max-width: 600px;
+      height: 42px;
+      background-color: #f0e6cb;
+      border: 3px solid #333;
+      background-image: url("{% static 'images/pixel-paper.png' %}");
+      background-size: 4px 4px;
+      box-shadow: 4px 4px 0 #888;
+      border-radius: 0;
+      overflow: hidden;
+      margin: 0 auto 30px;
+    }
+    .search-bar input {
+      flex: 1;
+      padding: 0 12px;
+      border: none;
+      font-family: 'MyCustomFont', sans-serif;
+      font-size: 14px;
+      background: transparent;
+      color: #000;
+    }
+    .search-bar input::placeholder {
+      color: #000;
+      font-weight: bold;
+    }
+    .search-bar button {
+      width: 44px;
+      background: #444 url("{% static 'images/돋보기.png' %}") no-repeat center center;
+      background-size: 42px 42px;
+      border: none;
+      cursor: pointer;
+    }
+    .post-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .post-item {
+      background: rgba(250, 235, 180, 0.9);
+      background-image: url("{% static 'images/pixel-paper.png' %}");
+      background-size: 4px 4px;
+      background-repeat: repeat;
+      border: 2px solid #5a4a2f;
+      box-shadow: 2px 2px 0 #b9a782;
+      padding: 12px;
+    }
+    .post-item h4 {
+      margin-bottom: 4px;
+      font-size: 14px;
+      color: #333;
+    }
+    .post-item p {
+      font-size: 12.5px;
+      color: #444;
+    }
+    {% block extra_style %}{% endblock %}
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <!-- 상단 네비게이션 -->
+    <div class="top-nav">
+      <div class="menu-left">
+        <a href="#" class="menu-box {% block nav_mentor_active %}{% endblock %}">멘토멘티</a>
+        <a href="{% url 'post_list' %}" class="menu-box {% block nav_community_active %}{% endblock %}">커뮤니티</a>
+        <a href="#" class="menu-box {% block nav_mypage_active %}{% endblock %}">마이페이지</a>
+        <a href="#" class="menu-box {% block nav_policy_active %}{% endblock %}">청년정책</a>
+      </div>
+      <div class="menu-right">
+        <a href="{% url 'post_new' %}" class="write-btn">글쓰기</a>
+        <div class="login-info">홍길동님 환영합니다</div>
+      </div>
+    </div>
+    {% block category_bar %}{% endblock %}
+    {% block search_bar %}{% endblock %}
+    {% block content %}{% endblock %}
+  </div>
+</body>
+</html>

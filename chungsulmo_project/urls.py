@@ -17,13 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.shortcuts import redirect
-# from allauth.socialaccount import urls as socialaccount_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('social/', include(socialaccount_urls)),
     path('social/', include('allauth.urls')),  # allauth 기본 경로
     path('', include('community.urls')),  # community 앱으로 연결,
     path('accounts/', include('accounts.urls')),
-    # path('', lambda request: redirect('community:index')),
+    path('board/', include('board.urls')),
+    path('mentor/', include('mentor.urls')),  # 멘토멘티 연결 추가
 ]

@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'community',
     'accounts',
+    'mentor',
+    'board',
 
     'django.contrib.sites',  # 필수
     'allauth',
@@ -63,7 +65,7 @@ ROOT_URLCONF = 'chungsulmo_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -113,7 +115,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
 
@@ -132,10 +134,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATIC_URL = '/static/'
 
-# # 개발 시 static 파일 경로
-# STATICFILES_DIRS = [
-#     BASE_DIR / "static",
-# ]
+# 개발 시 static 파일 경로
+STATICFILES_DIRS = []
 
 AUTH_USER_MODEL = 'accounts.User'
 
