@@ -141,7 +141,7 @@ AUTH_USER_MODEL = 'accounts.User'
 
 
 
-SITE_ID = 1
+SITE_ID = 2
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
@@ -150,3 +150,8 @@ AUTHENTICATION_BACKENDS = (
 
 LOGIN_REDIRECT_URL = '/'   # 로그인 성공 시 이동 경로
 LOGOUT_REDIRECT_URL = '/'  # 로그아웃 시 이동 경로
+
+
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_LOGIN_ON_GET = True
+ACCOUNT_ADAPTER = 'allauth.account.adapter.DefaultAccountAdapter'

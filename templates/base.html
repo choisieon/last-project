@@ -173,10 +173,12 @@
         <a href="#" class="menu-box {% block nav_mypage_active %}{% endblock %}">마이페이지</a>
         <a href="#" class="menu-box {% block nav_policy_active %}{% endblock %}">청년정책</a>
       </div>
+
       <div class="menu-right">
         <a href="{% url 'post_new' %}" class="write-btn">글쓰기</a>
         <div class="login-info">홍길동님 환영합니다</div>
       </div>
+
     </div>
     {% block category_bar %}{% endblock %}
     {% block search_bar %}{% endblock %}
