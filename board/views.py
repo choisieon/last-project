@@ -1,18 +1,28 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Post
-from .forms import PostForm, CommentForm
+from django.urls import reverse
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.db.models import Count
 from django.views.decorators.http import require_POST
-# Create your views here.
+from .models import Post, Comment
+from .forms import PostForm, CommentForm
+
 def post_list(request):
-    posts = Post.objects.all()
-    return render(request, 'board/post_list.html', {'posts': posts})
+    sort = request.GET.get('sort', '')
+    if sort == 'likes':
+        posts = Post.objects.annotate(like_count=Count('likes')).order_by('-like_count', '-created_at')
+    elif sort == 'comments':
+        posts = Post.objects.annotate(comment_count=Count('comments')).order_by('-comment_count', '-created_at')
+    else:
+        posts = Post.objects.all().order_by('-created_at')
+    return render(request, 'board/post_list.html', {'posts': posts, 'sort': sort})
 
 def post_new(request):
     if request.method == "POST":
-        form = PostForm(request.POST)
+        form = PostForm(request.POST, request.FILES)
         if form.is_valid():
             post = form.save(commit=False)
-            post.author = request.user  # 로그인한 사용자
+            post.author = request.user
             post.save()
             return redirect('post_list')
     else:
@@ -23,38 +33,92 @@ def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
     session_key = f'viewed_{post.pk}'
 
-    if not request.session.get(session_key, False):
+    # 조회수 증가 (작성자 본인 제외)
+    if not request.session.get(session_key, False) and request.user != post.author:
         post.views += 1
         post.save()
         request.session[session_key] = True
-    # 조회수 증가 (작성자 본인은 제외)
-    if request.user != post.author:
-        post.views += 1
-        post.save()
+
+    comments = post.comments.filter(parent__isnull=True)
+    comment_form = CommentForm(request.POST or None)
     
-    # 댓글 작성 처리
-    if request.method == 'POST':
-        comment_form = CommentForm(request.POST)
-        if comment_form.is_valid():
-            comment = comment_form.save(commit=False)
-            comment.post = post
-            comment.author = request.user
-            comment.save()
-            return redirect('post_detail', pk=post.pk)
-    else:
-        comment_form = CommentForm()
-    
+    if request.method == 'POST' and comment_form.is_valid():
+        parent_id = comment_form.cleaned_data.get('parent_id')
+        parent = None
+        
+        if parent_id:
+            try:
+                parent = Comment.objects.get(id=parent_id, post=post)
+            except Comment.DoesNotExist:
+                parent = None
+
+        new_comment = Comment.objects.create(
+            post=post,
+            author=request.user,
+            content=comment_form.cleaned_data['content'],
+            parent=parent
+        )
+        # 댓글 작성 후 해당 위치로 이동
+        url = reverse('post_detail', kwargs={'pk': pk})
+        return redirect(f'{url}#comment-{new_comment.id}')
+
     return render(request, 'board/post_detail.html', {
         'post': post,
+        'comments': comments,
         'comment_form': comment_form,
     })
 
+@login_required
 @require_POST
 def post_like(request, pk):
     post = get_object_or_404(Post, pk=pk)
-    like, created = Like.objects.get_or_create(post=post, user=request.user)
+    user = request.user
+    if user in post.likes.all():
+        post.likes.remove(user)
+    else:
+        post.likes.add(user)
+    return redirect('post_detail', pk=pk)
+
+@login_required
+@require_POST
+def post_like_ajax(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    user = request.user
+    liked = False
     
-    if not created:  # 이미 좋아요를 눌렀다면 취소
-        like.delete()
+    if user in post.likes.all():
+        post.likes.remove(user)
+    else:
+        post.likes.add(user)
+        liked = True
     
-    return redirect('post_detail', pk=post.pk)
+    return JsonResponse({
+        'liked': liked,
+        'count': post.likes.count(),
+    })
+
+@login_required
+def post_edit(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    if request.user != post.author:
+        return redirect('post_detail', pk=pk)
+    
+    if request.method == "POST":
+        form = PostForm(request.POST, request.FILES, instance=post)
+        if form.is_valid():
+            form.save()
+            return redirect('post_detail', pk=post.pk)
+    else:
+        form = PostForm(instance=post)
+    return render(request, 'board/post_edit.html', {'form': form, 'post': post})
+
+@login_required
+def post_delete(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    if request.user != post.author:
+        return redirect('post_detail', pk=pk)
+    
+    if request.method == "POST":
+        post.delete()
+        return redirect('post_list')
+    return render(request, 'board/post_confirm_delete.html', {'post': post})
