@@ -152,7 +152,11 @@
       <button class="sns-button kakao">KAKAO 로그인</button>
     </a>
 
-    <button class="sns-button naver">NAVER 로그인</button>
+
+    <a href="{% provider_login_url 'naver' %}">
+      <button class="sns-button naver">NAVER 로그인</button>
+    </a>
+
     <button class="sns-button google">GOOGLE 로그인</button>
 
     <div class="signup-link">

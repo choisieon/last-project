@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.kakao',  # 카카오 로그인
+    'allauth.socialaccount.providers.naver', 
 ]
 
 MIDDLEWARE = [
