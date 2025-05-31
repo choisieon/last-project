@@ -8,44 +8,79 @@
 <div class="post-detail">
   <div class="post-item">
     <h4>{{ post.title }}</h4>
-    <!-- 게시글 상단: 작성자, 작성일, 조회수, 좋아요 -->
     <div class="post-meta">
-      <span>작성자: {{ post.author }}</span> | 
-      <span>작성일: {{ post.created_at|date:"Y-m-d H:i" }}</span> |
-      <span>조회수: {{ post.views }}</span> |
-      <span>좋아요: {{ post.likes.count }}</span>
-      <a href="{% url 'post_like' post.pk %}" class="like-btn">
-        {% if request.user in post.likes.all %}
-          ❤️ 취소
-        {% else %}
-          🤍 좋아요
-        {% endif %}
-      </a>
+      <span>작성자: {{ post.author }}</span>
+      <span>|</span>
+      <span>작성일: {{ post.created_at|date:"Y-m-d H:i" }}</span>
+      <span>|</span>
+      <span>조회수: {{ post.views }}</span>
+      <span>|</span>
+      <span class="like-group">
+        <a href="#" class="like-btn" data-post-id="{{ post.pk }}">
+          <span class="like-icon">
+            {% if request.user in post.likes.all %}❤️{% else %}🤍{% endif %}
+          </span>
+          <span class="like-count">{{ post.likes.count }}</span>
+        </a>
+      </span>
     </div>
+    {% if post.image %}
+      <div style="margin-bottom:1rem;">
+        <img src="{{ post.image.url }}" alt="첨부 이미지" style="max-width:100%; border-radius:8px;">
+      </div>
+    {% endif %}
     <div class="post-content">
       {{ post.content|linebreaksbr }}
     </div>
     <div class="post-actions">
       <a href="{% url 'post_list' %}">목록으로</a>
+      {% if request.user == post.author %}
+        <a href="{% url 'post_edit' post.pk %}" style="margin-left:10px; color:#007aff; border-color:#007aff;">수정</a>
+        <form action="{% url 'post_delete' post.pk %}" method="post" style="display:inline; margin-left:10px;">
+          {% csrf_token %}
+          <button type="submit"
+                  onclick="return confirm('정말 삭제하시겠습니까?');"
+                  style="background:none;
+                         border:1.5px solid #dc3545;
+                         color:#dc3545;
+                         padding:6px 12px;
+                         border-radius:4px;
+                         cursor:pointer;">
+            삭제
+          </button>
+        </form>
+      {% endif %}
     </div>
   </div>
 
-  <!-- 댓글 입력 폼 -->
+  <!-- 댓글 입력 폼 (최상위 댓글) -->
   <div class="comment-form">
     <form method="post">
       {% csrf_token %}
       {{ comment_form.content }}
+      <input type="hidden" name="parent_id" value="">
       <button type="submit" class="write-btn">댓글 작성</button>
     </form>
   </div>
 
-  <!-- 댓글 목록 -->
+  <!-- 댓글/대댓글 목록 -->
   <div class="comment-list">
-    {% for comment in post.comments.all %}
-      <div class="comment">
+    {% for comment in comments %}
+      <div class="comment" id="comment-{{ comment.id }}">
         <strong>{{ comment.author }}</strong>
         <span>{{ comment.created_at|date:"Y-m-d H:i" }}</span>
         <p>{{ comment.content }}</p>
+        <!-- 답글 버튼 -->
+        <a href="#" class="reply-toggle" data-comment-id="{{ comment.id }}">답글</a>
+        <!-- 대댓글 작성 폼 (처음엔 숨김) -->
+        <form method="post" class="comment-form reply-form" data-parent-id="{{ comment.id }}" style="display:none;">
+          {% csrf_token %}
+          {{ comment_form.content }}
+          <input type="hidden" name="parent_id" value="{{ comment.id }}">
+          <button type="submit">대댓글 작성</button>
+        </form>
+        <!-- 대댓글(재귀 출력) -->
+        {% include "board/comment_replies.html" with replies=comment.replies.all comment_form=comment_form %}
       </div>
     {% empty %}
       <div class="comment-empty">아직 댓글이 없습니다.</div>
@@ -74,23 +109,53 @@
   }
   .post-meta {
     margin-bottom: 15px;
-    font-size: 0.97rem;
+    font-size: 1.05rem;
     color: #4a3b28;
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
     align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    line-height: 1.6;
+  }
+  .like-group {
+    display: flex;
+    align-items: center;
+    gap: 3px;
   }
   .like-btn {
-    margin-left: 10px;
+    display: flex;
+    align-items: center;
+    gap: 2px;
     text-decoration: none;
     font-weight: bold;
     color: #e53935;
     font-size: 1.05rem;
     transition: color 0.2s;
+    padding: 0 2px;
+    border-radius: 4px;
+    background: none;
+    cursor: pointer;
   }
   .like-btn:hover {
     color: #1976d2;
+    background: #fffbe6;
+  }
+  .like-icon {
+    font-size: 1.1em;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+  }
+  .like-count {
+    font-size: 1em;
+    color: #e53935;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    font-weight: bold;
+    margin-left: 1px;
   }
   .post-content {
     margin: 15px 0;
@@ -115,6 +180,10 @@
   .post-actions a:hover {
     background: #007aff;
     color: #fff;
+  }
+  .post-actions form button:hover {
+    background: #dc3545;
+    color: white;
   }
   .comment-form {
     margin: 30px 0 18px 0;
@@ -176,4 +245,63 @@
     font-size: 1rem;
   }
 </style>
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const likeBtn = document.querySelector('.like-btn');
+  if (likeBtn) {
+    likeBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const postId = likeBtn.getAttribute('data-post-id');
+      fetch(`/board/post/${postId}/like_ajax/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': getCookie('csrftoken'),
+          'Content-Type': 'application/json',
+        },
+        credentials: 'same-origin',
+      })
+      .then(response => {
+        if (!response.ok) throw new Error('서버 오류');
+        return response.json();
+      })
+      .then(data => {
+        const likeIcon = likeBtn.querySelector('.like-icon');
+        const likeCount = likeBtn.querySelector('.like-count');
+        likeIcon.textContent = data.liked ? '❤️' : '🤍';
+        likeCount.textContent = data.count;
+      })
+      .catch(err => {
+        alert('로그인이 필요하거나 오류가 발생했습니다.');
+      });
+    });
+  }
+
+  // 대댓글 폼 토글
+  document.querySelectorAll('.reply-toggle').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const commentId = this.dataset.commentId;
+      const form = document.querySelector('.reply-form[data-parent-id="' + commentId + '"]');
+      if (form) {
+        form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
+      }
+    });
+  });
+});
+</script>
 {% endblock %}
