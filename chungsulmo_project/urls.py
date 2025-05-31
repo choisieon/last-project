@@ -1,5 +1,5 @@
 """
-URL configuration for chungsulmo_project project.
+URL configuration for chungsulmo project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.2/topics/http/urls/
@@ -18,12 +18,15 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.shortcuts import redirect
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('community.urls')),
-    path('mentor/', include('mentor.urls')),  # 멘토멘티 연결 추가
+    path('social/', include('allauth.urls')),  # allauth 기본 경로
+    path('', include('community.urls')),  # community 앱으로 연결,
+    path('accounts/', include('accounts.urls')),
     path('board/', include('board.urls')),
+    path('mentor/', include('mentor.urls')),  # 멘토멘티 연결 추가
 ]
 
 if settings.DEBUG:

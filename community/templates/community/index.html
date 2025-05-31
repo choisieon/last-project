@@ -272,8 +272,8 @@
       </div>
     </div>
     <div class="top-right">
-      <a href="#">로그인</a>
-      <a href="#">회원가입</a>
+      <a href="{% url 'accounts:login' %}">로그인</a>
+      <a href="{% url 'accounts:signup' %}">회원가입</a>
       <a href="#">문의</a>
       <a href="{% url 'post_new' %}" class="write-btn">글쓰기</a>
     </div>
