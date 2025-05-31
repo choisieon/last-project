@@ -19,9 +19,11 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.shortcuts import redirect
+from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', views.index, name='index'),
     path('social/', include('allauth.urls')),  # allauth 기본 경로
     path('', include('community.urls')),  # community 앱으로 연결,
     path('accounts/', include('accounts.urls')),
