@@ -143,8 +143,9 @@
       font-weight: bold;
     }
     .post-item {
-      padding: 8px 12px;
+      padding: 20px 12px;
       border-top: 1px solid #d6c27a;
+      min-height: 100px;
     }
     .post-item:first-child {
       border-top: none;
@@ -152,14 +153,28 @@
     .post-item h4 {
       margin-bottom: 4px;
       font-size: 14px;
-      font-weight: bold;
+    }
+    .post-item h4 a {
+      text-decoration: none;
+      font-weight: normal;
       color: #2e1d00;
     }
-    .post-item p {
-      font-size: 13px;
-      color: #4b3f2f;
-      font-weight: normal;
+    .post-item .meta-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #555;
+      margin-top: 6px;
     }
+    .post-item .meta-info span {
+      margin-right: 12px;
+    }
+    .post-item .icons {
+      display: flex;
+      gap: 12px;
+    }
+    .post-item .icon-like { color: red; }
+    .post-item .icon-comment { color: teal; }
     @media screen and (max-width: 768px) {
       .main-container { flex-direction: column; padding: 2rem 1rem; }
       .search-container { top: 720px; }
@@ -207,6 +222,13 @@
           <div class="post-item">
             <h4><a href="{% url 'post_detail' post.id %}">{{ post.title }}</a></h4>
             <p>{{ post.content|truncatechars:80 }}</p>
+            <div class="meta-info">
+              <span>{{ post.created_at|date:"Y-m-d H:i" }}</span>
+              <div class="icons">
+                <span class="icon-like">❤️ {{ post.likes.count }}</span>
+                <span class="icon-comment">💬 {{ post.comments.count }}</span>
+              </div>
+            </div>
           </div>
           {% endfor %}
         </div>
