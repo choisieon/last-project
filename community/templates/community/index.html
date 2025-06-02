@@ -269,14 +269,24 @@
         <a href="{% url 'mentor_home' %}">멘토멘티</a> 
         <a href="#">마이페이지</a>
         <a href="#">청년정책</a>
-      </div>
     </div>
-    <div class="top-right">
-      <a href="{% url 'accounts:login' %}">로그인</a>
-      <a href="{% url 'accounts:signup' %}">회원가입</a>
-      <a href="#">문의</a>
-      <a href="{% url 'post_new' %}" class="write-btn">글쓰기</a>
-    </div>
+  </div>
+
+  <div class="top-right">
+    {% if user.is_authenticated %}
+    <span>{{ user.username }}님 환영합니다</span>
+    <a href="{% url 'accounts:logout' %}">로그아웃</a>
+    <a href="#">문의</a>
+    <a href="{% url 'post_new' %}" class="write-btn">글쓰기</a>
+    {% else %}
+    <a href="{% url 'accounts:login' %}">로그인</a>
+    <a href="{% url 'accounts:signup' %}">회원가입</a>
+    <a href="#">문의</a>
+    <a href="{% url 'accounts:login' %}?next={% url 'post_new' %}" class="write-btn">글쓰기</a>
+    {% endif %}
+  </div>
+
+
     <div class="intro-box">
       청년들이 함께 모여 삶과 고민을 나누는 공간,<br />
       청설모 커뮤니티에 오신 것을 환영합니다!
