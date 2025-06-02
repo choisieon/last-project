@@ -146,6 +146,10 @@ AUTH_USER_MODEL = 'accounts.User'
 
 
 
+
+
+
+
 SITE_ID = 2
 
 AUTHENTICATION_BACKENDS = (
@@ -160,3 +164,30 @@ LOGOUT_REDIRECT_URL = '/'  # 로그아웃 시 이동 경로
 SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_LOGIN_ON_GET = True
 ACCOUNT_ADAPTER = 'allauth.account.adapter.DefaultAccountAdapter'
+
+
+
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': ['profile', 'email'],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+            'prompt': 'select_account'
+        }
+    },
+    'kakao': {
+        'SCOPE': ['account_email', 'profile_nickname'],
+        'AUTH_PARAMS': {
+            "response_type": "code",
+            'prompt': 'login'
+        },
+    },
+    'naver': {
+        'SCOPE': ['name', 'email'],
+        'AUTH_PARAMS': {
+            "response_type": "code",
+            'auth_type': 'reauthenticate'
+        },
+    }
+}
