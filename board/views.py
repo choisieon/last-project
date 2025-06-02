@@ -42,9 +42,13 @@ def post_detail(request, pk):
     comments = post.comments.filter(parent__isnull=True)
     comment_form = CommentForm(request.POST or None)
     
-    if request.method == 'POST' and comment_form.is_valid():
-        parent_id = comment_form.cleaned_data.get('parent_id')
-        parent = None
+    if request.method == 'POST':
+        if not request.user.is_authenticated:
+            return redirect('accounts:login')  # 또는 로그인 URL 이름
+
+        if comment_form.is_valid():
+            parent_id = comment_form.cleaned_data.get('parent_id')
+            parent = None
         
         if parent_id:
             try:
