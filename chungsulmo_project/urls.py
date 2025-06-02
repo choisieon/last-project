@@ -16,14 +16,20 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 from django.shortcuts import redirect
-from allauth.socialaccount import urls as socialaccount_urls
+from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('social/', include(socialaccount_urls)),
-    # path('social/', include('allauth.urls')),  # allauth 기본 경로
+    path('accounts/', include('allauth.urls')),  # allauth 기본 경로
+    path('', views.index, name='index'),
     path('', include('community.urls')),  # community 앱으로 연결,
-    path('accounts/', include('accounts.urls')),
-    # path('', lambda request: redirect('community:index')),
+    path('auth/', include('accounts.urls')),
+    path('board/', include('board.urls')),
+    path('mentor/', include('mentor.urls')),  # 멘토멘티 연결 추가
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

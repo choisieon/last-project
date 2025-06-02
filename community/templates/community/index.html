@@ -99,7 +99,7 @@
 
     .intro-box {
       position: absolute;
-      top: 500px;
+      top: 450px;
       left: 50%;
       transform: translateX(-50%);
       background: rgba(255, 255, 255, 0.95);
@@ -114,45 +114,50 @@
       z-index: 10;
     }
 
-    .search-container {
-      display: flex;
-      justify-content: center;
-      margin: 0 auto;
-      padding: 1rem;
-      background: white;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-      border-radius: 8px;
-      width: 80%;
-      position: absolute;
-      top: 595px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 10;
-    }
+  .search-bar {
+  display: flex;
+  width: 600px;
+  height: 40px;
+  background-color: #f0e6cb;
+  border: 3px solid #333;
+  background-image: url("{% static 'images/pixel-paper.png' %}");
+  background-size: 4px 4px;
+  box-shadow: 4px 4px 0 #888;
+  border-radius: 0;
+  overflow: hidden;
+  margin: -120px auto;
+}
 
-    .search-container input {
-      flex: 1;
-      padding: 0.6rem 1rem;
-      border: 1px solid #ccc;
-      border-radius: 6px 0 0 6px;
-      font-size: 14px;
-    }
+.search-bar input {
+  flex: 1;
+  padding: 0 10px;
+  border: none;
+  font-family: 'MyCustomFont', sans-serif;
+  font-size: 14px;
+  background: transparent;
+  color: #000;
+}
 
-    .search-container button {
-      padding: 0.6rem 1rem;
-      background: #007aff;
-      color: white;
-      border: none;
-      border-radius: 0 6px 6px 0;
-      cursor: pointer;
-    }
+.search-bar input::placeholder {
+  color: #000;
+  font-weight: bold;
+}
+
+.search-bar button {
+  width: 45px;
+  background: #444 url("{% static 'images/돋보기.png' %}") no-repeat center center;
+  background-size: 41px 45px;
+  border: none;
+  cursor: pointer;
+}
+
 
     .main-container {
       display: flex;
       gap: 2rem;
       justify-content: space-between;
       padding: 2rem;
-      margin-top: -25px;
+      margin-top: 110px;
     }
 
     .left-content {
@@ -183,8 +188,8 @@
   border: 3px solid #333;
   box-shadow: 4px 4px 0 #666; /* 픽셀그림자 느낌 */
   /* border-radius: 10; /* 둥근 테두리 제거해서 네모네모하게 */
-  font-size: 14px;
-} */ */
+  /* font-size: 14px;
+} */ */ */
 
     /* .box {
       background: white;
@@ -260,8 +265,8 @@
     <div class="top-left">
       <div class="identity-box">청년들의 인생설계 모임, <strong>청설모</strong></div>
       <div class="nav-menu">
-        <a href="#">커뮤니티</a>
-        <a href="#">멘토멘티</a>
+       <a href="{% url 'post_list' %}" class="menu-box {% block nav_community_active %}{% endblock %}">커뮤니티</a>
+        <a href="{% url 'mentor_home' %}">멘토멘티</a> 
         <a href="#">마이페이지</a>
         <a href="#">청년정책</a>
       </div>
@@ -270,16 +275,16 @@
       <a href="{% url 'accounts:login' %}">로그인</a>
       <a href="{% url 'accounts:signup' %}">회원가입</a>
       <a href="#">문의</a>
-      <a href="#" class="write">글쓰기</a>
+      <a href="{% url 'post_new' %}" class="write-btn">글쓰기</a>
     </div>
     <div class="intro-box">
       청년들이 함께 모여 삶과 고민을 나누는 공간,<br />
       청설모 커뮤니티에 오신 것을 환영합니다!
     </div>
-    <div class="search-container">
-      <input type="text" placeholder="궁금한 내용을 검색해보세요...">
-      <button>검색</button>
-    </div>
+<div class="search-bar">
+  <input type="text" placeholder="검색창" />
+  <button type="submit"></button>
+</div>
     <div class="main-container">
       <div class="left-content">
         <div class="post-banner">
