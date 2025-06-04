@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="box"
+       style="max-width:480px; margin:48px auto; padding:2.2rem 2rem; border-radius:14px; background:rgba(255,255,255,0.97); box-shadow:0 4px 16px rgba(0,0,0,0.10);">
+    <h2 style="margin-bottom:1.3rem; font-size:1.5rem; color:#222; text-align:center; font-family:'MyCustomFont',sans-serif;">댓글 수정</h2>
+    <form method="post">
+      {% csrf_token %}
+      <div style="margin-bottom:1.2rem;">
+        {{ form.content }}
+      </div>
+      <div style="display:flex; justify-content:center; gap:12px;">
+        <button type="submit" class="write-btn" style="min-width:120px; font-size:1.1rem;">수정 완료</button>
+        <a href="javascript:history.back()" class="menu-box" style="padding:7px 20px;">취소</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

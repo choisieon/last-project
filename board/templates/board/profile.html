@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>{{ profile.nickname|default:profile_user.username }}</h2>
+  {% if profile.image %}
+    <img src="{{ profile.image.url }}" width="80">
+  {% endif %}
+  <p>{{ profile.bio }}</p>
+  <p>팔로워: {{ followers }} | 팔로잉: {{ following }}</p>
+  {% if request.user != profile_user %}
+    <form method="post" action="{% url 'follow_toggle' profile_user.username %}">
+      {% csrf_token %}
+      <button type="submit">
+        {% if is_following %}언팔로우{% else %}팔로우{% endif %}
+      </button>
+    </form>
+  {% endif %}
+{% endblock %}
