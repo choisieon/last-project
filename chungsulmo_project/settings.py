@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'accounts',
     'mentor',
     'board',
+    'youth_policy',
 
     'django.contrib.sites',  # 필수
     'allauth',
