@@ -29,6 +29,7 @@ urlpatterns = [
     path('auth/', include('accounts.urls')),
     path('board/', include('board.urls')),
     path('mentor/', include('mentor.urls')),  # 멘토멘티 연결 추가
+    path('policy/', include('youth_policy.urls')) # youth_policy 앱으로 연결
 ]
 
 if settings.DEBUG:

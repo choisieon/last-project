@@ -18,7 +18,9 @@ class Command(BaseCommand):
                 description=row['정책설명'],
                 age_range=row['대상연령'],
                 keyword=row.get('정책키워드', ''),
-                region=row.get('시행지역', '')
+                region=row.get('시행지역', ''),
+                period=row.get('신청기간', ''),
+                URL_ADD=row.get('신청URL', ''),
             )
 
         self.stdout.write(self.style.SUCCESS("✅ 청년정책 데이터 저장 완료"))
