@@ -1,4 +1,6 @@
-소셜 로그인 사용 위한 단계별 설정
+# 소셜 로그인 사용 위한 단계별 설정
+
+## 카카오톡
 1. 프로젝트 clone 및 마이그레이션
 
 2. requirements 파일 다운로드(+ pip install pillow)
