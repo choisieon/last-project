@@ -33,10 +33,13 @@
       {{ post.content|linebreaksbr }}
     </div>
     <div class="post-actions">
-      <a href="{% url 'post_list' %}">목록으로</a>
+      <a href="{% url 'board:post_list' %}{% if request.GET.category or request.GET.sort or request.GET.keyword %}?{% endif %}
+{% if request.GET.category %}category={{ request.GET.category }}{% endif %}
+{% if request.GET.sort %}{% if request.GET.category %}&{% endif %}sort={{ request.GET.sort }}{% endif %}
+{% if request.GET.keyword %}{% if request.GET.category or request.GET.sort %}&{% endif %}keyword={{ request.GET.keyword }}{% endif %}">목록으로</a>
       {% if request.user == post.author %}
-        <a href="{% url 'post_edit' post.pk %}" style="margin-left:10px; color:#007aff; border-color:#007aff;">수정</a>
-        <form action="{% url 'post_delete' post.pk %}" method="post" style="display:inline; margin-left:10px;">
+        <a href="{% url 'board:post_edit' post.pk %}" style="margin-left:10px; color:#007aff; border-color:#007aff;">수정</a>
+        <form action="{% url 'board:post_delete' post.pk %}" method="post" style="display:inline; margin-left:10px;">
           {% csrf_token %}
           <button type="submit"
                   onclick="return confirm('정말 삭제하시겠습니까?');"

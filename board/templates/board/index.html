@@ -1,0 +1,326 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>청설모 콘텐츠</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    @font-face {
+  font-family: 'MyCustomFont';
+  src: url("{% static 'fonts/픽셀.woff2' %}") format('woff2');
+  font-weight: 400;       /* normal 또는 400 */
+  font-style: bold; 
+}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+
+    body {
+  font-family: 'MyCustomFont', sans-serif;
+  background-color: #f9f9f9;
+  overflow-x: hidden;
+}
+    /* {
+      font-family: 'Apple SD Gothic Neo', sans-serif;
+      background-color: #f9f9f9;
+      overflow-x: hidden;
+    } */
+
+    .background-wrapper {
+      width: 100%;
+      background: url('{% static "images/Frame 13.png" %}') no-repeat top center;
+      background-size: 105% auto;
+      background-repeat: no-repeat;
+      background-color: #cde4c7;
+      min-height: 1000px;
+      position: relative;
+      padding-top: 680px;
+    }
+
+    .top-left {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+    }
+
+    .identity-box {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .nav-menu {
+      margin-top: 10px;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 6px 10px;
+      border-radius: 10px;
+      font-size: 14px;
+      display: flex;
+      gap: 12px;
+    }
+
+    .nav-menu a {
+      text-decoration: none;
+      color: #333;
+    }
+
+    .top-right {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      gap: 10px;
+      background: rgba(255,255,255,0.95);
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-size: 14px;
+    }
+
+    .top-right a {
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+    }
+
+    .top-right a.write {
+      font-weight: bold;
+      color: white;
+      background: #007aff;
+      padding: 2px 8px;
+      border-radius: 8px;
+    }
+
+    .intro-box {
+      position: absolute;
+      top: 450px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.95);
+      padding: 18px 24px;
+      border-radius: 12px;
+      max-width: 600px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: 500;
+      line-height: 1.5;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+      z-index: 10;
+    }
+
+  .search-bar {
+  display: flex;
+  width: 600px;
+  height: 40px;
+  background-color: #f0e6cb;
+  border: 3px solid #333;
+  background-image: url("{% static 'images/pixel-paper.png' %}");
+  background-size: 4px 4px;
+  box-shadow: 4px 4px 0 #888;
+  border-radius: 0;
+  overflow: hidden;
+  margin: -120px auto;
+}
+
+.search-bar input {
+  flex: 1;
+  padding: 0 10px;
+  border: none;
+  font-family: 'MyCustomFont', sans-serif;
+  font-size: 14px;
+  background: transparent;
+  color: #000;
+}
+
+.search-bar input::placeholder {
+  color: #000;
+  font-weight: bold;
+}
+
+.search-bar button {
+  width: 45px;
+  background: #444 url("{% static 'images/돋보기.png' %}") no-repeat center center;
+  background-size: 41px 45px;
+  border: none;
+  cursor: pointer;
+}
+
+
+    .main-container {
+      display: flex;
+      gap: 2rem;
+      justify-content: space-between;
+      padding: 2rem;
+      margin-top: 110px;
+    }
+
+    .left-content {
+      flex: 2.5;
+    }
+
+    .right-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+    .box, .post-banner, .search-container, .intro-box, .identity-box, .nav-menu {
+  background-color: rgba(250, 235, 180, 0.9); /* 밝은 크림톤 + 투명도 */
+  background-image: url("{% static 'images/pixel-paper.png' %}"); /* 도트 텍스처 */
+  background-size: 4px 4px;
+  background-repeat: repeat;
+  border: 2.5px solid #5a4a2f; /* 조금 더 연한 픽셀 테두리 */
+  box-shadow: 3px 3px 0 #b9a782; /* 연한 픽셀 그림자 */
+  border-radius: 0;
+  font-size: 14px;
+  color: #4a3b28; /* 너무 어둡지 않은 갈색 폰트 */
+  font-weight: bold;
+}
+
+    /* .box, .post-banner, .search-container, .intro-box, .identity-box, .nav-menu  {
+  background: #fff8dc;
+  border: 3px solid #333;
+  box-shadow: 4px 4px 0 #666; /* 픽셀그림자 느낌 */
+  /* border-radius: 10; /* 둥근 테두리 제거해서 네모네모하게 */
+  /* font-size: 14px;
+} */ */ */
+
+    /* .box {
+      background: white;
+      padding: 1.2rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    } */
+
+    .box h3 {
+      margin-bottom: 0.5rem;
+      font-size: 16px;
+    }
+
+    .box ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+
+    .box li {
+      margin: 4px 0;
+      color: #007aff;
+      font-size: 14px;
+    }
+
+    /* .post-banner {
+      background: white;
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      margin-bottom: 1.5rem;
+    } */
+
+    .post-banner img {
+      width: 100%;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+    }
+
+    .post-item {
+      margin-bottom: 1rem;
+      border-top: 1px solid #eee;
+      padding-top: 1rem;
+    }
+
+    .post-item h4 {
+      margin-bottom: 0.5rem;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .post-item p {
+      font-size: 14px;
+      color: #555;
+    }
+
+    @media screen and (max-width: 768px) {
+      .main-container {
+        flex-direction: column;
+        padding: 2rem 1rem;
+      }
+      .search-container {
+        top: 720px;
+      }
+      .intro-box {
+        top: 500px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="background-wrapper">
+    <div class="top-left">
+      <div class="identity-box">청년들의 인생설계 모임, <strong>청설모</strong></div>
+      <div class="nav-menu">
+       <a href="{% url 'post_list' %}" class="menu-box {% block nav_community_active %}{% endblock %}">커뮤니티</a>
+        <a href="{% url 'mentor_home' %}">멘토멘티</a> 
+        <a href="#">마이페이지</a>
+        <a href="#">청년정책</a>
+      </div>
+    </div>
+    <div class="top-right">
+      <a href="{% url 'accounts:login' %}">로그인</a>
+      <a href="{% url 'accounts:signup' %}">회원가입</a>
+      <a href="#">문의</a>
+      <a href="{% url 'post_new' %}" class="write-btn">글쓰기</a>
+    </div>
+    <div class="intro-box">
+      청년들이 함께 모여 삶과 고민을 나누는 공간,<br />
+      청설모 커뮤니티에 오신 것을 환영합니다!
+    </div>
+<div class="search-bar">
+  <input type="text" placeholder="검색창" />
+  <button type="submit"></button>
+</div>
+    <div class="main-container">
+      <div class="left-content">
+        <div class="post-banner">
+          <img src="{% static 'images/2d8e5db9-325b-4843-8616-fb995ad921a9.png' %}" alt="인기 게시글 배너">
+          <div class="post-item">
+            <h4>찢어진 벽지 보수 팁 있나요ㅠ</h4>
+            <p>포스터나 도배작업 외에 가성비 방법 있을까요?</p>
+          </div>
+          <div class="post-item">
+            <h4>자취생 침대 추천해주세요!</h4>
+            <p>허리 안 아프고 관리 쉬운 매트리스 찾습니다. 애기랑 같이 쓸 거라 고민돼요.</p>
+          </div>
+          <div class="post-item">
+            <h4>가구 배치가 너무 어려워요</h4>
+            <p>책상이랑 침대 위치를 어떻게 잡아야 할지 모르겠어요. 조언 부탁드려요!</p>
+          </div>
+        </div>
+      </div>
+      <div class="right-content">
+        <div class="box">
+          <h3>🔥 인기 검색어</h3>
+          <ul>
+            <li>#청년지원금</li>
+            <li>#청년정책</li>
+            <li>#취업지원제도</li>
+            <li>#연애</li>
+            <li>#대외활동 추천</li>
+          </ul>
+        </div>
+        <div class="box">
+          <h3>🧭 청년 정책</h3>
+          <p>💡 서울시 청년월세 지원 신청 중!</p>
+          <p>📅 내일청년통장 신청 마감: 6/10</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

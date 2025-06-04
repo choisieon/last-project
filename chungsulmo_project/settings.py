@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -42,7 +43,7 @@ INSTALLED_APPS = [
     'community',
     'accounts',
     'mentor',
-    'board',
+    'board.apps.BoardConfig',   # 사용자 프로필/팔로우
 
     'django.contrib.sites',  # 필수
     'allauth',
@@ -137,7 +138,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 STATIC_URL = '/static/'
 
 # 개발 시 static 파일 경로
-STATICFILES_DIRS = []
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 
 AUTH_USER_MODEL = 'accounts.User'
 
@@ -152,3 +155,7 @@ AUTHENTICATION_BACKENDS = (
 
 LOGIN_REDIRECT_URL = '/'   # 로그인 성공 시 이동 경로
 LOGOUT_REDIRECT_URL = '/'  # 로그아웃 시 이동 경로
+
+# TinyMCE self-hosted 설정
+TINYMCE_JS_URL = '/static/tinymce/tinymce.min.js'
+TINYMCE_COMPRESSOR = False
