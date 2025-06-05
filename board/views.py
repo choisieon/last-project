@@ -1,3 +1,4 @@
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.http import JsonResponse
@@ -217,3 +218,4 @@ def upload_image(request):
         url = default_storage.url(file_name)
         return JsonResponse({'location': url})
     return JsonResponse({'error': 'Invalid request'}, status=400)
+

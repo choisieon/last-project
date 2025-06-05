@@ -148,12 +148,18 @@
 
     <div class="sns-label">SNS로 로그인</div>
 
-    <a href="/social/login/">
+    <a href="{% provider_login_url 'kakao' %}">
       <button class="sns-button kakao">KAKAO 로그인</button>
     </a>
 
-    <button class="sns-button naver">NAVER 로그인</button>
-    <button class="sns-button google">GOOGLE 로그인</button>
+
+    <a href="{% provider_login_url 'naver' %}">
+      <button class="sns-button naver">NAVER 로그인</button>
+    </a>
+
+    <a href="{% provider_login_url 'google' %}">
+      <button class="sns-button google">Google 로그인</button>
+    </a>
 
     <div class="signup-link">
       <a href="{% url 'accounts:signup' %}">회원가입</a>

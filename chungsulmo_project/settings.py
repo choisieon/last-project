@@ -1,3 +1,4 @@
+
 """
 Django settings for chungsulmo_project project.
 
@@ -167,4 +168,5 @@ TINYMCE_DEFAULT_CONFIG = {
     'plugins': 'image,link,code',
     'toolbar': 'undo redo | image link | code',
     'images_upload_url': '/upload-image/',  # 이미지 업로드 URL
+
 }
