@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ policy.name }} - 청년정책 상세</title>
+  <style>
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background-color: #f5f5f5;
+      padding: 2rem;
+    }
+
+    .policy-detail {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .section {
+      margin-bottom: 1.5rem;
+    }
+
+    .label {
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .empty {
+      color: #999;
+    }
+
+    textarea {
+      width: 100%;
+      resize: vertical;
+      min-height: 60px;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-top: 0.5rem;
+    }
+
+    button {
+      margin-top: 0.5rem;
+      padding: 0.5rem 1rem;
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #1e40af;
+    }
+
+    .comment {
+      margin-bottom: 1rem;
+      padding: 0.75rem;
+      background-color: #f0f4ff;
+      border-radius: 4px;
+    }
+
+    .reply {
+      margin-left: 1.5rem;
+      background-color: #eef2ff;
+    }
+
+    .comment-tools {
+      margin-top: 0.3rem;
+      font-size: 0.9rem;
+    }
+
+    .comment-tools a {
+      color: #888;
+      margin-right: 0.75rem;
+    }
+
+    a {
+      color: #2563eb;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="policy-detail">
+    <h1>{{ policy.name }}</h1>
+
+    <div class="section">
+      <span class="label">정책 설명</span>
+      <div>{{ policy.description|linebreaksbr }}</div>
+    </div>
+
+    <div class="section">
+      <span class="label">대상 연령</span>
+      <div>{{ policy.age_range|default:"없음" }}</div>
+    </div>
+
+    <div class="section">
+      <span class="label">키워드</span>
+      <div>{{ policy.keyword|default:"없음" }}</div>
+    </div>
+
+    <div class="section">
+      <span class="label">신청 기간</span>
+      <div>{{ policy.period|default:"없음" }}</div>
+    </div>
+
+    <div class="section">
+      <span class="label">신청 URL</span>
+      {% if policy.URL_ADD and policy.URL_ADD != "nan" %}
+        <a href="{{ policy.URL_ADD }}" target="_blank">{{ policy.URL_ADD }}</a>
+      {% else %}
+        <div class="empty">없음</div>
+      {% endif %}
+    </div>
+
+    <!-- 🔽 댓글 목록 -->
+    <div class="section">
+      <span class="label">댓글</span>
+      {% if comments %}
+        {% for comment in comments %}
+          <div class="comment">
+            <strong>{{ comment.author.username }}</strong>: {{ comment.content }}
+
+            {% if user == comment.author %}
+              <div class="comment-tools">
+                <a href="{% url 'youth_policy:edit_policy_comment' comment.id %}">✏️ 수정</a>
+                <a href="{% url 'youth_policy:delete_policy_comment' comment.id %}" onclick="return confirm('정말 삭제하시겠습니까?');">🗑 삭제</a>
+              </div>
+            {% endif %}
+
+            {% for reply in comment.replies.all %}
+              <div class="comment reply">
+                <strong>{{ reply.author.username }}</strong>: {{ reply.content }}
+                {% if user == reply.author %}
+                  <div class="comment-tools">
+                    <a href="{% url 'youth_policy:edit_policy_comment' reply.id %}">✏️ 수정</a>
+                    <a href="{% url 'youth_policy:delete_policy_comment' reply.id %}" onclick="return confirm('정말 삭제하시겠습니까?');">🗑 삭제</a>
+                  </div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty">댓글이 없습니다.</div>
+      {% endif %}
+    </div>
+
+    <!-- 🔽 댓글 작성 -->
+    <div class="section">
+      <span class="label">댓글 작성</span>
+      <form method="POST" action="{% url 'youth_policy:add_policy_comment' policy.id %}">
+        {% csrf_token %}
+        <textarea name="content" placeholder="댓글을 입력하세요" required></textarea>
+        {% if user.is_authenticated %}
+          <button type="submit">댓글 등록</button>
+        {% else %}
+          <button type="button" onclick="window.location.href='{% url 'accounts:login' %}?next={{ request.path }}'">댓글 등록</button>
+        {% endif %}
+      </form>
+    </div>
+
+    <div style="margin-top: 2rem;">
+      <a href="{% url 'youth_policy:basic_page' %}">← 목록으로 돌아가기</a>
+    </div>
+  </div>
+</body>
+</html>
