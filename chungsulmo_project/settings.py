@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'accounts',
     'mentor',
     'board.apps.BoardConfig',   # 사용자 프로필/팔로우
+    'tinymce',
 
     'django.contrib.sites',  # 필수
     'allauth',
@@ -139,7 +140,7 @@ STATIC_URL = '/static/'
 
 # 개발 시 static 파일 경로
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
+    os.path.join(BASE_DIR / "static"),
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
@@ -157,5 +158,13 @@ LOGIN_REDIRECT_URL = '/'   # 로그인 성공 시 이동 경로
 LOGOUT_REDIRECT_URL = '/'  # 로그아웃 시 이동 경로
 
 # TinyMCE self-hosted 설정
-TINYMCE_JS_URL = '/static/tinymce/tinymce.min.js'
+TINYMCE_JS_URL = '/static/tinymce/js/tinymce/tinymce.min.js'
 TINYMCE_COMPRESSOR = False
+
+
+TINYMCE_DEFAULT_CONFIG = {
+    'height': 400,
+    'plugins': 'image,link,code',
+    'toolbar': 'undo redo | image link | code',
+    'images_upload_url': '/upload-image/',  # 이미지 업로드 URL
+}

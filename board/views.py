@@ -6,8 +6,10 @@ from django.db.models import Q, Count
 from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator
 from django.contrib.auth.models import User
-from .models import Post, Comment, Profile, Follow
+from .models import Post, Comment, Profile, Follow, PostImage
 from .forms import PostForm, CommentForm
+from django.views.decorators.csrf import csrf_exempt   # CSRF 검증 우회
+from django.core.files.storage import default_storage   # 파일 저장을 위해 필요
 
 # 게시글 목록 + 검색 + 정렬 + 페이지네이션
 def post_list(request):
@@ -54,10 +56,15 @@ def post_new(request):
     category = request.GET.get('category') or request.POST.get('category')
     if request.method == "POST":
         form = PostForm(request.POST, request.FILES)
+        files = request.FILES.getlist('images')
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
+            post.category = category  # 필요시
             post.save()
+            # 여러 장 이미지 저장
+            for f in request.FILES.getlist('images'):  # ✅ getlist('images')
+                PostImage.objects.create(post=post, image=f)
             return redirect('board:post_list')
     else:
         form = PostForm(initial={'category': category})
@@ -199,3 +206,14 @@ def follow_toggle(request, username):
 def index(request):
     posts = Post.objects.order_by('-created_at')   # 최신순 정렬
     return render(request, 'board/index.html', {'posts': posts})
+
+@csrf_exempt
+def upload_image(request):
+    if request.method == 'POST' and request.FILES.get('file'):
+        file = request.FILES['file']
+        # 파일 저장 (예: media/uploads/ 경로에 저장)
+        file_name = default_storage.save(f'uploads/{file.name}', file)
+        # 저장된 파일의 URL 생성 (예: /media/uploads/파일명.jpg)
+        url = default_storage.url(file_name)
+        return JsonResponse({'location': url})
+    return JsonResponse({'error': 'Invalid request'}, status=400)

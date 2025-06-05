@@ -207,6 +207,46 @@
       margin-bottom: 7px;
       text-shadow: 1px 1px 3px #fff, 0 0 2px #0008;
     }
+    .post-images img {
+      max-width: 350px;
+      max-height: 350px;
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      display: block;
+    }
+    .post-preview img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      display: block;
+      border-radius: 8px;
+      background: none;
+    }
+    .post-item-text {
+      flex: 1;
+    }
+    .post-item-row {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+    .post-preview {
+      width: 110px;
+      min-width: 80px;
+      max-width: 140px;
+      height: 110px;
+      overflow: hidden;
+      background: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 16px;   /* 왼쪽 여백 (오른쪽에 붙이니까) */
+      border: none;
+      box-shadow: none;
+      padding: 0;
+    }
 
     </style>
     {% block extra_style %}{% endblock %}

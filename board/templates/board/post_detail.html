@@ -24,13 +24,15 @@
         </a>
       </span>
     </div>
-    {% if post.image %}
-      <div style="margin-bottom:1rem;">
-        <img src="{{ post.image.url }}" alt="첨부 이미지" style="max-width:100%; border-radius:8px;">
+    {% if post.images.all %}
+      <div class="post-images" style="margin-bottom:1rem;">
+        {% for image in post.images.all %}
+          <img src="{{ image.image.url }}" alt="첨부 이미지" style="max-width:350px; max-height:350px; width:100%; height:auto; border-radius:8px; margin-bottom:8px; display:block;">
+        {% endfor %}
       </div>
     {% endif %}
     <div class="post-content">
-      {{ post.content|linebreaksbr }}
+      {{ post.content|safe }}
     </div>
     <div class="post-actions">
       <a href="{% url 'board:post_list' %}{% if request.GET.category or request.GET.sort or request.GET.keyword %}?{% endif %}

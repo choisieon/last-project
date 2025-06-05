@@ -44,21 +44,27 @@
     {% if posts %}
       {% for post in posts %}
         <div class="post-item post-item-row">
+          <!-- 왼쪽: 본문/정보 -->
           <div class="post-item-text">
             <h4>
               <a href="{% url 'board:post_detail' post.pk %}?category={{ category }}{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}">{{ post.title }}</a>
             </h4>
-            <p>{{ post.content|truncatechars:50 }}</p>
-            <span>작성자: {{ post.author }} | {{ post.created_at|date:"Y-m-d H:i" }}</span>
-            <span> | 조회수: {{ post.views }}</span>
-            <span> | 🤍 {{ post.likes.count }}</span>
-            <span> | 댓글: {{ post.comments.count }}</span>
-          </div>
-          {% if post.image %}
-            <div class="post-item-image">
-              <img src="{{ post.image.url }}" alt="첨부 이미지">
+            <div class="post-meta">
+              <span>작성자: {{ post.author }} | {{ post.created_at|date:"Y-m-d H:i" }}</span>
+              <span> | 조회수: {{ post.views }}</span>
+              <span> | 🤍 {{ post.likes.count }}</span>
+              <span> | 댓글: {{ post.comments.count }}</span>
             </div>
-          {% endif %}
+            <div class="post-snippet">
+              {{ post.content|truncatechars_html:10|safe }}
+            </div>
+          </div>
+          <!-- 오른쪽: 이미지만! -->
+          <div class="post-preview">
+            {% if post.images.first %}
+              <img src="{{ post.images.first.image.url }}" alt="미리보기 이미지">
+            {% endif %}
+          </div>
         </div>
       {% endfor %}
     {% else %}
@@ -190,6 +196,8 @@
   color: #fff;
   font-weight: bold;
 }
+
+
 
 @media (max-width: 600px) {
   .post-item-row {

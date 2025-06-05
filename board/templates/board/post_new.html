@@ -23,35 +23,63 @@
       </div>
       <div class="form-group">
         {{ form.content.label_tag }}
-        {{ form.content }}
-        {% for error in form.content.errors %}
-          <div class="error">{{ error }}</div>
-        {% endfor %}
+        <div id="content_field">
+          {{ form.content }}
+        </div>
       </div>
-      <div class="form-group">
-        {{ form.image.label_tag }}
-        {{ form.image }}
-        {% for error in form.image.errors %}
-          <div class="error">{{ error }}</div>
-        {% endfor %}
+      <div class="form-group" id="image_field">
+        {{ form.images.label_tag }}
+        {{ form.images }}
       </div>
       <button type="submit" class="write-btn">등록</button>
     </form>
   </div>
 </div>
 
-{% if category == 'review' or form.category.value == 'review' %}
-  <script src="{% static 'tinymce/tinymce.min.js' %}"></script>
-  <script>
+<!-- Self-hosted TinyMCE 스크립트 -->
+<script src="{% static 'tinymce/js/tinymce/tinymce.min.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const categorySelect = document.getElementById('id_category');
+  let tinymceLoaded = false;
+
+  function enableTinyMCE() {
+    if (tinymceLoaded) return;
     tinymce.init({
-      selector: 'textarea[name="content"]',
+      selector: '#id_content',
+      plugins: 'image',
+      toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright | image link',
       menubar: false,
-      toolbar: 'formatselect | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image',
-      plugins: 'lists link image',
-      language: 'ko_KR'
+      language: 'ko_KR',
+      images_upload_url: '/board/upload-image/', // 이미지 업로드 구현 필요
+      automatic_uploads: true,
     });
-  </script>
-{% endif %}
+    tinymceLoaded = true;
+  }
+
+  function disableTinyMCE() {
+    if (!tinymceLoaded) return;
+    tinymce.remove('#id_content');
+    tinymceLoaded = false;
+  }
+
+  categorySelect.addEventListener('change', function() {
+    if (this.value === 'review') {
+      enableTinyMCE();
+      document.getElementById('image_field').style.display = 'none';
+    } else {
+      disableTinyMCE();
+      document.getElementById('image_field').style.display = 'block';
+    }
+  });
+
+  // 페이지 로드 시 초기 상태 반영
+  if (categorySelect.value === 'review') {
+    enableTinyMCE();
+    document.getElementById('image_field').style.display = 'none';
+  }
+});
+</script>
 {% endblock %}
 
 {% block extra_style %}
@@ -106,20 +134,15 @@
 }
 
 .write-btn {
-  width: 130px;
-  font-size: 1.17rem;
-  font-weight: bold;
-  background: #007aff;
-  color: #fff;
-  border: 2px solid #5a4a2f;
-  border-radius: 7px;
-  box-shadow: 2px 2px 0 #b9a782;
-  padding: 13px 0;
-  cursor: pointer;
-  letter-spacing: 1px;
-  margin-top: 18px;
-  margin-bottom: 8px;
-  transition: background 0.2s, color 0.2s;
+  background-color: #007aff;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    border: 2px solid #5a4a2f;
+    box-shadow: 3px 3px 0 #b9a782;
 }
 
 .write-btn:hover {

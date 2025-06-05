@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 # from django.contrib.auth.models import User
 from django.conf import settings
+from tinymce.models import HTMLField  # ✅ TinyMCE용 필드 import
 
 
 # Create your models here.
@@ -18,7 +19,6 @@ class Post(models.Model):
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     views = models.PositiveIntegerField(default=0)
-    image = models.ImageField(upload_to='post_images/', blank=True, null=True)
     likes = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='liked_posts', blank=True)
 
     def __str__(self):
@@ -50,3 +50,7 @@ class Follow(models.Model):
 
     class Meta:
         unique_together = ('follower', 'following')
+
+class PostImage(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='post_images/')
