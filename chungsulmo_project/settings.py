@@ -38,7 +38,20 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'community',
+<<<<<<< Updated upstream
     'mentor',
+=======
+    'board',
+    'accounts',
+    'django.contrib.sites',  # 필수
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.kakao',  # 카카오 로그인
+    'allauth.socialaccount.providers.naver',  # 네이버 로그인
+    'allauth.socialaccount.providers.google', # 구글 로그인
+    'mentor.apps.MentorConfig',
+>>>>>>> Stashed changes
 ]
 
 MIDDLEWARE = [
