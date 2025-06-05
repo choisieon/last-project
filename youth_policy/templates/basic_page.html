@@ -14,7 +14,7 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 1.5rem;
-      grid-auto-rows: 1fr; /* 🔹 행마다 동일한 높이 */
+      grid-auto-rows: 1fr;
     }
 
     .policy-card {
@@ -27,7 +27,7 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      height: 100%; /* 🔹 셀 높이에 맞춤 */
+      height: 100%;
     }
 
     .policy-card:hover {
@@ -52,6 +52,30 @@
 
     .empty {
       color: #999;
+    }
+
+    textarea {
+      width: 100%;
+      resize: vertical;
+      min-height: 50px;
+      padding: 0.5rem;
+      margin-top: 0.25rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      margin-top: 0.5rem;
+      padding: 0.5rem 1rem;
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #1e40af;
     }
 
     a {
@@ -79,31 +103,26 @@
 <body>
   <h1>주목~~ 청년정책 들어간다!!</h1>
 
-  <div class="card-grid">
-    {% for policy in policies %}
-    <div class="policy-card">
-      <div>
-        <div class="policy-title">{{ policy.name }}</div>
+<!-- 청년정책 목록 페이지: 댓글 없이 카드만 -->
+<div class="card-grid">
+  {% for policy in policies %}
+  <div class="policy-card">
+    <a href="{% url 'youth_policy:policy_detail' policy.id %}" style="text-decoration: none; color: inherit;">
+      <div class="policy-title">{{ policy.name }}</div>
 
-        <div class="policy-section">
-          <span class="policy-label">정책 설명</span>
-          <div>{{ policy.description|linebreaksbr }}</div>
-        </div>
+      <div class="policy-section">
+        <span class="policy-label">정책 설명</span>
+        <div>{{ policy.description|linebreaksbr }}</div>
+      </div>
 
-        <div class="policy-section">
-          <span class="policy-label">대상 연령</span>
-          <div>{% if policy.age_range %}{{ policy.age_range }}{% else %}<span class="empty">없음</span>{% endif %}</div>
-        </div>
+      <div class="policy-section">
+        <span class="policy-label">대상 연령</span>
+        <div>{{ policy.age_range|default:"없음" }}</div>
+      </div>
 
-        <div class="policy-section">
-          <span class="policy-label">키워드</span>
-          <div>{% if policy.keyword %}{{ policy.keyword }}{% else %}<span class="empty">없음</span>{% endif %}</div>
-        </div>
-
-        <div class="policy-section">
-          <span class="policy-label">신청 기간</span>
-          <div>{% if policy.period %}{{ policy.period }}{% else %}<span class="empty">없음</span>{% endif %}</div>
-        </div>
+      <div class="policy-section">
+        <span class="policy-label">키워드</span>
+        <div>{{ policy.keyword|default:"없음" }}</div>
       </div>
 
       <div class="policy-section">
@@ -116,8 +135,9 @@
           {% endif %}
         </div>
       </div>
-    </div>
-    {% endfor %}
+    </a>
   </div>
+  {% endfor %}
+</div>
 </body>
 </html>

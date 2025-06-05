@@ -3,7 +3,6 @@ from django.utils import timezone
 # from django.contrib.auth.models import User
 from django.conf import settings
 
-
 # Create your models here.
 class Post(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
