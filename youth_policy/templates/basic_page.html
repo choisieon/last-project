@@ -111,14 +111,17 @@
       <div class="policy-title">{{ policy.name }}</div>
 
       <div class="policy-section">
-        <span class="policy-label">정책 설명</span>
-        <div>{{ policy.description|linebreaksbr }}</div>
+        <span class="policy-label">대상 연령</span>
+        <div>
+          {{ policy.minage|default:"없음" }} ~ {{ policy.maxage|default:"없음" }}세
+        </div>
       </div>
 
       <div class="policy-section">
-        <span class="policy-label">대상 연령</span>
-        <div>{{ policy.age_range|default:"없음" }}</div>
+        <span class="policy-label">신청 기간</span>
+        <div>{{ policy.period|default:"없음" }}</div>
       </div>
+
 
       <div class="policy-section">
         <span class="policy-label">키워드</span>
@@ -126,14 +129,8 @@
       </div>
 
       <div class="policy-section">
-        <span class="policy-label">신청 URL</span>
-        <div>
-          {% if policy.URL_ADD and policy.URL_ADD != "nan" %}
-            <a href="{{ policy.URL_ADD }}" target="_blank">{{ policy.URL_ADD }}</a>
-          {% else %}
-            <span class="empty">없음</span>
-          {% endif %}
-        </div>
+        <span class="policy-label">범주(대분류/중분류)</span>
+        <div>{{ policy.major|default:"없음" }}/{{ policy.medium|default:"없음" }}</div>
       </div>
     </a>
   </div>
