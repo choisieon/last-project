@@ -1,0 +1,169 @@
+{% load socialaccount %}
+{% load allauth %}
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>로그인</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    @font-face {
+      font-family: 'MyCustomFont';
+      src: url("{% static 'fonts/픽셀.woff2' %}") format('woff2');
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'MyCustomFont', sans-serif;
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .login-container {
+      background-color: rgba(250, 235, 180, 0.9);
+      padding: 40px;
+      border: 2px solid #5a4a2f;
+      width: 360px;
+      box-shadow: 3px 3px 0 #b9a782;
+      text-align: center;
+      background-image: url("{% static 'images/pixel-paper.png' %}");
+      background-size: 4px 4px;
+      background-repeat: repeat;
+    }
+
+    .title-box {
+      background-color: #f2a65a;
+      padding: 12px;
+      font-size: 20px;
+      font-weight: bold;
+      border: 2px solid #5a4a2f;
+      margin-bottom: 30px;
+      color: #1c1c1c;
+    }
+
+    .form-group {
+      text-align: left;
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      font-size: 14px;
+      color: #4a3b28;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 0;
+      border: 2px solid #5a4a2f;
+      font-size: 14px;
+      background-color: white;
+    }
+
+    .form-button {
+      width: 100%;
+      padding: 12px;
+      margin: 20px 0 10px;
+      border: 2px solid #5a4a2f;
+      font-weight: bold;
+      background-color: #ff914d;
+      color: #000;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .form-button:hover {
+      background-color: #ffb36a;
+    }
+
+    .sns-label {
+      font-size: 13px;
+      color: #333;
+      margin: 30px 0 10px;
+    }
+
+    .sns-button {
+      width: 100%;
+      padding: 10px;
+      margin: 6px 0;
+      border: 2px solid #5a4a2f;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 0;
+      font-size: 14px;
+    }
+
+    .kakao { background-color: #FEE500; }
+    .naver { background-color: #03C75A; color: white; }
+    .google { background-color: white; }
+
+    .signup-link {
+      text-align: right;
+      margin-top: 20px;
+    }
+
+    .signup-link a {
+      font-size: 13px;
+      color: #007aff;
+      text-decoration: none;
+      padding: 4px 8px;
+      background-color: #eaf4ff;
+      border: 2px solid #5a4a2f;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="title-box">로그인</div>
+
+    <form action="" method="POST">
+      {% csrf_token %}
+      <div class="form-group">
+        {{ form.username.label_tag }}
+        {{ form.username }}
+      </div>
+
+      <div class="form-group">
+        {{ form.password.label_tag }}
+        {{ form.password }}
+      </div>
+
+      <input type="submit" class="form-button" value="로그인">
+    </form>
+
+    <div class="sns-label">SNS로 로그인</div>
+
+    <a href="{% provider_login_url 'kakao' %}">
+      <button class="sns-button kakao">KAKAO 로그인</button>
+    </a>
+
+
+    <a href="{% provider_login_url 'naver' %}">
+      <button class="sns-button naver">NAVER 로그인</button>
+    </a>
+
+    <a href="{% provider_login_url 'google' %}">
+      <button class="sns-button google">Google 로그인</button>
+    </a>
+
+    <div class="signup-link">
+      <a href="{% url 'accounts:signup' %}">회원가입</a>
+    </div>
+  </div>
+</body>
+</html>

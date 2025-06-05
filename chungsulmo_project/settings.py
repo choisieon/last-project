@@ -11,9 +11,12 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 # Quick-start development settings - unsuitable for production
@@ -38,11 +41,18 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'community',
+<<<<<<< HEAD
 <<<<<<< Updated upstream
     'mentor',
 =======
     'board',
     'accounts',
+=======
+    'accounts',
+    'mentor',
+    'board',
+
+>>>>>>> main
     'django.contrib.sites',  # 필수
     'allauth',
     'allauth.account',
@@ -50,8 +60,11 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.kakao',  # 카카오 로그인
     'allauth.socialaccount.providers.naver',  # 네이버 로그인
     'allauth.socialaccount.providers.google', # 구글 로그인
+<<<<<<< HEAD
     'mentor.apps.MentorConfig',
 >>>>>>> Stashed changes
+=======
+>>>>>>> main
 ]
 
 MIDDLEWARE = [
@@ -62,6 +75,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware'
 ]
 
 ROOT_URLCONF = 'chungsulmo_project.urls'
@@ -69,7 +83,7 @@ ROOT_URLCONF = 'chungsulmo_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -119,7 +133,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
 
@@ -139,7 +153,23 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 STATIC_URL = '/static/'
 
 # 개발 시 static 파일 경로
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
+STATICFILES_DIRS = []
 
+AUTH_USER_MODEL = 'accounts.User'
+
+
+
+SITE_ID = 2
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+
+LOGIN_REDIRECT_URL = '/'   # 로그인 성공 시 이동 경로
+LOGOUT_REDIRECT_URL = '/'  # 로그아웃 시 이동 경로
+
+
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_LOGIN_ON_GET = True
+ACCOUNT_ADAPTER = 'allauth.account.adapter.DefaultAccountAdapter'

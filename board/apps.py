@@ -1,9 +1,6 @@
 from django.apps import AppConfig
 
-<<<<<<< HEAD
-=======
 
->>>>>>> main
-class AccountsConfig(AppConfig):
+class BoardConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'accounts'
+    name = 'board'
