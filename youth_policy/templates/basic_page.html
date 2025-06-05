@@ -6,85 +6,76 @@
   <style>
     body {
       font-family: 'Noto Sans KR', sans-serif;
-      background-color: #f5f5f5;
+      background-color: #e0f2fe;
       padding: 2rem;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.8rem;
+      margin-bottom: 2rem;
+      color: #1f2937;
     }
 
     .card-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 1.5rem;
-      grid-auto-rows: 1fr;
     }
 
     .policy-card {
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      background-color: #ffffff;
+      border: 3px solid #60a5fa;
+      border-radius: 12px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
       padding: 1.5rem;
       box-sizing: border-box;
-      transition: transform 0.2s;
+      transition: transform 0.2s, box-shadow 0.2s;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      height: 100%;
     }
 
     .policy-card:hover {
       transform: translateY(-4px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
     }
 
     .policy-title {
       font-size: 1.2rem;
       font-weight: bold;
       margin-bottom: 1rem;
+      color: #1e3a8a;
     }
 
     .policy-section {
-      margin-bottom: 1rem;
+      margin-bottom: 0.9rem;
+      font-size: 0.95rem;
     }
 
     .policy-label {
       font-weight: bold;
-      display: block;
-      margin-bottom: 0.25rem;
+      display: inline-block;
+      margin-bottom: 0.2rem;
+      color: #0369a1;
+    }
+
+    .policy-content {
+      color: #374151;
+      padding-left: 0.25rem;
     }
 
     .empty {
-      color: #999;
-    }
-
-    textarea {
-      width: 100%;
-      resize: vertical;
-      min-height: 50px;
-      padding: 0.5rem;
-      margin-top: 0.25rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-
-    button {
-      margin-top: 0.5rem;
-      padding: 0.5rem 1rem;
-      background-color: #2563eb;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #1e40af;
+      color: #9ca3af;
     }
 
     a {
-      color: #2563eb;
       text-decoration: none;
+      color: inherit;
     }
 
-    a:hover {
-      text-decoration: underline;
+    a:hover .policy-card {
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
     }
 
     @media (max-width: 900px) {
@@ -101,40 +92,36 @@
   </style>
 </head>
 <body>
-  <h1>주목~~ 청년정책 들어간다!!</h1>
+  <h1>📢 주목! 청년정책 모음.zip</h1>
 
-<!-- 청년정책 목록 페이지: 댓글 없이 카드만 -->
-<div class="card-grid">
-  {% for policy in policies %}
-  <div class="policy-card">
-    <a href="{% url 'youth_policy:policy_detail' policy.id %}" style="text-decoration: none; color: inherit;">
-      <div class="policy-title">{{ policy.name }}</div>
+  <div class="card-grid">
+    {% for policy in policies %}
+    <a href="{% url 'youth_policy:policy_detail' policy.id %}">
+      <div class="policy-card">
+        <div class="policy-title">📌 {{ policy.name }}</div>
 
-      <div class="policy-section">
-        <span class="policy-label">대상 연령</span>
-        <div>
-          {{ policy.minage|default:"없음" }} ~ {{ policy.maxage|default:"없음" }}세
+        <div class="policy-section">
+          <span class="policy-label">📚 키워드</span>
+          <div class="policy-content">{{ policy.keyword|default:"없음" }}</div>
+        </div>
+
+        <div class="policy-section">
+          <span class="policy-label">🧭 범주</span>
+          <div class="policy-content">{{ policy.major|default:"없음" }} / {{ policy.medium|default:"없음" }}</div>
+        </div>
+
+        <div class="policy-section">
+          <span class="policy-label">🎯 대상 연령</span>
+          <div class="policy-content">{{ policy.minage|default:"없음" }} ~ {{ policy.maxage|default:"없음" }}세</div>
+        </div>
+
+        <div class="policy-section">
+          <span class="policy-label">⏰ 신청 기간</span>
+          <div class="policy-content">{{ policy.period|default:"없음" }}</div>
         </div>
       </div>
-
-      <div class="policy-section">
-        <span class="policy-label">신청 기간</span>
-        <div>{{ policy.period|default:"없음" }}</div>
-      </div>
-
-
-      <div class="policy-section">
-        <span class="policy-label">키워드</span>
-        <div>{{ policy.keyword|default:"없음" }}</div>
-      </div>
-
-      <div class="policy-section">
-        <span class="policy-label">범주(대분류/중분류)</span>
-        <div>{{ policy.major|default:"없음" }}/{{ policy.medium|default:"없음" }}</div>
-      </div>
     </a>
+    {% endfor %}
   </div>
-  {% endfor %}
-</div>
 </body>
 </html>
