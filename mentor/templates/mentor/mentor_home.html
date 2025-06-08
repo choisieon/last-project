@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 {% load static %}
 <!DOCTYPE html>
@@ -359,3 +360,331 @@
   </div> -->
 </body>
 </html>
+=======
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>멘토멘티 - 청설모</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    @font-face {
+      font-family: 'MyCustomFont';
+      src: url("{% static 'fonts/픽셀.woff2' %}") format('woff2');
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    body {
+      font-family: 'MyCustomFont', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: url("{% static 'images/Frame 13.png' %}") no-repeat center center fixed;
+      background-size: cover;
+      background-color: #cde4c7;
+    }
+
+    .wrapper {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 30px 20px;
+    }
+
+    /* .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(250, 235, 180, 0.9);
+      background-image: url("{% static 'images/pixel-paper.png' %}");
+      background-size: 4px 4px;
+      background-repeat: repeat;
+      border: 2.5px solid #5a4a2f;
+      box-shadow: 3px 3px 0 #b9a782;
+      padding: 10px 16px;
+      margin-bottom: 20px;
+    }
+
+    .menu-left {
+      display: flex;
+      gap: 14px;
+    }
+
+    .menu-left a {
+      text-decoration: none;
+      color: #4a3b28;
+      font-weight: bold;
+      font-size: 14px;
+      padding: 4px 8px;
+    }
+
+    .menu-left a.active {
+      background-color: #007aff;
+      color: white;
+      border-radius: 4px;
+    }
+
+    .menu-right {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .write-btn {
+      background-color: #007aff;
+      color: white;
+      font-weight: bold;
+      padding: 6px 10px;
+      border: none;
+      cursor: pointer;
+      font-family: 'MyCustomFont';
+      box-shadow: 2px 2px 0 #444;
+    }
+
+    .login-info {
+      color: #4a3b28;
+      font-size: 13px;
+    } */
+
+  .top-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: none; /* 배경을 개별 박스로 분리하므로 없음 */
+    padding: 10px 16px;
+    margin-bottom: 20px;
+  }
+
+  .menu-left,
+  .menu-right {
+    display: flex;
+    gap: 12px;
+  }
+
+  .menu-box {
+    background-color: rgba(250, 235, 180, 0.9);
+    background-image: url("{% static 'images/pixel-paper.png' %}");
+    background-size: 4px 4px;
+    background-repeat: repeat;
+    border: 2.5px solid #5a4a2f;
+    box-shadow: 3px 3px 0 #b9a782;
+    padding: 6px 12px;
+    font-weight: bold;
+    color: #3c2e1e;
+    font-size: 14px;
+    text-decoration: none;
+  }
+
+  .menu-box.active {
+    color: #007aff;
+    font-weight: bold;
+  }
+
+  .write-btn {
+    background-color: #007aff;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    border: 2px solid #5a4a2f;
+    box-shadow: 3px 3px 0 #b9a782;
+  }
+
+  .login-info {
+    background-color: rgba(250, 235, 180, 0.9);
+    background-image: url("{% static 'images/pixel-paper.png' %}");
+    background-size: 4px 4px;
+    background-repeat: repeat;
+    padding: 6px 12px;
+    border: 2.5px solid #5a4a2f;
+    box-shadow: 3px 3px 0 #b9a782;
+    font-size: 14px;
+    color: #3c2e1e;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+  }
+    /* .page-title {
+      background-color: rgba(250, 235, 180, 0.9);
+      background-image: url("{% static 'images/pixel-paper.png' %}");
+      background-size: 4px 4px;
+      background-repeat: repeat;
+      color: #4a3b28;
+      border: 2.5px solid #5a4a2f;
+      box-shadow: 3px 3px 0 #b9a782;
+      padding: 10px 14px;
+      display: inline-block;
+      font-weight: bold;
+      font-size: 16px;
+    } */
+
+    .category-bar {
+      margin-top: 20px;
+      margin-bottom: 15px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .category-bar button {
+      background-color: rgba(250, 235, 180, 0.9);
+      background-image: url("{% static 'images/pixel-paper.png' %}");
+      background-size: 4px 4px;
+      background-repeat: repeat;
+      border: 2px solid #5a4a2f;
+      box-shadow: 2px 2px 0 #b9a782;
+      font-family: 'MyCustomFont';
+      font-size: 13px;
+      font-weight: bold;
+      padding: 6px 10px;
+      cursor: pointer;
+      color: #4a3b28;
+    }
+
+    .category-bar .active {
+      background-color: #007aff;
+      color: white;
+    }
+
+    /* 검색창 스타일 (기존 search-container 대신 사용) */
+.search-bar {
+  display: flex;
+  width: 100%;
+  max-width: 600px;
+  height: 42px;
+  background-color: #f0e6cb;
+  border: 3px solid #333;
+  background-image: url("{% static 'images/pixel-paper.png' %}");
+  background-size: 4px 4px;
+  box-shadow: 4px 4px 0 #888;
+  border-radius: 0;
+  overflow: hidden;
+  margin: 0 auto 30px;
+}
+
+.search-bar input {
+  flex: 1;
+  padding: 0 12px;
+  border: none;
+  font-family: 'MyCustomFont', sans-serif;
+  font-size: 14px;
+  background: transparent;
+  color: #000;
+}
+
+.search-bar input::placeholder {
+  color: #000;
+  font-weight: bold;
+}
+
+.search-bar button {
+  width: 44px;
+  background: #444 url("{% static 'images/돋보기.png' %}") no-repeat center center;
+  background-size: 42px 42px;
+  border: none;
+  cursor: pointer;
+}
+    .post-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .post-item {
+      background: rgba(250, 235, 180, 0.9);
+      background-image: url("{% static 'images/pixel-paper.png' %}");
+      background-size: 4px 4px;
+      background-repeat: repeat;
+      border: 2px solid #5a4a2f;
+      box-shadow: 2px 2px 0 #b9a782;
+      padding: 12px;
+    }
+
+    .post-item h4 {
+      margin-bottom: 4px;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .post-item p {
+      font-size: 12.5px;
+      color: #444;
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="wrapper">
+    <!-- 상단 네비게이션 -->
+<div class="top-nav">
+  <div class="menu-left">
+    <a href="{% url 'index' %}" class="menu-box home-link">
+      <i class="fas fa-home"></i>
+    </a>
+    <a href="{% url 'post_list' %}" class="menu-box">커뮤니티</a>
+    <a href="#" class="menu-box active">멘토멘티</a>
+    <a href="#" class="menu-box">마이페이지</a>
+    <a href="#" class="menu-box">청년정책</a>
+  </div>
+  <div class="menu-right">
+    <button class="write-btn">글쓰기</button>
+    <div class="login-info">홍길동님 환영합니다</div>
+  </div>
+</div>
+
+    <!-- 페이지 타이틀
+    <div class="page-title">멘토멘티</div> -->
+
+    <!-- 카테고리 바 -->
+    <div class="category-bar">
+      <button class="active">전체</button>
+      <button>인생선배</button>
+      <button>대학선배</button>
+      <button>연애선배</button>
+      <button>자취선배</button>
+      <button>취업선배</button>
+      <button>지갑선배</button>
+      <button>운동선배</button>
+    </div>
+
+    <!-- 검색창 -->
+<!-- 🔍 검색창 -->
+<div class="search-bar">
+  <input type="text" placeholder="검색창" />
+  <button type="submit"></button>
+</div>
+
+
+    <!-- 게시글 리스트 -->
+    <div class="post-list">
+      <div class="post-item">
+        <h4>혼자 자취할 때 가장 필요한 꿀팁은?</h4>
+        <p>자취 5년 차 선배입니다. 진짜 유용한 도구들 알려드려요.</p>
+      </div>
+      <div class="post-item">
+        <h4>대학생활 잘 보내려면 어떤 자세가 필요할까요?</h4>
+        <p>후회 없는 대학생활을 위한 조언 몇 가지 드려봅니다.</p>
+      </div>
+      <div class="post-item">
+        <h4>첫 연애, 어떻게 해야 덜 서툴까요?</h4>
+        <p>부끄럽지만 연애 선배로서 정리해봤습니다 😊</p>
+      </div>
+      <div class="post-item">
+        <h4>취준생인데 너무 막막합니다...</h4>
+        <p>취업선배로서 현실적인 조언 드려요. 같이 이겨내요!</p>
+      </div>
+      <div class="post-item">
+        <h4>월급을 받자마자 사라지는 당신을 위해</h4>
+        <p>지갑선배가 알려주는 실속형 소비 전략!</p>
+      </div>
+      <div class="post-item">
+        <h4>운동을 시작하려는데 어떻게 시작할까요?</h4>
+        <p>운동선배로서 루틴 짜는 법부터 알려드립니다.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+>>>>>>> main

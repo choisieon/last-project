@@ -1,0 +1,6 @@
+<form method="POST">
+  {% csrf_token %}
+  <textarea name="content" required>{{ comment.content }}</textarea>
+  <button type="submit">수정 완료</button>
+  <a href="javascript:history.back()">취소</a>
+</form>
