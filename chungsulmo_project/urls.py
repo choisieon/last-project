@@ -30,16 +30,6 @@ urlpatterns = [
     path('board/', include('board.urls')),
     path('mentor/', include('mentor.urls')),  # 멘토멘티 연결 추가
 ]
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
-
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
->>>>>>> Stashed changes
-=======
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
->>>>>>> main
