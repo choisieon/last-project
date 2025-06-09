@@ -65,6 +65,18 @@
       padding-left: 0.25rem;
     }
 
+    .policy-meta {
+      margin-top: 1rem;
+      font-size: 0.95rem;
+      color: #374151;
+      padding-left: 0.25rem;
+      line-height: 1.4;
+    }
+
+    .policy-meta span {
+      margin-right: 0.4rem;
+    }
+
     .empty {
       color: #9ca3af;
     }
@@ -98,26 +110,35 @@
     {% for policy in policies %}
     <a href="{% url 'youth_policy:policy_detail' policy.id %}">
       <div class="policy-card">
-        <div class="policy-title">📌 {{ policy.name }}</div>
+        <div>
+          <div class="policy-title">📌 {{ policy.name }}</div>
 
-        <div class="policy-section">
-          <span class="policy-label">📚 키워드</span>
-          <div class="policy-content">{{ policy.keyword|default:"없음" }}</div>
+          <div class="policy-section">
+            <span class="policy-label">📚 키워드</span>
+            <div class="policy-content">{{ policy.keyword|default:"없음" }}</div>
+          </div>
+
+          <div class="policy-section">
+            <span class="policy-label">🧭 범주</span>
+            <div class="policy-content">{{ policy.major|default:"없음" }} / {{ policy.medium|default:"없음" }}</div>
+          </div>
+
+          <div class="policy-section">
+            <span class="policy-label">🎯 대상 연령</span>
+            <div class="policy-content">{{ policy.minage|default:"없음" }} ~ {{ policy.maxage|default:"없음" }}세</div>
+          </div>
+
+          <div class="policy-section">
+            <span class="policy-label">⏰ 신청 기간</span>
+            <div class="policy-content">{{ policy.period|default:"없음" }}</div>
+          </div>
         </div>
 
-        <div class="policy-section">
-          <span class="policy-label">🧭 범주</span>
-          <div class="policy-content">{{ policy.major|default:"없음" }} / {{ policy.medium|default:"없음" }}</div>
-        </div>
-
-        <div class="policy-section">
-          <span class="policy-label">🎯 대상 연령</span>
-          <div class="policy-content">{{ policy.minage|default:"없음" }} ~ {{ policy.maxage|default:"없음" }}세</div>
-        </div>
-
-        <div class="policy-section">
-          <span class="policy-label">⏰ 신청 기간</span>
-          <div class="policy-content">{{ policy.period|default:"없음" }}</div>
+        <!-- 카드 하단 정보 -->
+        <div class="policy-meta">
+          <span>조회수: {{ policy.view_count }}</span> |
+          <span>🤍 {{ policy.likes.count }}</span> |
+          <span>댓글: {{ policy.comments.count }}</span>
         </div>
       </div>
     </a>

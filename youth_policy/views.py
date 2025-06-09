@@ -21,10 +21,12 @@ def add_policy_comment(request, policy_id):
         PolicyComment.objects.create(policy=policy, author=request.user, content=content)
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
-
-# youth_policy/views.py
+# views.py > policy_detail
 def policy_detail(request, policy_id):
     policy = get_object_or_404(YouthPolicy, id=policy_id)
+    policy.view_count += 1
+    policy.save(update_fields=['view_count'])
+
     comments = policy.comments.filter(parent__isnull=True)
     return render(request, 'policy_detail.html', {
         'policy': policy,
@@ -50,3 +52,4 @@ def edit_policy_comment(request, comment_id):
         return redirect(request.META.get('HTTP_REFERER', '/'))
 
     return render(request, 'edit_comment.html', {'comment': comment})
+

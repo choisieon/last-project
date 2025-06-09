@@ -78,6 +78,53 @@
       font-weight: bold;
     }
 
+    .comment-form {
+      background-color: #f9fafb;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      padding: 1rem;
+      margin-top: 2rem;
+    }
+
+    .comment-form h3 {
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #1f2937;
+      display: flex;
+      align-items: center;
+    }
+
+    .comment-form h3::before {
+      content: "✏️";
+      margin-right: 0.5rem;
+    }
+
+    .comment-form textarea {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      padding: 0.75rem;
+      font-size: 0.95rem;
+      resize: vertical;
+      box-sizing: border-box;
+    }
+
+    .comment-form button {
+      margin-top: 0.75rem;
+      background-color: #60a5fa;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 0.5rem 1rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .comment-form button:hover {
+      background-color: #3b82f6;
+    }
+
     .back-btn {
       display: block;
       text-align: center;
@@ -125,19 +172,19 @@
       <button>#{{ policy.minage }} ~ {{ policy.maxage }}세</button>
     </div>
 
-    <!-- 댓글 작성 폼 -->
     {% if user.is_authenticated %}
-      <h3 style="margin-top: 2rem;">✏️ 댓글 작성</h3>
-      <form action="{% url 'youth_policy:add_policy_comment' policy.id %}" method="post">
-        {% csrf_token %}
-        <textarea name="content" rows="4" style="width: 100%;" placeholder="댓글을 입력하세요."></textarea><br>
-        <button type="submit" style="margin-top: 0.5rem;">댓글 작성</button>
-      </form>
+      <div class="comment-form">
+        <h3>댓글 작성</h3>
+        <form action="{% url 'youth_policy:add_policy_comment' policy.id %}" method="post">
+          {% csrf_token %}
+          <textarea name="content" rows="4" placeholder="댓글을 입력하세요."></textarea>
+          <button type="submit">댓글 작성</button>
+        </form>
+      </div>
     {% else %}
       <p>댓글을 작성하려면 <a href="{% url 'login' %}?next={{ request.path }}">로그인</a> 하세요.</p>
     {% endif %}
 
-    <!-- 댓글 목록 -->
     <hr>
     <h2>💬 댓글</h2>
 
@@ -154,7 +201,6 @@
             </p>
           {% endif %}
 
-          <!-- 대댓글 -->
           {% for reply in comment.replies.all %}
             <div style="margin-left: 2rem; border-left: 2px solid #60a5fa; padding-left: 1rem; margin-top: 1rem;">
               <p><strong>{{ reply.author.username }}</strong> | {{ reply.created_at|date:"Y.m.d H:i" }}</p>
@@ -169,13 +215,12 @@
             </div>
           {% endfor %}
 
-          <!-- 대댓글 작성 폼 -->
           {% if user.is_authenticated %}
             <form action="{% url 'youth_policy:add_policy_comment' policy.id %}" method="post" style="margin-top: 1rem;">
               {% csrf_token %}
               <input type="hidden" name="parent_id" value="{{ comment.id }}">
-              <textarea name="content" rows="2" style="width: 100%;" placeholder="답글을 입력하세요."></textarea><br>
-              <button type="submit" style="margin-top: 0.5rem;">답글 작성</button>
+              <textarea name="content" rows="2" style="width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid #cbd5e1;" placeholder="답글을 입력하세요."></textarea><br>
+              <button type="submit" style="margin-top: 0.5rem; background-color: #60a5fa; color: white; border: none; border-radius: 4px; padding: 0.4rem 0.8rem;">답글 작성</button>
             </form>
           {% endif %}
         </div>

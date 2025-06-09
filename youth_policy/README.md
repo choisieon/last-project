@@ -5,3 +5,4 @@
 - pip install -r requirements.txt
 - python manage.py makemigrations/migrate
 - python manage.py import_policies
+- python manage.py import_regions

@@ -17,8 +17,23 @@ class YouthPolicy(models.Model):
     document = models.TextField("제출서류내용", blank=True)
     etc = models.TextField("기타사항내용", blank=True)
 
+    view_count = models.PositiveIntegerField(default=0)
+    likes = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='liked_policies', blank=True)
+
     def __str__(self):
         return self.name
+    
+    def comment_count(self):
+        return self.comments.count()
+    
+
+class Region(models.Model):
+    name = models.CharField(max_length=100)
+    code = models.CharField()
+
+    def __str__(self):
+        return f"{self.name} ({self.population})"
+
     
 class PolicyComment(models.Model):
     policy = models.ForeignKey('YouthPolicy', on_delete=models.CASCADE, related_name='comments')
