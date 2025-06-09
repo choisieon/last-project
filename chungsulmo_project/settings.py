@@ -1,3 +1,5 @@
+
+
 """
 Django settings for chungsulmo_project project.
 
@@ -41,9 +43,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'community',
-    'board',
     'accounts',
+    'mentor',
+    'board.apps.BoardConfig',   # 사용자 프로필/팔로우
+    'tinymce',
     'youth_policy',
+    'mentor.apps.MentorConfig',
+
     'django.contrib.sites',  # 필수
     'allauth',
     'allauth.account',
@@ -51,7 +57,6 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.kakao',  # 카카오 로그인
     'allauth.socialaccount.providers.naver',  # 네이버 로그인
     'allauth.socialaccount.providers.google', # 구글 로그인
-    'mentor.apps.MentorConfig',
 ]
 
 MIDDLEWARE = [
@@ -140,13 +145,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 STATIC_URL = '/static/'
 
 # 개발 시 static 파일 경로
-STATICFILES_DIRS = []
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR / "static"),
+]
 
 AUTH_USER_MODEL = 'accounts.User'
-
-
-
-
 
 
 
@@ -160,14 +163,23 @@ AUTHENTICATION_BACKENDS = (
 LOGIN_REDIRECT_URL = '/'   # 로그인 성공 시 이동 경로
 LOGOUT_REDIRECT_URL = '/'  # 로그아웃 시 이동 경로
 
+# TinyMCE self-hosted 설정
+TINYMCE_JS_URL = '/static/tinymce/js/tinymce/tinymce.min.js'
+TINYMCE_COMPRESSOR = False
 
+
+TINYMCE_DEFAULT_CONFIG = {
+    'height': 400,
+    'plugins': 'image,link,code',
+    'toolbar': 'undo redo | image link | code',
+    'images_upload_url': '/upload-image/',  # 이미지 업로드 URL
+}  
+  
 SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_LOGIN_ON_GET = True
 ACCOUNT_ADAPTER = 'allauth.account.adapter.DefaultAccountAdapter'
-
-
-
-
+  
+  
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'SCOPE': ['profile', 'email'],
@@ -190,4 +202,5 @@ SOCIALACCOUNT_PROVIDERS = {
             'auth_type': 'reauthenticate'
         },
     }
-}
+
+

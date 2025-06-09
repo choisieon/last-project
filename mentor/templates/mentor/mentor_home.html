@@ -1,3 +1,4 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="ko">
@@ -5,7 +6,9 @@
   <meta charset="UTF-8" />
   <title>멘토멘티 - 청설모</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
   <style>
     @font-face {
       font-family: 'MyCustomFont';
@@ -13,6 +16,7 @@
       font-weight: 400;
       font-style: normal;
     }
+
     body {
       font-family: 'MyCustomFont', sans-serif;
       margin: 0;
@@ -21,11 +25,13 @@
       background-size: cover;
       background-color: #cde4c7;
     }
+
     .wrapper {
       max-width: 800px;
       margin: 0 auto;
       padding: 30px 20px;
     }
+
     .top-nav {
       display: flex;
       justify-content: space-between;
@@ -66,6 +72,7 @@
       box-shadow: 3px 3px 0 #b9a782;
     }
     .login-info {
+
       background-color: rgba(250, 235, 180, 0.9);
       background-image: url("{% static 'images/pixel-paper.png' %}");
       background-size: 4px 4px;
@@ -79,6 +86,7 @@
       display: flex;
       align-items: center;
     }
+
     .category-bar {
       margin-top: 20px;
       margin-bottom: 15px;
@@ -86,6 +94,7 @@
       flex-wrap: wrap;
       gap: 10px;
     }
+
     .category-badge {
   font-size: 12px;
   background: #007aff;
@@ -128,6 +137,7 @@
   cursor: pointer;
 }
 
+
     .category-bar button {
       background-color: rgba(250, 235, 180, 0.9);
       background-image: url("{% static 'images/pixel-paper.png' %}");
@@ -142,10 +152,12 @@
       cursor: pointer;
       color: #4a3b28;
     }
+
     .category-bar .active {
       background-color: #007aff;
       color: white;
     }
+
     .search-bar {
       display: flex;
       width: 100%;
@@ -157,6 +169,8 @@
       background-size: 4px 4px;
       box-shadow: 4px 4px 0 #888;
       margin: 0 auto 30px;
+      border-radius: 0;
+      overflow: hidden;
     }
     .search-bar input {
       flex: 1;
@@ -185,11 +199,13 @@
       border-bottom: 2px solid #999;
       padding-bottom: 6px;
     }
+
     .post-list {
       display: flex;
       flex-direction: column;
       gap: 14px;
     }
+
     .post-item {
       background: rgba(250, 235, 180, 0.9);
       background-image: url("{% static 'images/pixel-paper.png' %}");
@@ -199,14 +215,17 @@
       box-shadow: 2px 2px 0 #b9a782;
       padding: 12px;
     }
+
     .post-item.mentoring {
       border-color: #007aff;
     }
+
     .post-item h4 {
       margin-bottom: 4px;
       font-size: 14px;
       color: #333;
     }
+
     .post-item p {
       font-size: 12.5px;
       color: #444;
@@ -219,10 +238,12 @@
     <!-- 상단 네비게이션 -->
 <div class="top-nav">
   <div class="menu-left">
-    <a href="{% url 'index' %}" class="menu-box home-link">
+
+    <a href="{% url 'board:index' %}" class="menu-box home-link">
       <i class="fas fa-home"></i>
     </a>
-    <a href="{% url 'post_list' %}" class="menu-box">커뮤니티</a>
+    <a href="{% url 'board:post_list' %}" class="menu-box">커뮤니티</a>
+
     <a href="#" class="menu-box active">멘토멘티</a>
     <a href="#" class="menu-box">마이페이지</a>
     <a href="#" class="menu-box">청년정책</a>
@@ -246,6 +267,16 @@
       <button>취업선배</button>
       <button>지갑선배</button>
       <button>운동선배</button>
+
+    </div>
+
+    <!-- 검색창 -->
+<!-- 🔍 검색창 -->
+<div class="search-bar">
+  <input type="text" placeholder="검색창" />
+  <button type="submit"></button>
+</div>
+
       <button onclick="location.href='/mentor/list/'">👤 선배 구경하기</button> <!-- NEW -->
     </div>
     <div class="category-bar">
@@ -342,3 +373,4 @@
   </div> -->
 </body>
 </html>
+

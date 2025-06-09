@@ -1,3 +1,4 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="ko">
@@ -35,6 +36,9 @@
     .menu-left, .menu-right {
       display: flex;
       gap: 12px;
+
+      align-items: center;
+
     }
     .menu-box {
       background-color: rgba(250, 235, 180, 0.9);
@@ -55,14 +59,20 @@
     }
     .write-btn {
       background-color: #007aff;
-      color: white;
-      padding: 6px 12px;
-      border: none;
-      cursor: pointer;
-      font-weight: bold;
-      font-size: 14px;
-      border: 2px solid #5a4a2f;
-      box-shadow: 3px 3px 0 #b9a782;
+
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    border: 2px solid #5a4a2f;
+    box-shadow: 3px 3px 0 #b9a782;
+    }
+    .write-btn:hover {
+      background: #005bb5;
+      color: #fff700;
+
     }
     .login-info {
       background-color: rgba(250, 235, 180, 0.9);
@@ -158,6 +168,93 @@
       font-size: 12.5px;
       color: #444;
     }
+
+    .form-outer {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding-top: 40px;
+    }
+    .form-control {
+      background: #fffbe9;
+      border: 2px solid #1976d2;
+      border-radius: 7px;
+      padding: 13px 14px;
+      font-size: 1.09rem;
+      color: #222831;
+      box-shadow: 2px 2px 0 #b9a78233;
+      margin-bottom: 13px;
+      width: 100%;
+    }
+    .form-container {
+      width: 480px;
+      padding: 36px 32px 28px 32px;
+      background: rgba(255,255,255,0.95);
+      border: 2.5px solid #5a4a2f;
+      box-shadow: 4px 4px 0 #b9a782;
+      border-radius: 14px;
+    }
+    .form-control:focus {
+      border: 2px solid #007aff;
+      background: #fff;
+      outline: none;
+      box-shadow: 0 0 8px #007aff33;
+    }
+
+    .form-group {
+      margin-bottom: 22px;
+    }
+    .form-group label {
+      color: #222;
+      display: block;
+      font-weight: bold;
+      font-size: 1.12rem;
+      margin-bottom: 7px;
+      text-shadow: 1px 1px 3px #fff, 0 0 2px #0008;
+    }
+    .post-images img {
+      max-width: 350px;
+      max-height: 350px;
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      display: block;
+    }
+    .post-preview img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      display: block;
+      border-radius: 8px;
+      background: none;
+    }
+    .post-item-text {
+      flex: 1;
+    }
+    .post-item-row {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+    .post-preview {
+      width: 110px;
+      min-width: 80px;
+      max-width: 140px;
+      height: 110px;
+      overflow: hidden;
+      background: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 16px;   /* 왼쪽 여백 (오른쪽에 붙이니까) */
+      border: none;
+      box-shadow: none;
+      padding: 0;
+    }
+
+
     </style>
     {% block extra_style %}{% endblock %}
 </head>
@@ -166,17 +263,17 @@
     <!-- 상단 네비게이션 -->
     <div class="top-nav">
       <div class="menu-left">
-        <a href="{% url 'index' %}" class="menu-box home-link">
+
+        <a href="{% url 'board:index' %}" class="menu-box home-link">
           <i class="fas fa-home"></i>
         </a>
-        <a href="{% url 'post_list' %}" class="menu-box {% block nav_community_active %}{% endblock %}">커뮤니티</a>
+        <a href="{% url 'board:post_list' %}" class="menu-box {% block nav_community_active %}{% endblock %}">커뮤니티</a>
         <a href="{% url 'mentor:mentor_home' %}" class="menu-box {% block nav_mentor_active %}{% endblock %}">멘토멘티</a>
         <a href="#" class="menu-box {% block nav_mypage_active %}{% endblock %}">마이페이지</a>
         <a href="#" class="menu-box {% block nav_policy_active %}{% endblock %}">청년정책</a>
       </div>
-
       <div class="menu-right">
-        <a href="{% url 'post_new' %}" class="write-btn">글쓰기</a>
+        <a href="{% url 'board:post_new' %}" class="write-btn">글쓰기</a>
         <div class="login-info">홍길동님 환영합니다</div>
       </div>
 

@@ -1,3 +1,5 @@
+
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="ko">
@@ -265,17 +267,21 @@
     <div class="top-left">
       <div class="identity-box">청년들의 인생설계 모임, <strong>청설모</strong></div>
       <div class="nav-menu">
-       <a href="{% url 'post_list' %}" class="menu-box {% block nav_community_active %}{% endblock %}">커뮤니티</a>
-       <a href="{% url 'mentor:mentor_home' %}">멘토멘티</a>
+
+       <a href="{% url 'board:post_list' %}" class="menu-box {% block nav_community_active %}{% endblock %}">커뮤니티</a>
+        <a href="{% url 'mentor:mentor_home' %}">멘토멘티</a> 
         <a href="#">마이페이지</a>
         <a href="{% url 'youth_policy:basic_page' %}">청년정책</a>
+
       </div>
     </div>
     <div class="top-right">
       <a href="{% url 'accounts:login' %}">로그인</a>
       <a href="{% url 'accounts:signup' %}">회원가입</a>
       <a href="#">문의</a>
-      <a href="{% url 'post_new' %}" class="write">글쓰기</a>
+
+      <a href="{% url 'board:post_new' %}" class="write-btn">글쓰기</a>
+
     </div>
     <div class="intro-box">
       청년들이 함께 모여 삶과 고민을 나누는 공간,<br />
@@ -323,4 +329,8 @@
     </div>
   </div>
 </body>
+
 </html>
+
+
+
