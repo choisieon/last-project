@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import YouthPolicy, PolicyComment
+from .models import YouthPolicy, PolicyComment, Region
+from .utils import get_sido_code_list
 
 # Create your views here.
 def basic_page(request):
@@ -40,7 +41,6 @@ def delete_policy_comment(request, comment_id):
     comment.delete()
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
-
 # 댓글 수정 (폼 + 처리)
 @login_required
 def edit_policy_comment(request, comment_id):
@@ -53,3 +53,22 @@ def edit_policy_comment(request, comment_id):
 
     return render(request, 'edit_comment.html', {'comment': comment})
 
+def region_view(request):
+    selected_sido_code = request.GET.get('sido')
+    selected_sigungu_code = request.GET.get('sigungu')
+
+    sido_list = get_sido_code_list()
+
+    sigungu_list = Region.objects.filter(code__startswith=selected_sido_code) if selected_sido_code else []
+    filtered_policies = []
+
+    if selected_sigungu_code:
+        filtered_policies = YouthPolicy.objects.filter(region__regex=rf'(,|^){selected_sigungu_code}(,|$)')
+
+    return render(request, '지역정책.html', {
+        'sido_list': sido_list,
+        'sigungu_list': sigungu_list,
+        'policies': filtered_policies,
+        'selected_sido_code': selected_sido_code,
+        'selected_sigungu_code': selected_sigungu_code
+    })

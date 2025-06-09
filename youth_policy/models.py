@@ -1,6 +1,16 @@
 from django.db import models
 from django.conf import settings
 
+
+class Sigungu(models.Model):
+    code = models.CharField(max_length=5, primary_key=True)
+    name = models.CharField(max_length=50)
+    sido_name = models.CharField(max_length=20)  # 예: '경기도'
+
+    def __str__(self):
+        return self.name
+    
+    
 class YouthPolicy(models.Model):
     name = models.CharField("정책명", max_length=255)
     description = models.TextField("정책설명")
@@ -20,6 +30,8 @@ class YouthPolicy(models.Model):
     view_count = models.PositiveIntegerField(default=0)
     likes = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='liked_policies', blank=True)
 
+    sigungu = models.ForeignKey(Sigungu, on_delete=models.CASCADE, related_name='policies', null=True, blank=True)
+
     def __str__(self):
         return self.name
     
@@ -33,7 +45,7 @@ class Region(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.population})"
-
+    
     
 class PolicyComment(models.Model):
     policy = models.ForeignKey('YouthPolicy', on_delete=models.CASCADE, related_name='comments')
