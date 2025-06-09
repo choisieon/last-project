@@ -1,0 +1,194 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>멘토멘티 Q&A - 청설모</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @font-face {
+      font-family: 'MyCustomFont';
+      src: url("{% static 'fonts/픽셀.woff2' %}") format('woff2');
+    }
+    body {
+      font-family: 'MyCustomFont', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: url("{% static 'images/Frame 13.png' %}") no-repeat center center fixed;
+      background-size: cover;
+      background-color: #cde4c7;
+    }
+    .wrapper {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 30px 20px;
+    }
+    .category-bar {
+      margin-top: 20px;
+      margin-bottom: 15px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .category-bar button {
+      background-color: rgba(250, 235, 180, 0.9);
+      background-image: url("{% static 'images/pixel-paper.png' %}");
+      background-size: 4px 4px;
+      border: 2px solid #5a4a2f;
+      box-shadow: 2px 2px 0 #b9a782;
+      font-family: 'MyCustomFont';
+      font-size: 13px;
+      font-weight: bold;
+      padding: 6px 10px;
+      cursor: pointer;
+      color: #4a3b28;
+    }
+    .category-bar .active {
+      background-color: #007aff;
+      color: white;
+    }
+    .write-btn {
+      background-color: #007aff;
+      color: white;
+      padding: 6px 12px;
+      border: 2px solid #5a4a2f;
+      box-shadow: 3px 3px 0 #b9a782;
+      font-family: 'MyCustomFont';
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+    .post-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .post-item {
+      background: rgba(250, 235, 180, 0.9);
+      background-image: url("{% static 'images/pixel-paper.png' %}");
+      background-size: 4px 4px;
+      border: 2px solid #5a4a2f;
+      box-shadow: 2px 2px 0 #b9a782;
+      padding: 12px;
+    }
+    .post-item.mentoring {
+      border-color: #007aff;
+    }
+    .post-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .category-badge {
+      font-size: 12px;
+      background: #007aff;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .post-title {
+      font-size: 15px;
+      font-weight: bold;
+      margin: 6px 0;
+      color: #222;
+    }
+    .post-preview {
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 8px;
+    }
+    .post-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: #333;
+    }
+    .meta-info {
+      font-size: 12px;
+      color: #666;
+      margin: 4px 0;
+    }
+    .mentor-info {
+      font-size: 12px;
+      color: #333;
+    }
+    .mentor-profile-btn, .apply-mentoring-btn {
+      font-size: 12px;
+      padding: 4px 8px;
+      background-color: #ffcc00;
+      border: 1px solid #5a4a2f;
+      font-family: 'MyCustomFont';
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <h2>💬 멘토멘티 문답 리스트</h2>
+
+    <!-- 카테고리 필터 -->
+    <div class="category-bar">
+      <button class="active">전체</button>
+      <button>인생선배</button>
+      <button>대학선배</button>
+      <button>연애선배</button>
+      <button>자취선배</button>
+      <button>취업선배</button>
+      <button>지갑선배</button>
+      <button>운동선배</button>
+    </div>
+
+    <!-- 정렬 필터 -->
+    <div class="category-bar">
+      <a href="?sort=latest"><button class="{% if sort == 'latest' %}active{% endif %}">최신순</button></a>
+      <a href="?sort=views"><button class="{% if sort == 'views' %}active{% endif %}">조회순</button></a>
+      <a href="?sort=likes"><button class="{% if sort == 'likes' %}active{% endif %}">공감순</button></a>
+      <a href="?sort=answers"><button class="{% if sort == 'answers' %}active{% endif %}">답변순</button></a>
+    </div>
+
+    <button class="write-btn" onclick="location.href='{% url 'mentor:question_create' %}'">글쓰기</button>
+
+    <!-- 질문 리스트 -->
+    <div class="post-list">
+      {% for question in questions %}
+        <div class="post-item {% if question.is_promoted_to_mentoring %}mentoring{% endif %}">
+          <div class="post-header">
+            <span class="category-badge">
+              {% if question.category == 'college' %}🏫 대학선배{% elif question.category == 'life' %}🌱 인생선배
+              {% elif question.category == 'love' %}💘 연애선배{% elif question.category == 'house' %}🏠 자취선배
+              {% elif question.category == 'job' %}💼 취업선배{% elif question.category == 'money' %}💳 지갑선배
+              {% elif question.category == 'fitness' %}💪 운동선배{% else %}📌 기타{% endif %}
+            </span>
+            <h4 class="post-title">
+              <a href="{% url 'mentor:question_detail' question.id %}">{{ question.title }}</a>
+            </h4>
+          </div>
+
+          <p class="post-preview">{{ question.content|truncatechars:60 }}</p>
+
+          <div class="meta-info">
+            조회수: {{ question.views }} | 공감: {{ question.likes }} | 답변: {{ question.answers.count }} |
+            {{ question.created_at|date:"Y-m-d H:i" }}
+          </div>
+
+          <div class="post-footer">
+            <div class="mentor-info">
+              👤 <strong>{{ question.author.nickname }}</strong> |
+              {{ question.author.bio|default:"소개 없음" }}
+              <button class="mentor-profile-btn" onclick="location.href='/mentor/profile/{{ question.author.id }}'">프로필</button>
+            </div>
+            {% if question.is_promoted_to_mentoring %}
+              <button class="apply-mentoring-btn">멘토링 진행중..</button>
+            {% endif %}
+          </div>
+        </div>
+      {% empty %}
+        <p>아직 작성된 질문이 없습니다.</p>
+      {% endfor %}
+    </div>
+  </div>
+</body>
+</html>

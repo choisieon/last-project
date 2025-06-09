@@ -1,0 +1,81 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>선배찾기 - 청설모</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    @font-face {
+      font-family: 'MyCustomFont';
+      src: url("{% static 'fonts/픽셀.woff2' %}") format('woff2');
+    }
+    body {
+      font-family: 'MyCustomFont', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: url("{% static 'images/Frame 13.png' %}") no-repeat center center fixed;
+      background-size: cover;
+      background-color: #cde4c7;
+    }
+    .wrapper {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 30px 20px;
+    }
+    .mentor-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .mentor-card {
+      background: rgba(250, 235, 180, 0.95);
+      background-image: url("{% static 'images/pixel-paper.png' %}");
+      border: 2px solid #5a4a2f;
+      box-shadow: 3px 3px 0 #b9a782;
+      padding: 16px;
+      font-size: 13px;
+      color: #333;
+    }
+    .mentor-card h3 {
+      font-size: 16px;
+      margin: 0 0 6px;
+    }
+    .mentor-card p {
+      margin: 6px 0;
+      font-size: 12.5px;
+    }
+    .apply-btn {
+      margin-top: 10px;
+      padding: 4px 8px;
+      background-color: #007aff;
+      color: white;
+      border: 1px solid #333;
+      font-family: 'MyCustomFont';
+      cursor: pointer;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <h2>👀 선배 찾기</h2>
+    <div class="mentor-grid">
+      {% for mentor in mentors %}
+        <div class="mentor-card">
+          <h3>👤 {{ mentor.nickname }}</h3>
+          <p><strong>소개:</strong> {{ mentor.bio|truncatechars:50 }}</p>
+          <p><strong>키워드:</strong> {{ mentor.keywords }}</p>
+          <p><strong>역할:</strong> {% if mentor.role == 'mentor' %}멘토{% elif mentor.role == 'mentee' %}멘티{% else %}둘다{% endif %}</p>
+          <button class="apply-btn" onclick="location.href='/mentor/request/{{ mentor.id }}/'">멘토링 신청</button>
+        <!-- 기존 mentor-card 내부에 추가 -->
+          <button class="apply-btn" onclick="location.href='{% url 'mentor:mentor_profile' mentor.id %}'">
+  📖 선배 더 알아보기
+</button>
+
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</body>
+</html>

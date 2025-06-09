@@ -1,0 +1,6 @@
+<h2>멘토멘티 온보딩 설정</h2>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">저장하고 시작하기</button>
+</form>

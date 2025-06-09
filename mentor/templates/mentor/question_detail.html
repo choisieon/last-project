@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block content %}
+  <style>
+    .question-box, .answer-box {
+      background-color: #fffce8;
+      padding: 16px;
+      margin-bottom: 20px;
+      border: 2px solid #ccc084;
+      box-shadow: 2px 2px 0 #aaa;
+      font-family: 'MyCustomFont', sans-serif;
+    }
+    .question-title {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .question-meta {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+    .category-badge {
+      display: inline-block;
+      background-color: #007aff;
+      color: white;
+      padding: 2px 8px;
+      font-size: 12px;
+      border-radius: 4px;
+      margin-left: 8px;
+    }
+    .answer-box {
+      background-color: #f7f7f7;
+      border-left: 4px solid #007aff;
+    }
+    .answer-meta {
+      font-size: 12px;
+      color: #444;
+      margin-top: 6px;
+    }
+    .action-buttons {
+      margin-top: 30px;
+      display: flex;
+      gap: 12px;
+    }
+    .action-buttons a {
+      padding: 8px 14px;
+      background-color: #007aff;
+      color: white;
+      font-weight: bold;
+      text-decoration: none;
+      border: 2px solid #3c2e1e;
+      box-shadow: 2px 2px 0 #b9a782;
+      font-size: 14px;
+    }
+  </style>
+
+  <!-- 질문 블럭 -->
+  <div class="question-box">
+    <div class="question-title">
+      {{ question.title }}
+      <span class="category-badge">
+        {% if question.category == 'college' %}🏫 대학선배
+        {% elif question.category == 'life' %}🌱 인생선배
+        {% elif question.category == 'love' %}💘 연애선배
+        {% elif question.category == 'house' %}🏠 자취선배
+        {% elif question.category == 'job' %}💼 취업선배
+        {% elif question.category == 'money' %}💳 지갑선배
+        {% elif question.category == 'fitness' %}💪 운동선배
+        {% else %}📌 기타
+        {% endif %}
+      </span>
+    </div>
+    <p>{{ question.content }}</p>
+    <div class="question-meta">
+      작성자: {{ question.author.nickname }} |
+      작성일: {{ question.created_at|date:"Y-m-d H:i" }}
+    </div>
+  </div>
+
+  <!-- 답변 리스트 -->
+  <h3>💬 답변</h3>
+  {% for answer in question.answers.all %}
+    <div class="answer-box">
+      <p>{{ answer.content }}</p>
+      <div class="answer-meta">
+        ⬩ {{ answer.author.nickname }} | {{ answer.created_at|date:"Y-m-d H:i" }}
+      </div>
+    </div>
+  {% empty %}
+    <p>아직 답변이 없습니다.</p>
+  {% endfor %}
+
+  <!-- 답변하기/멘토링 신청 버튼 -->
+
+  <div class="action-buttons">
+    {% if request.user.is_authenticated %}
+      {% if request.user.id != question.author.user.id %}
+        <a href="{% url 'mentor:mentor_request' question.author.id %}">🤝 멘토링 신청</a>
+      {% else %}
+        <a href="{% url 'mentor:answer_create' question.id %}">✍ 답변 작성하기</a>
+      {% endif %}
+    {% endif %}
+  </div>
+  
+
+{% endblock %}

@@ -1,4 +1,5 @@
 
+
 """
 Django settings for chungsulmo_project project.
 
@@ -46,12 +47,16 @@ INSTALLED_APPS = [
     'mentor',
     'board.apps.BoardConfig',   # 사용자 프로필/팔로우
     'tinymce',
+    'youth_policy',
+    'mentor.apps.MentorConfig',
 
     'django.contrib.sites',  # 필수
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.kakao',  # 카카오 로그인
+    'allauth.socialaccount.providers.naver',  # 네이버 로그인
+    'allauth.socialaccount.providers.google', # 구글 로그인
 ]
 
 MIDDLEWARE = [
@@ -148,7 +153,7 @@ AUTH_USER_MODEL = 'accounts.User'
 
 
 
-SITE_ID = 1
+SITE_ID = 2
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
@@ -168,5 +173,34 @@ TINYMCE_DEFAULT_CONFIG = {
     'plugins': 'image,link,code',
     'toolbar': 'undo redo | image link | code',
     'images_upload_url': '/upload-image/',  # 이미지 업로드 URL
+}  
+  
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_LOGIN_ON_GET = True
+ACCOUNT_ADAPTER = 'allauth.account.adapter.DefaultAccountAdapter'
+  
+  
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': ['profile', 'email'],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+            'prompt': 'select_account'
+        }
+    },
+    'kakao': {
+        'SCOPE': ['account_email', 'profile_nickname'],
+        'AUTH_PARAMS': {
+            "response_type": "code",
+            'prompt': 'login'
+        },
+    },
+    'naver': {
+        'SCOPE': ['name', 'email'],
+        'AUTH_PARAMS': {
+            "response_type": "code",
+            'auth_type': 'reauthenticate'
+        },
+    }
 
-}
+
