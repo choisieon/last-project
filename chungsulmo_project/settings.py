@@ -178,7 +178,7 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     },
     'kakao': {
-        'SCOPE': ['account_email', 'profile_nickname'],
+        'SCOPE': ['profile_nickname'],
         'AUTH_PARAMS': {
             "response_type": "code",
             'prompt': 'login'

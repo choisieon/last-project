@@ -78,12 +78,6 @@
       font-weight: bold;
     }
 
-    .person-img {
-      width: 100px;
-      margin: 1rem auto 0;
-      display: block;
-    }
-
     .back-btn {
       display: block;
       text-align: center;
@@ -96,13 +90,13 @@
       text-decoration: underline;
     }
 
-    .a {
-      color: #2563eb; /* 기본 링크 색상 */
+    a {
+      color: #2563eb;
       text-decoration: none;
     }
 
     a:visited {
-      color: #2563eb; /* 방문 후에도 동일한 색상 유지 */
+      color: #2563eb;
     }
   </style>
 </head>
@@ -129,6 +123,65 @@
       <button>#{{ policy.major|default:"분류없음" }}</button>
       <button>#{{ policy.medium|default:"하위분류없음" }}</button>
       <button>#{{ policy.minage }} ~ {{ policy.maxage }}세</button>
+    </div>
+
+    <!-- 댓글 작성 폼 -->
+    {% if user.is_authenticated %}
+      <h3 style="margin-top: 2rem;">✏️ 댓글 작성</h3>
+      <form action="{% url 'youth_policy:add_policy_comment' policy.id %}" method="post">
+        {% csrf_token %}
+        <textarea name="content" rows="4" style="width: 100%;" placeholder="댓글을 입력하세요."></textarea><br>
+        <button type="submit" style="margin-top: 0.5rem;">댓글 작성</button>
+      </form>
+    {% else %}
+      <p>댓글을 작성하려면 <a href="{% url 'login' %}?next={{ request.path }}">로그인</a> 하세요.</p>
+    {% endif %}
+
+    <!-- 댓글 목록 -->
+    <hr>
+    <h2>💬 댓글</h2>
+
+    <div id="comment-section">
+      {% for comment in comments %}
+        <div style="margin-bottom: 1.5rem; border-bottom: 1px solid #ccc; padding-bottom: 1rem;">
+          <p><strong>{{ comment.author.username }}</strong> | {{ comment.created_at|date:"Y.m.d H:i" }}</p>
+          <p>{{ comment.content|linebreaks }}</p>
+
+          {% if user.is_authenticated and user == comment.author %}
+            <p>
+              <a href="{% url 'youth_policy:edit_policy_comment' comment.id %}">수정</a> |
+              <a href="{% url 'youth_policy:delete_policy_comment' comment.id %}" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</a>
+            </p>
+          {% endif %}
+
+          <!-- 대댓글 -->
+          {% for reply in comment.replies.all %}
+            <div style="margin-left: 2rem; border-left: 2px solid #60a5fa; padding-left: 1rem; margin-top: 1rem;">
+              <p><strong>{{ reply.author.username }}</strong> | {{ reply.created_at|date:"Y.m.d H:i" }}</p>
+              <p>{{ reply.content|linebreaks }}</p>
+
+              {% if user.is_authenticated and user == reply.author %}
+                <p>
+                  <a href="{% url 'youth_policy:edit_policy_comment' reply.id %}">수정</a> |
+                  <a href="{% url 'youth_policy:delete_policy_comment' reply.id %}" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</a>
+                </p>
+              {% endif %}
+            </div>
+          {% endfor %}
+
+          <!-- 대댓글 작성 폼 -->
+          {% if user.is_authenticated %}
+            <form action="{% url 'youth_policy:add_policy_comment' policy.id %}" method="post" style="margin-top: 1rem;">
+              {% csrf_token %}
+              <input type="hidden" name="parent_id" value="{{ comment.id }}">
+              <textarea name="content" rows="2" style="width: 100%;" placeholder="답글을 입력하세요."></textarea><br>
+              <button type="submit" style="margin-top: 0.5rem;">답글 작성</button>
+            </form>
+          {% endif %}
+        </div>
+      {% empty %}
+        <p>아직 댓글이 없습니다.</p>
+      {% endfor %}
     </div>
 
     <a href="{% url 'youth_policy:basic_page' %}" class="back-btn">← 목록으로 돌아가기</a>
