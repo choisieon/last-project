@@ -120,7 +120,7 @@
       <a class="navbar-brand fw-bold text-primary" href="#">📢 청년정책 모음.zip</a>
       <form class="d-flex ms-auto" method="get">
         <select name="sido" class="form-select" onchange="this.form.submit()">
-          <option value="">시도 선택</option>
+          <option value="">전체</option>
           {% for sido in sido_list %}
             <option value="{{ sido.code }}" {% if selected_sido == sido.code %}selected{% endif %}>{{ sido.name }}</option>
           {% endfor %}
