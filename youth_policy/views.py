@@ -1,12 +1,28 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import YouthPolicy, PolicyComment, Region
-from .utils import get_sido_code_list
+from .models import YouthPolicy, PolicyComment, Region, Sigungu, Sido
 
 # Create your views here.
 def basic_page(request):
+    selected_sido = request.GET.get('sido')
+    selected_sigungu = request.GET.get('sigungu')
+
+    sido_list = Sido.objects.all().order_by('code')
+    sigungu_list = Sigungu.objects.filter(code__startswith=selected_sido) if selected_sido else []
+
     policies = YouthPolicy.objects.all()
-    return render(request, 'basic_page.html', {'policies': policies})
+    if selected_sigungu:
+        policies = policies.filter(sigungu__code=selected_sigungu)
+    elif selected_sido:
+        policies = policies.filter(sigungu__code__startswith=selected_sido)
+
+    return render(request, 'basic_page.html', {
+        'sido_list': sido_list,
+        'sigungu_list': sigungu_list,
+        'selected_sido': selected_sido,
+        'selected_sigungu': selected_sigungu,
+        'policies': policies,
+    })
 
 def youth_policy_detail(request, policy_id):
     policy = get_object_or_404(YouthPolicy, id=policy_id)
@@ -53,22 +69,4 @@ def edit_policy_comment(request, comment_id):
 
     return render(request, 'edit_comment.html', {'comment': comment})
 
-def region_view(request):
-    selected_sido_code = request.GET.get('sido')
-    selected_sigungu_code = request.GET.get('sigungu')
 
-    sido_list = get_sido_code_list()
-
-    sigungu_list = Region.objects.filter(code__startswith=selected_sido_code) if selected_sido_code else []
-    filtered_policies = []
-
-    if selected_sigungu_code:
-        filtered_policies = YouthPolicy.objects.filter(region__regex=rf'(,|^){selected_sigungu_code}(,|$)')
-
-    return render(request, '지역정책.html', {
-        'sido_list': sido_list,
-        'sigungu_list': sigungu_list,
-        'policies': filtered_policies,
-        'selected_sido_code': selected_sido_code,
-        'selected_sigungu_code': selected_sigungu_code
-    })

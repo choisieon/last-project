@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import YouthPolicy, Region
+from .models import YouthPolicy, Region, Sido
 
-# Register your models here.
 admin.site.register(YouthPolicy)
+admin.site.register(Region)
+admin.site.register(Sido)
