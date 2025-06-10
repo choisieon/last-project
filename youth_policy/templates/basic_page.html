@@ -125,15 +125,6 @@
             <option value="{{ sido.code }}" {% if selected_sido == sido.code %}selected{% endif %}>{{ sido.name }}</option>
           {% endfor %}
         </select>
-
-        {% if sigungu_list %}
-        <select class="form-select" name="sigungu" onchange="this.form.submit()">
-          <option value="">시군구 선택</option>
-          {% for sigungu in sigungu_list %}
-            <option value="{{ sigungu.code }}" {% if selected_sigungu == sigungu.code %}selected{% endif %}>{{ sigungu.name }}</option>
-          {% endfor %}
-        </select>
-        {% endif %}
       </form>
     </div>
   </nav>

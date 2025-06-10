@@ -6,4 +6,5 @@
 - python manage.py makemigrations/migrate
 - python manage.py import_policies
 - python manage.py import_regions
+- python manage.py init_sigungu
 - python manage.py init_sido

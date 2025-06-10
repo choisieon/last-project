@@ -1,7 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import YouthPolicy, PolicyComment, Region, Sigungu, Sido
-
 # Create your views here.
 def basic_page(request):
     selected_sido = request.GET.get('sido')
