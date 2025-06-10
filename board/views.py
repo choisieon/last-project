@@ -1,4 +1,3 @@
-
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.http import JsonResponse
@@ -9,8 +8,10 @@ from django.core.paginator import Paginator
 from django.contrib.auth.models import User
 from .models import Post, Comment, Profile, Follow, PostImage
 from .forms import PostForm, CommentForm
+from django.contrib.auth import get_user_model
 from django.views.decorators.csrf import csrf_exempt   # CSRF 검증 우회
 from django.core.files.storage import default_storage   # 파일 저장을 위해 필요
+from .models import Notification
 
 # 게시글 목록 + 검색 + 정렬 + 페이지네이션
 def post_list(request):
@@ -92,11 +93,26 @@ def post_detail(request, pk):
             content=comment_form.cleaned_data['content'],
             parent=parent
         )
-        return redirect(f'{reverse("post_detail", kwargs={"pk": pk})}#comment-{new_comment.id}')
+        # 알림 생성 코드 추가
+        if post.author != request.user:
+            Notification.objects.create(
+                user=post.author,
+                message=f"'{post.title}' 글에 새로운 댓글이 달렸습니다.",
+                url=reverse('board:post_detail', args=[post.pk])
+            )
+        return redirect(f'{reverse("board:post_detail", kwargs={"pk": pk})}#comment-{new_comment.id}')
+    # 팔로우 상태 확인 (로그인한 경우에만)
+    is_following = False
+    if request.user.is_authenticated:
+        User = get_user_model()
+        author = post.author
+        is_following = author.followers.filter(pk=request.user.pk).exists()
     return render(request, 'board/post_detail.html', {
         'post': post,
         'comments': comments,
         'comment_form': comment_form,
+        'author': post.author,
+        'is_following': is_following,
     })
 
 # 좋아요 (페이지 리로드)
@@ -109,7 +125,7 @@ def post_like(request, pk):
         post.likes.remove(user)
     else:
         post.likes.add(user)
-    return redirect('post_detail', pk=pk)
+    return redirect('board:post_detail', pk=pk)
 
 # 좋아요 (AJAX)
 @login_required
@@ -133,12 +149,12 @@ def post_like_ajax(request, pk):
 def post_edit(request, pk):
     post = get_object_or_404(Post, pk=pk)
     if request.user != post.author:
-        return redirect('post_detail', pk=pk)
+        return redirect('board:post_detail', pk=pk)
     if request.method == "POST":
         form = PostForm(request.POST, request.FILES, instance=post)
         if form.is_valid():
             form.save()
-            return redirect('post_detail', pk=post.pk)
+            return redirect('board:post_detail', pk=post.pk)
     else:
         form = PostForm(instance=post)
     return render(request, 'board/post_edit.html', {'form': form, 'post': post})
@@ -148,10 +164,10 @@ def post_edit(request, pk):
 def post_delete(request, pk):
     post = get_object_or_404(Post, pk=pk)
     if request.user != post.author:
-        return redirect('post_detail', pk=pk)
+        return redirect('board:post_detail', pk=pk)
     if request.method == "POST":
         post.delete()
-        return redirect('post_list')
+        return redirect('board:post_list')
     return render(request, 'board/post_confirm_delete.html', {'post': post})
 
 # 댓글 수정
@@ -159,12 +175,12 @@ def post_delete(request, pk):
 def comment_edit(request, pk):
     comment = get_object_or_404(Comment, pk=pk)
     if request.user != comment.author:
-        return redirect('post_detail', pk=comment.post.pk)
+        return redirect('board:post_detail', pk=comment.post.pk)
     if request.method == 'POST':
         form = CommentForm(request.POST, instance=comment)
         if form.is_valid():
             form.save()
-            return redirect('post_detail', pk=comment.post.pk)
+            return redirect('board:post_detail', pk=comment.post.pk)
     else:
         form = CommentForm(instance=comment)
     return render(request, 'board/comment_edit.html', {'form': form, 'comment': comment})
@@ -176,7 +192,7 @@ def comment_delete(request, pk):
     post_pk = comment.post.pk
     if request.user == comment.author:
         comment.delete()
-    return redirect('post_detail', pk=post_pk)
+    return redirect('board:post_detail', pk=post_pk)
 
 # 프로필 페이지
 def profile(request, username):
@@ -199,9 +215,20 @@ def profile(request, username):
 @login_required
 def follow_toggle(request, username):
     target = get_object_or_404(User, username=username)
-    follow, created = Follow.objects.get_or_create(follower=request.user, following=target)
-    if not created:
-        follow.delete()  # 이미 팔로우 중이면 언팔로우
+    if request.user == target:
+        return redirect('profile', username=target.username)
+    
+    # 팔로우 여부 확인 (related_name 주의!)
+    is_following = Follow.objects.filter(
+        follower=request.user, 
+        following=target
+    ).exists()
+    
+    if is_following:
+        Follow.objects.filter(follower=request.user, following=target).delete()
+    else:
+        Follow.objects.create(follower=request.user, following=target)
+    
     return redirect('profile', username=target.username)
 
 def index(request):
@@ -219,3 +246,35 @@ def upload_image(request):
         return JsonResponse({'location': url})
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
+
+# def create_comment(request, post_id):
+#     post = get_object_or_404(Post, id=post_id)
+#     if request.method == "POST":
+#         form = CommentForm(request.POST)
+#         if form.is_valid():
+#             comment = form.save(commit=False)
+#             comment.author = request.user
+#             comment.post = post
+#             comment.save()
+#             # 글 작성자에게 알림 생성 (자기 댓글은 제외)
+#             if post.author != request.user:
+#                 Notification.objects.create(
+#                     user=post.author,
+#                     message=f"'{post.title}' 글에 새로운 댓글이 달렸습니다.",
+#                     url=reverse('board:post_detail', args=[post.id])
+#                 )
+#             return redirect('board:post_detail', post_id=post.id)
+
+def notification_read(request, noti_id):
+    noti = get_object_or_404(Notification, id=noti_id, user=request.user)
+    noti.is_read = True
+    noti.save()
+    return redirect(noti.url)
+
+
+@login_required
+def notification_list(request):
+    notifications = request.user.notifications.all().order_by('-created_at')
+    return render(request, 'board/notification_list.html', {
+        'notifications': notifications,
+    })

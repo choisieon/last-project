@@ -45,17 +45,43 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function enableTinyMCE() {
     if (tinymceLoaded) return;
+    document.getElementById('id_content').removeAttribute('required');
     tinymce.init({
-      selector: '#id_content',
-      plugins: 'image',
-      toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright | image link',
-      menubar: false,
+      selector: 'textarea#id_content',
+      height: 500,
       language: 'ko_KR',
-      images_upload_url: '/board/upload-image/', // 이미지 업로드 구현 필요
+      plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table help wordcount',
+      toolbar: 'undo redo | formatselect | bold italic backcolor | \
+                alignleft aligncenter alignright alignjustify | \
+                bullist numlist outdent indent | removeformat | help | \
+                link image media code preview fullscreen',
+      menubar: 'file edit view insert format tools table help',
+      content_css: 'writer',
+      images_upload_url: '/board/upload-image/',
       automatic_uploads: true,
+      setup: function(editor) {
+        editor.on('init', function() {
+          if (editor.getContent() === '') {
+            editor.setContent(
+              '<h3>1. 경험한 일</h3>' +
+              '<p>여기에 자신이 겪은 상황이나 사건을 구체적으로 적어주세요.</p>' +
+              '<p style="color:#888; font-size:0.95em;">예시: "처음에는 두려웠지만, 직접 해보니 생각보다 쉬웠습니다."</p>' +
+              '<hr>' +
+              '<h3>2. 느낀 점</h3>' +
+              '<p>당시 느꼈던 감정, 생각, 배운 점 등을 자유롭게 작성해 주세요.</p>' +
+              '<hr>' +
+              '<h3>3. 추천/비추천 이유</h3>' +
+              '<p>이 경험을 다른 사람에게 추천하거나 비추천하는 이유를 적어주세요.</p>' +
+              '<hr>' +
+              '<h3>추가 정보 (선택)</h3>' +
+              '<p>사진, 링크, 참고자료 등 추가적으로 공유하고 싶은 내용이 있다면 첨부해 주세요.</p>'
+            );
+          }
+        });
+      }
     });
     tinymceLoaded = true;
-  }
+}
 
   function disableTinyMCE() {
     if (!tinymceLoaded) return;
@@ -70,14 +96,22 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
       disableTinyMCE();
       document.getElementById('image_field').style.display = 'block';
+      if (tinymce.get('id_content')) {
+        tinymce.get('id_content').setContent('');
+      }
+      document.getElementById('id_content').value = '';
     }
   });
+
 
   // 페이지 로드 시 초기 상태 반영
   if (categorySelect.value === 'review') {
     enableTinyMCE();
     document.getElementById('image_field').style.display = 'none';
   }
+  document.querySelector('form').addEventListener('submit', function() {
+    tinymce.triggerSave();
+  });
 });
 </script>
 {% endblock %}

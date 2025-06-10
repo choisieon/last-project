@@ -25,6 +25,16 @@
         </a>
       </span>
     </div>
+    <h3>작성자: {{ author.username }}</h3>
+    <p>팔로워: {{ author.followers.count }} | 팔로잉: {{ author.followings.count }}</p>
+    {% if request.user.is_authenticated and request.user != author %}
+      <form method="post" action="{% url 'board:follow_toggle' author.username %}">
+        {% csrf_token %}
+        <button type="submit">
+          {% if is_following %}언팔로우{% else %}팔로우{% endif %}
+        </button>
+      </form>
+    {% endif %}
     {% if post.images.all %}
       <div class="post-images" style="margin-bottom:1rem;">
         {% for image in post.images.all %}

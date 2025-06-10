@@ -1,4 +1,3 @@
-
 from django import forms
 from .models import Post, PostImage, Comment
 from tinymce.widgets import TinyMCE
@@ -27,7 +26,7 @@ class PostForm(forms.ModelForm):
         model = Post
         fields = ['category', 'title', 'content']  # 글 제목, 내용만 입력받음
         widgets = {
-            'category': forms.Select(attrs={'class': 'form-control'}),   # 드롭다운(select)에도 클래스 적용
+            'category': forms.Select(attrs={'class': 'form-control', 'rows': 10, 'required': False}),   # 드롭다운(select)에도 클래스 적용
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 10}),
         }
@@ -36,7 +35,8 @@ class PostForm(forms.ModelForm):
     # 추가된 부분: __init__ 메서드 (카테고리 초기값에 따라 TinyMCE 적용)
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.initial.get('category') == 'review':
+        category = self.initial.get('category') or self.data.get('category')
+        if 'category' == 'review':
             self.fields['content'].widget = TinyMCE(attrs={'cols': 80, 'rows': 30})
 
     # 추가된 부분: 이미지 개수 검증
@@ -58,4 +58,3 @@ class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ['content']
-

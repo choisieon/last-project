@@ -1,4 +1,3 @@
-
 from django.urls import path
 from . import views
 
@@ -14,7 +13,11 @@ urlpatterns = [
     path('post/<int:pk>/delete/', views.post_delete, name='post_delete'),
     path('comment/<int:pk>/edit/', views.comment_edit, name='comment_edit'),
     path('comment/<int:pk>/delete/', views.comment_delete, name='comment_delete'),
-    path('', views.index, name='index'),
+    # path('', views.index, name='index'),
     path('upload-image/', views.upload_image, name='upload_image'),
-]
+    path('<str:username>/follow/', views.follow_toggle, name='follow_toggle'),
+    path('profile/<str:username>/', views.profile, name='profile'),
+    path('notifications/read/<int:noti_id>/', views.notification_read, name='notifications_read'),
+    path('notifications/all/', views.notification_list, name='notifications_all'),
 
+]

@@ -1,5 +1,3 @@
-
-
 """
 Django settings for chungsulmo_project project.
 
@@ -44,7 +42,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'community',
     'accounts',
-    'mentor',
     'board.apps.BoardConfig',   # 사용자 프로필/팔로우
     'tinymce',
     'youth_policy',
@@ -55,8 +52,6 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.kakao',  # 카카오 로그인
-    'allauth.socialaccount.providers.naver',  # 네이버 로그인
-    'allauth.socialaccount.providers.google', # 구글 로그인
 ]
 
 MIDDLEWARE = [
@@ -82,6 +77,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'board.context_processors.notification_counts',
             ],
         },
     },
@@ -135,7 +131,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+# STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -143,6 +139,8 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATIC_URL = '/static/'
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # collectstatic 명령으로 모일 경로
 
 # 개발 시 static 파일 경로
 STATICFILES_DIRS = [
@@ -168,12 +166,40 @@ TINYMCE_JS_URL = '/static/tinymce/js/tinymce/tinymce.min.js'
 TINYMCE_COMPRESSOR = False
 
 
+# TINYMCE_DEFAULT_CONFIG = {
+#     'height': 400,
+#     'plugins': 'image,link,code',
+#     'toolbar': 'undo redo | image link | code',
+#     'images_upload_url': '/upload-image/',  # 이미지 업로드 URL
+# }  
+
+
 TINYMCE_DEFAULT_CONFIG = {
-    'height': 400,
-    'plugins': 'image,link,code',
-    'toolbar': 'undo redo | image link | code',
-    'images_upload_url': '/upload-image/',  # 이미지 업로드 URL
-}  
+    'height': 500,
+    'plugins': '''
+        advlist autolink lists link image charmap print preview hr anchor
+        pagebreak searchreplace wordcount visualblocks visualchars code
+        fullscreen insertdatetime media nonbreaking save table contextmenu
+        directionality emoticons template paste textcolor colorpicker textpattern codesample
+    ''',
+    'toolbar1': '''
+        fullscreen preview bold italic underline | fontselect fontsizeselect | 
+        forecolor backcolor | alignleft alignright aligncenter alignjustify | 
+        indent outdent | bullist numlist table | link image media | codesample
+    ''',
+    'toolbar2': '''
+        visualblocks visualchars | charmap emoticons | insertdatetime
+        | hr nonbreaking | template | pagebreak restoredraft | code
+    ''',
+    'contextmenu': 'formats | link image',
+    'menubar': True,
+    'statusbar': True,
+    'theme_advanced_resizing': True,
+    'images_upload_url': '/upload-image/',
+    'width': '100%',
+    'language': 'ko_KR',
+}
+
   
 SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_LOGIN_ON_GET = True
@@ -202,5 +228,5 @@ SOCIALACCOUNT_PROVIDERS = {
             'auth_type': 'reauthenticate'
         },
     }
-
+}
 

@@ -239,7 +239,7 @@
 <div class="top-nav">
   <div class="menu-left">
 
-    <a href="{% url 'board:index' %}" class="menu-box home-link">
+    <a href="{% url 'community:index' %}" class="menu-box home-link">
       <i class="fas fa-home"></i>
     </a>
     <a href="{% url 'board:post_list' %}" class="menu-box">커뮤니티</a>
@@ -267,18 +267,17 @@
       <button>취업선배</button>
       <button>지갑선배</button>
       <button>운동선배</button>
-
+      <button onclick="location.href='/mentor/list/'">👤 선배 구경하기</button> <!-- NEW -->
     </div>
 
     <!-- 검색창 -->
 <!-- 🔍 검색창 -->
-<div class="search-bar">
+<!-- <div class="search-bar">
   <input type="text" placeholder="검색창" />
   <button type="submit"></button>
 </div>
 
-      <button onclick="location.href='/mentor/list/'">👤 선배 구경하기</button> <!-- NEW -->
-    </div>
+    </div> -->
     <div class="category-bar">
       <button 
         onclick="location.href='/mentor/questions/'"
