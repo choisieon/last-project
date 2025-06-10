@@ -19,5 +19,5 @@ urlpatterns = [
     path('profile/<str:username>/', views.profile, name='profile'),
     path('notifications/read/<int:noti_id>/', views.notification_read, name='notifications_read'),
     path('notifications/all/', views.notification_list, name='notifications_all'),
-
+    path('bookmark/', views.toggle_bookmark, name='toggle_bookmark'),
 ]

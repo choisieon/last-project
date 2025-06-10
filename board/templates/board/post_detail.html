@@ -16,6 +16,16 @@
       <span>|</span>
       <span>조회수: {{ post.views }}</span>
       <span>|</span>
+      <form class="bookmark-form" method="post" data-post-id="{{ post.id }}">
+        {% csrf_token %}
+        <button type="button" class="bookmark-btn">
+          {% if is_bookmarked %}
+            ★ 저장됨
+          {% else %}
+            ☆ 저장하기
+          {% endif %}
+        </button>
+      </form>
       <span class="like-group">
         <a href="#" class="like-btn" data-post-id="{{ post.pk }}">
           <span class="like-icon">
@@ -307,6 +317,26 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  // 북마크(저장) 버튼 AJAX
+  document.querySelectorAll('.bookmark-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const form = this.closest('.bookmark-form');
+      const postId = form.dataset.postId;
+      fetch('{% url "board:toggle_bookmark" %}', {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `post_id=${postId}`
+      })
+      .then(response => response.json())
+      .then(data => {
+        this.innerText = data.bookmarked ? '★ 저장됨' : '☆ 저장하기';
+      });
+    });
+  });
+
   // 대댓글 폼 토글
   document.querySelectorAll('.reply-toggle').forEach(function(btn) {
     btn.addEventListener('click', function(e) {
@@ -319,6 +349,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
+
 </script>
 {% endblock %}
 

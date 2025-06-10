@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q, Count
 from django.views.decorators.http import require_POST
@@ -11,7 +11,7 @@ from .forms import PostForm, CommentForm
 from django.contrib.auth import get_user_model
 from django.views.decorators.csrf import csrf_exempt   # CSRF 검증 우회
 from django.core.files.storage import default_storage   # 파일 저장을 위해 필요
-from .models import Notification
+from .models import Notification, Bookmark
 
 # 게시글 목록 + 검색 + 정렬 + 페이지네이션
 def post_list(request):
@@ -76,6 +76,9 @@ def post_new(request):
 def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
     session_key = f'viewed_{post.pk}'
+    is_bookmarked = False
+    if request.user.is_authenticated:
+        is_bookmarked = post.bookmark_set.filter(user=request.user).exists()
     # 조회수 증가 (작성자 본인 제외)
     if not request.session.get(session_key, False) and request.user != post.author:
         post.views += 1
@@ -113,6 +116,7 @@ def post_detail(request, pk):
         'comment_form': comment_form,
         'author': post.author,
         'is_following': is_following,
+        'is_bookmarked': is_bookmarked,
     })
 
 # 좋아요 (페이지 리로드)
@@ -278,3 +282,18 @@ def notification_list(request):
     return render(request, 'board/notification_list.html', {
         'notifications': notifications,
     })
+
+
+@login_required
+def toggle_bookmark(request):
+    if request.method == 'POST':
+        post_id = request.POST.get('post_id')
+        post = get_object_or_404(Post, id=post_id)
+        bookmark, created = Bookmark.objects.get_or_create(user=request.user, post=post)
+        if not created:
+            bookmark.delete()
+            bookmarked = False
+        else:
+            bookmarked = True
+        return JsonResponse({'bookmarked': bookmarked})
+    return HttpResponseBadRequest()
