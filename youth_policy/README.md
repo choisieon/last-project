@@ -4,7 +4,8 @@
 2. 클론한 후 필수 명령어
 - pip install -r requirements.txt
 - python manage.py makemigrations/migrate
-- python manage.py import_policies
+- python manage.py init_policy
 - python manage.py import_regions
-- python manage.py init_sigungu
 - python manage.py init_sido
+- python manage.py fill_sido_to_youthpolicy
+- python manage.py fill_sigungu_to_youthpolicy

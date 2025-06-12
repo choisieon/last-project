@@ -99,6 +99,16 @@
       box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
     }
 
+    .filter-form {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .form-select {
+      min-width: 150px;
+    }
+
     @media (max-width: 900px) {
       .card-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -109,6 +119,11 @@
       .card-grid {
         grid-template-columns: 1fr;
       }
+      
+      .filter-form {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
     }
   </style>
 </head>
@@ -118,11 +133,21 @@
   <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4 py-3">
     <div class="container-fluid">
       <a class="navbar-brand fw-bold text-primary" href="#">📢 청년정책 모음.zip</a>
-      <form class="d-flex ms-auto" method="get">
-        <select name="sido" class="form-select" onchange="this.form.submit()">
-          <option value="">전체</option>
+      
+      <!-- 필터 폼 -->
+      <form class="filter-form ms-auto" method="get" id="filterForm">
+        <!-- 시도 선택 -->
+        <select name="sido" class="form-select" onchange="resetSigunguAndSubmit()">
+          <option value="">시도 선택</option>
           {% for sido in sido_list %}
             <option value="{{ sido.code }}" {% if selected_sido == sido.code %}selected{% endif %}>{{ sido.name }}</option>
+          {% endfor %}
+        </select>
+
+        <select name="sigungu" class="form-select" onchange="this.form.submit()">
+          <option value="">시군구 선택</option>
+          {% for sigungu in sigungu_list %}
+            <option value="{{ sigungu.code }}" {% if selected_sigungu == sigungu.code %}selected{% endif %}>{{ sigungu.name }}</option>
           {% endfor %}
         </select>
       </form>
@@ -136,26 +161,33 @@
     <a href="{% url 'youth_policy:policy_detail' policy.id %}">
       <div class="policy-card">
         <div>
-          <div class="policy-title">📌 {{ policy.name }}</div>
+          <div class="policy-title">📌 {{ policy.정책명 }}</div>
 
           <div class="policy-section">
             <span class="policy-label">📚 키워드</span>
-            <div class="policy-content">{{ policy.keyword|default:"없음" }}</div>
-          </div>
-
-          <div class="policy-section">
-            <span class="policy-label">🧭 범주</span>
-            <div class="policy-content">{{ policy.major|default:"없음" }} / {{ policy.medium|default:"없음" }}</div>
+            <div class="policy-content">{{ policy.정책키워드|default:"없음" }}</div>
           </div>
 
           <div class="policy-section">
             <span class="policy-label">🎯 대상 연령</span>
-            <div class="policy-content">{{ policy.minage|default:"없음" }} ~ {{ policy.maxage|default:"없음" }}세</div>
+            <div class="policy-content">{{ policy.대상연령|default:"없음" }}</div>
           </div>
 
           <div class="policy-section">
+            <span class="policy-label">🌍 시도</span>
+            <div class="policy-content">{{ policy.sido.name|default:"없음" }}</div>
+          </div>
+
+          {% if policy.sigungu %}
+          <div class="policy-section">
+            <span class="policy-label">🏘️ 시군구</span>
+            <div class="policy-content">{{ policy.sigungu.name }}</div>
+          </div>
+          {% endif %}
+
+          <div class="policy-section">
             <span class="policy-label">⏰ 신청 기간</span>
-            <div class="policy-content">{{ policy.period|default:"없음" }}</div>
+            <div class="policy-content">{{ policy.신청기간|default:"없음" }}</div>
           </div>
         </div>
 
@@ -171,6 +203,24 @@
   {% else %}
     <p class="empty">조건에 맞는 정책이 없습니다.</p>
   {% endif %}
+
+  <script>
+    // 시도 변경 시 시군구 선택 초기화하고 폼 제출
+    function resetSigunguAndSubmit() {
+      // 시군구 선택값이 있다면 제거
+      const form = document.getElementById('filterForm');
+      const sigunguInput = form.querySelector('select[name="sigungu"]');
+      if (sigunguInput) {
+        sigunguInput.remove();
+      }
+      form.submit();
+    }
+
+    // 필터 초기화
+    function resetFilters() {
+      window.location.href = window.location.pathname;
+    }
+  </script>
 
 </body>
 </html>

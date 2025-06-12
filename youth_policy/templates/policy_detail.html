@@ -151,15 +151,15 @@
   <div class="calendar-box">
     <h1>{{ policy.name }}</h1>
 
-    <div class="main-keyword">📌 메인 키워드: {{ policy.keyword|default:"없음" }}</div>
+    <div class="main-keyword">📌 메인 키워드: {{ policy.정책키워드|default:"없음" }}</div>
 
     <div class="description-box">
-      <p><strong>정책 설명</strong><br>{{ policy.description|linebreaksbr }}</p>
-      <p><strong>추가 신청 자격</strong><br>{{ policy.addaply|linebreaksbr }}</p>
-      <p><strong>신청 기간</strong><br>{{ policy.period }}</p>
-      <p><strong>신청 URL</strong><br>
-        {% if policy.URL_ADD and policy.URL_ADD != "nan" %}
-          <a href="{{ policy.URL_ADD }}" target="_blank">{{ policy.URL_ADD }}</a>
+      <p><strong>정책 설명</strong><br>{{ policy.정책설명|linebreaksbr }}</p>
+      <p><strong>추가 신청 자격</strong><br>{{ policy.추가신청자격조건내용|linebreaksbr }}</p>
+      <p><strong>신청 기간</strong><br>{{ policy.신청기간 }}</p>
+      <p><strong>신청URL</strong><br>
+        {% if policy.신청URL and policy.신청URL != "nan" %}
+          <a href="{{ policy.신청URL }}" target="_blank">{{ policy.신청URL }}</a>
         {% else %}
           <span>없음</span>
         {% endif %}
@@ -167,9 +167,9 @@
     </div>
 
     <div class="keyword-buttons">
-      <button>#{{ policy.major|default:"분류없음" }}</button>
-      <button>#{{ policy.medium|default:"하위분류없음" }}</button>
-      <button>#{{ policy.minage }} ~ {{ policy.maxage }}세</button>
+      <button>#{{ policy.정책키워드|default:"하위분류없음" }}</button>
+      <button>#{{ policy.대상연령 }}</button>
+      <button>#{{ policy.sido.name|default:"없음" }}</button>
     </div>
 
     {% if user.is_authenticated %}

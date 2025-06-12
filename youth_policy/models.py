@@ -12,28 +12,25 @@ class Sigungu(models.Model):
     
     
 class YouthPolicy(models.Model):
-    name = models.CharField("정책명", max_length=255)
-    description = models.TextField("정책설명")
-    age_range = models.CharField("대상연령", max_length=50)
-    keyword = models.CharField("정책키워드", max_length=100, blank=True)
-    region = models.CharField("시행지역", max_length=200, blank=True)
-    period = models.CharField("신청기간", max_length=200, blank=True)
-    URL_ADD = models.URLField("신청URL", max_length=200, blank=True)
-    major = models.CharField("대분류명", max_length=100, blank=True)  
-    medium = models.CharField("중분류명", max_length=100, blank=True) 
-    minage = models.IntegerField("최소연령", null=True, blank=True)  
-    maxage = models.IntegerField("최대연령", null=True, blank=True) 
-    addaply = models.TextField("추가신청자격조건내용", blank=True)
-    document = models.TextField("제출서류내용", blank=True)
-    etc = models.TextField("기타사항내용", blank=True)
+    정책명 = models.CharField(max_length=255, default="데이터 변경")
+    정책설명 = models.TextField(blank=True, null=True)
+    대상연령 = models.CharField(max_length=100, blank=True, null=True)
+    정책키워드 = models.CharField(max_length=255, blank=True, null=True)
+    시행지역 = models.CharField(max_length=255, blank=True, null=True)
+    신청기간 = models.CharField(max_length=255, blank=True, null=True)
+    신청URL = models.URLField(blank=True, null=True)
+    추가신청자격조건내용 = models.TextField(blank=True, null=True)
+    제출서류내용 = models.TextField(blank=True, null=True)
+    참여제외대상 = models.TextField(blank=True, null=True)
 
     view_count = models.PositiveIntegerField(default=0)
     likes = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='liked_policies', blank=True)
 
-    sigungu = models.ForeignKey('Sigungu', on_delete=models.CASCADE, related_name='policies', null=True, blank=True)
+    sido = models.ForeignKey('Sido', on_delete=models.CASCADE, null=True, blank=True)
+    sigungu = models.ForeignKey('Sigungu', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
-        return self.name
+        return self.정책명
     
     def comment_count(self):
         return self.comments.count()

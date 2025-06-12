@@ -5,16 +5,23 @@ from .models import YouthPolicy, PolicyComment, Region, Sigungu, Sido
 def basic_page(request):
     selected_sido = request.GET.get('sido')
     selected_sigungu = request.GET.get('sigungu')
-
+    
     sido_list = Sido.objects.all().order_by('code')
-    sigungu_list = Sigungu.objects.filter(code__startswith=selected_sido) if selected_sido else []
-
+    
+    sigungu_list = []
+    if selected_sido:
+        # 시도 코드로 시군구 필터링 (앞 2자리 매칭)
+        sigungu_list = Sigungu.objects.filter(
+            code__startswith=selected_sido
+        ).order_by('code')
+    
+    # 정책 필터링도 마찬가지로 수정
     policies = YouthPolicy.objects.all()
-    if selected_sigungu:
-        policies = policies.filter(sigungu__code=selected_sigungu)
-    elif selected_sido:
-        policies = policies.filter(sigungu__code__startswith=selected_sido)
-
+    if selected_sido:
+        policies = policies.filter(sido_id=selected_sido)
+        if selected_sigungu:
+            policies = policies.filter(sigungu_id=selected_sigungu)
+    
     return render(request, 'basic_page.html', {
         'sido_list': sido_list,
         'sigungu_list': sigungu_list,
