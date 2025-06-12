@@ -1,6 +1,8 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import YouthPolicy, PolicyComment, Region, Sigungu, Sido
+from django.core.paginator import Paginator
+
 # Create your views here.
 def basic_page(request):
     selected_sido = request.GET.get('sido')
@@ -17,18 +19,33 @@ def basic_page(request):
     
     # 정책 필터링도 마찬가지로 수정
     policies = YouthPolicy.objects.all()
+    
     if selected_sido:
         policies = policies.filter(sido_id=selected_sido)
-        if selected_sigungu:
-            policies = policies.filter(sigungu_id=selected_sigungu)
-    
-    return render(request, 'basic_page.html', {
+    if selected_sigungu:
+        policies = policies.filter(sigungu_id=selected_sigungu)
+
+
+    if 'sido' in request.GET and not selected_sigungu:
+        # 시도만 선택되고 시군구가 없으면, 해당 시도의 시군구 목록만 보여줌
+        pass
+
+    paginator = Paginator(policies, 9)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'policies': page_obj,
+        'page_obj': page_obj,
+        'paginator': paginator,
+        'is_paginated': page_obj.has_other_pages(),
         'sido_list': sido_list,
         'sigungu_list': sigungu_list,
         'selected_sido': selected_sido,
         'selected_sigungu': selected_sigungu,
-        'policies': policies,
-    })
+    }
+    
+    return render(request, 'basic_page.html', context)
 
 def youth_policy_detail(request, policy_id):
     policy = get_object_or_404(YouthPolicy, id=policy_id)
@@ -74,5 +91,3 @@ def edit_policy_comment(request, comment_id):
         return redirect(request.META.get('HTTP_REFERER', '/'))
 
     return render(request, 'edit_comment.html', {'comment': comment})
-
-

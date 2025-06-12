@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>청년정책 목록</title>
 
   <!-- Bootstrap 5 CDN -->
@@ -11,216 +12,575 @@
   <style>
     body {
       font-family: 'Noto Sans KR', sans-serif;
-      background-color: #e0f2fe;
+      background-color: #f8fafc;
       padding: 0;
       margin: 0;
+      line-height: 1.5;
+    }
+
+    /* 컨테이너 여백 추가 */
+    .main-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .navbar {
+      background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+      border-bottom: none;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .navbar-brand {
+      color: white !important;
+      font-size: 1.4rem;
+      font-weight: bold;
     }
 
     h1 {
       text-align: center;
-      font-size: 1.8rem;
-      margin: 2rem 0 1rem;
+      font-size: 2rem;
+      margin: 2rem 0;
       color: #1f2937;
+      font-weight: bold;
     }
 
-    .card-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.5rem;
-      padding: 2rem;
-    }
-
-    .policy-card {
-      background-color: #ffffff;
-      border: 3px solid #60a5fa;
+    /* 필터 영역 개선 */
+    .filter-section {
+      background: white;
       border-radius: 12px;
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
       padding: 1.5rem;
-      box-sizing: border-box;
-      transition: transform 0.2s, box-shadow 0.2s;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .policy-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
-    }
-
-    .policy-title {
-      font-size: 1.2rem;
-      font-weight: bold;
-      margin-bottom: 1rem;
-      color: #1e3a8a;
-    }
-
-    .policy-section {
-      margin-bottom: 0.9rem;
-      font-size: 0.95rem;
-    }
-
-    .policy-label {
-      font-weight: bold;
-      display: inline-block;
-      margin-bottom: 0.2rem;
-      color: #0369a1;
-    }
-
-    .policy-content {
-      color: #374151;
-      padding-left: 0.25rem;
-    }
-
-    .policy-meta {
-      margin-top: 1rem;
-      font-size: 0.95rem;
-      color: #374151;
-      padding-left: 0.25rem;
-      line-height: 1.4;
-    }
-
-    .policy-meta span {
-      margin-right: 0.4rem;
-    }
-
-    .empty {
-      color: #9ca3af;
-      text-align: center;
-      margin-top: 2rem;
-    }
-
-    a {
-      text-decoration: none;
-      color: inherit;
-    }
-
-    a:hover .policy-card {
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      border: 1px solid #e2e8f0;
     }
 
     .filter-form {
       display: flex;
       gap: 1rem;
       align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
     }
 
     .form-select {
-      min-width: 150px;
+      min-width: 160px;
+      border-radius: 8px;
+      border: 2px solid #e2e8f0;
+      padding: 0.6rem 1rem;
+      font-weight: 500;
     }
 
-    @media (max-width: 900px) {
-      .card-grid {
-        grid-template-columns: repeat(2, 1fr);
+    .form-select:focus {
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+    }
+
+    /* 카드 그리드 개선 - 여백 추가 */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    /* 카드 디자인 최적화 */
+    .policy-card {
+      background-color: #ffffff;
+      border: 2px solid #e2e8f0;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      padding: 1.8rem;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .policy-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #60a5fa, #3b82f6);
+    }
+
+    .policy-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+      border-color: #60a5fa;
+    }
+
+    /* 제목 영역 최적화 */
+    .policy-title {
+      font-size: 1.25rem;
+      font-weight: bold;
+      margin-bottom: 1.2rem;
+      color: #1e40af;
+      line-height: 1.4;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* 카드 콘텐츠 영역 - 좌우 분할 */
+    .policy-content {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 1rem;
+      flex: 1;
+    }
+
+    .policy-info-left {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .policy-info-right {
+      width: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+      border-radius: 12px;
+      padding: 1rem;
+      border: 1px solid #cbd5e1;
+    }
+
+    /* 정보 라인 개별 스타일 */
+    .info-line {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      color: #475569;
+      font-weight: 500;
+    }
+
+    .info-icon {
+      font-size: 1rem;
+      width: 20px;
+      text-align: center;
+    }
+
+    /* 오른쪽 콘텐츠 스타일 */
+    .policy-badge {
+      background: linear-gradient(135deg, #60a5fa, #3b82f6);
+      color: white;
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 0.8rem;
+      white-space: nowrap;
+    }
+
+    .policy-level {
+      font-size: 0.75rem;
+      color: #64748b;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    /* 신청 기간 강조 */
+    .application-period {
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      border: 1px solid #f59e0b;
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      margin: 1rem 0;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #92400e;
+      text-align: center;
+    }
+
+    /* 하단 통계 개선 */
+    .policy-stats {
+      margin-top: auto;
+      padding-top: 1rem;
+      border-top: 1px solid #f1f5f9;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 1rem;
+      font-size: 0.85rem;
+      color: #64748b;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    /* 회색 하트 유지 */
+    .stat-item .heart-icon {
+      color: #94a3b8;
+    }
+
+    /* 페이지네이션 스타일 */
+    .pagination-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 3rem 0 4rem 0;
+      gap: 1rem;
+    }
+
+    .pagination-info {
+      background: white;
+      padding: 0.8rem 1.5rem;
+      border-radius: 25px;
+      border: 2px solid #e2e8f0;
+      font-size: 0.9rem;
+      color: #64748b;
+      font-weight: 500;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .pagination {
+      background: white;
+      border-radius: 16px;
+      padding: 0.5rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border: 2px solid #e2e8f0;
+    }
+
+    .page-item {
+      margin: 0 0.2rem;
+    }
+
+    .page-link {
+      border: none;
+      color: #64748b;
+      font-weight: 600;
+      padding: 0.6rem 1rem;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+      background: transparent;
+      min-width: 45px;
+      text-align: center;
+    }
+
+    .page-link:hover {
+      background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+      color: #3b82f6;
+      transform: translateY(-2px);
+    }
+
+    .page-item.active .page-link {
+      background: linear-gradient(135deg, #60a5fa, #3b82f6);
+      color: white;
+      box-shadow: 0 4px 12px rgba(96, 165, 250, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .page-item.disabled .page-link {
+      color: #cbd5e1;
+      background: transparent;
+    }
+
+    .page-item.disabled .page-link:hover {
+      background: transparent;
+      transform: none;
+    }
+
+    /* 페이지네이션 화살표 스타일 */
+    .page-link.page-prev,
+    .page-link.page-next {
+      padding: 0.6rem 0.8rem;
+      font-size: 1.1rem;
+    }
+
+    /* 빈 상태 개선 */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      background: white;
+      border-radius: 16px;
+      margin: 2rem 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .empty-state h3 {
+      color: #64748b;
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+    }
+
+    .empty-state p {
+      color: #94a3b8;
+      font-size: 1rem;
+    }
+
+    /* 링크 스타일 */
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* 반응형 개선 */
+    @media (max-width: 768px) {
+      .main-container {
+        padding: 0 1rem;
       }
-    }
 
-    @media (max-width: 600px) {
       .card-grid {
         grid-template-columns: 1fr;
+        gap: 1.5rem;
       }
       
       .filter-form {
         flex-direction: column;
+        gap: 1rem;
+      }
+
+      .form-select {
+        min-width: 200px;
+      }
+
+      .policy-content {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .policy-info-right {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 0.8rem;
+      }
+
+      h1 {
+        font-size: 1.6rem;
+      }
+
+      .policy-card {
+        padding: 1.5rem;
+      }
+
+      .pagination-container {
+        flex-direction: column;
+        gap: 1rem;
+        margin: 2rem 0 3rem 0;
+      }
+
+      .pagination-info {
+        order: 2;
+        font-size: 0.8rem;
+        padding: 0.6rem 1.2rem;
+      }
+
+      .pagination {
+        order: 1;
+        padding: 0.3rem;
+      }
+
+      .page-link {
+        padding: 0.5rem 0.7rem;
+        font-size: 0.9rem;
+        min-width: 40px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .policy-stats {
+        justify-content: flex-end;
+        gap: 0.8rem;
+      }
+
+      .policy-info-right {
+        flex-direction: column;
         gap: 0.5rem;
+      }
+
+      .pagination {
+        padding: 0.2rem;
+      }
+
+      .page-link {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.8rem;
+        min-width: 35px;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- 🔷 Navbar 드롭다운 -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4 py-3">
-    <div class="container-fluid">
-      <a class="navbar-brand fw-bold text-primary" href="#">📢 청년정책 모음.zip</a>
-      
-      <!-- 필터 폼 -->
-      <form class="filter-form ms-auto" method="get" id="filterForm">
-        <!-- 시도 선택 -->
-        <select name="sido" class="form-select" onchange="resetSigunguAndSubmit()">
-          <option value="">시도 선택</option>
+  <!-- 네비게이션 바 -->
+  <nav class="navbar navbar-expand-lg">
+    <div class="main-container">
+      <div class="container-fluid p-0">
+        <a class="navbar-brand" href="#">📢 청년정책 모음.zip</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main-container">
+    <h1>🎯 청년을 위한 정책을 찾아보세요</h1>
+
+    <!-- 필터 섹션 -->
+    <div class="filter-section">
+      <form class="filter-form" method="get" id="filterForm">
+        <select name="sido" class="form-select" onchange="this.form.submit()">
+          <option value="">🗺️ 시도 선택</option>
           {% for sido in sido_list %}
             <option value="{{ sido.code }}" {% if selected_sido == sido.code %}selected{% endif %}>{{ sido.name }}</option>
           {% endfor %}
         </select>
 
         <select name="sigungu" class="form-select" onchange="this.form.submit()">
-          <option value="">시군구 선택</option>
+          <option value="">🏘️ 시군구 선택</option>
           {% for sigungu in sigungu_list %}
             <option value="{{ sigungu.code }}" {% if selected_sigungu == sigungu.code %}selected{% endif %}>{{ sigungu.name }}</option>
           {% endfor %}
         </select>
+        
+        <a href="{% url 'youth_policy:basic_page' %}" class="btn btn-outline-secondary">
+          🔄 필터 초기화
+        </a>
       </form>
     </div>
-  </nav>
 
-  <!-- 🔽 정책 카드 목록 -->
-  {% if policies %}
-  <div class="card-grid">
-    {% for policy in policies %}
-    <a href="{% url 'youth_policy:policy_detail' policy.id %}">
-      <div class="policy-card">
-        <div>
-          <div class="policy-title">📌 {{ policy.정책명 }}</div>
+    <!-- 정책 카드 목록 -->
+    {% if policies %}
+    <div class="card-grid">
+      {% for policy in policies %}
+      <a href="{% url 'youth_policy:policy_detail' policy.id %}">
+        <div class="policy-card">
+          <div class="policy-title">{{ policy.정책명 }}</div>
 
-          <div class="policy-section">
-            <span class="policy-label">📚 키워드</span>
-            <div class="policy-content">{{ policy.정책키워드|default:"없음" }}</div>
+          <div class="policy-content">
+            <div class="policy-info-left">
+              <div class="info-line">
+                <span class="info-icon">📚</span>
+                <span>{{ policy.정책키워드|default:"일반" }}</span>
+              </div>
+              <div class="info-line">
+                <span class="info-icon">👥</span>
+                <span>{{ policy.대상연령|default:"전체" }}</span>
+              </div>
+              <div class="info-line">
+                <span class="info-icon">📍</span>
+                <span>{{ policy.sido.name|default:"전국" }}</span>
+              </div>
+            </div>
+            
+            <div class="policy-info-right">
+              <div class="policy-badge">HOT</div>
+              <div class="policy-level">인기 정책</div>
+            </div>
           </div>
 
-          <div class="policy-section">
-            <span class="policy-label">🎯 대상 연령</span>
-            <div class="policy-content">{{ policy.대상연령|default:"없음" }}</div>
+          <div class="application-period">
+            <span class="info-icon">⏰</span>
+            {{ policy.신청기간|default:"상시 접수" }}
           </div>
 
-          <div class="policy-section">
-            <span class="policy-label">🌍 시도</span>
-            <div class="policy-content">{{ policy.sido.name|default:"없음" }}</div>
+          <div class="policy-stats">
+            <div class="stat-item">
+              <span>📊</span>
+              <span>{{ policy.view_count|default:0 }}</span>
+            </div>
+            <div class="stat-item">
+              <span class="heart-icon">🤍</span>
+              <span>{{ policy.likes.count|default:0 }}</span>
+            </div>
+            <div class="stat-item">
+              <span>💬</span>
+              <span>{{ policy.comments.count|default:0 }}</span>
+            </div>
           </div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
 
-          {% if policy.sigungu %}
-          <div class="policy-section">
-            <span class="policy-label">🏘️ 시군구</span>
-            <div class="policy-content">{{ policy.sigungu.name }}</div>
-          </div>
+    <!-- 페이지네이션 -->
+    {% if is_paginated %}
+    <div class="pagination-container">      
+      <nav aria-label="Page navigation">
+        <ul class="pagination mb-0">
+          <!-- 이전 페이지 -->
+          {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link page-prev" href="?{% if request.GET.sido %}sido={{ request.GET.sido }}&{% endif %}{% if request.GET.sigungu %}sigungu={{ request.GET.sigungu }}&{% endif %}page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                ‹
+              </a>
+            </li>
+          {% else %}
+            <li class="page-item disabled">
+              <span class="page-link page-prev" aria-label="Previous">‹</span>
+            </li>
           {% endif %}
 
-          <div class="policy-section">
-            <span class="policy-label">⏰ 신청 기간</span>
-            <div class="policy-content">{{ policy.신청기간|default:"없음" }}</div>
-          </div>
-        </div>
+          <!-- 페이지 번호들 -->
+          {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+              <li class="page-item active" aria-current="page">
+                <span class="page-link">{{ num }}</span>
+              </li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+              <li class="page-item">
+                <a class="page-link" href="?{% if request.GET.sido %}sido={{ request.GET.sido }}&{% endif %}{% if request.GET.sigungu %}sigungu={{ request.GET.sigungu }}&{% endif %}page={{ num }}">{{ num }}</a>
+              </li>
+            {% elif num == 1 %}
+              <li class="page-item">
+                <a class="page-link" href="?{% if request.GET.sido %}sido={{ request.GET.sido }}&{% endif %}{% if request.GET.sigungu %}sigungu={{ request.GET.sigungu }}&{% endif %}page={{ num }}">{{ num }}</a>
+              </li>
+              {% if page_obj.number > 4 %}
+                <li class="page-item disabled">
+                  <span class="page-link">…</span>
+                </li>
+              {% endif %}
+            {% elif num == paginator.num_pages %}
+              {% if page_obj.number < paginator.num_pages|add:'-3' %}
+                <li class="page-item disabled">
+                  <span class="page-link">…</span>
+                </li>
+              {% endif %}
+              <li class="page-item">
+                <a class="page-link" href="?{% if request.GET.sido %}sido={{ request.GET.sido }}&{% endif %}{% if request.GET.sigungu %}sigungu={{ request.GET.sigungu }}&{% endif %}page={{ num }}">{{ num }}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
 
-        <div class="policy-meta">
-          <span>조회수: {{ policy.view_count }}</span> |
-          <span>🤍 {{ policy.likes.count }}</span> |
-          <span>댓글: {{ policy.comments.count }}</span>
-        </div>
-      </div>
-    </a>
-    {% endfor %}
+          <!-- 다음 페이지 -->
+          {% if page_obj.has_next %}
+            <li class="page-item">
+              <a class="page-link page-next" href="?{% if request.GET.sido %}sido={{ request.GET.sido }}&{% endif %}{% if request.GET.sigungu %}sigungu={{ request.GET.sigungu }}&{% endif %}page={{ page_obj.next_page_number }}" aria-label="Next">
+                ›
+              </a>
+            </li>
+          {% else %}
+            <li class="page-item disabled">
+              <span class="page-link page-next" aria-label="Next">›</span>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <div class="empty-state">
+      <h3>🔍 검색 결과가 없습니다</h3>
+      <p>다른 지역을 선택하거나 필터를 초기화해보세요.</p>
+    </div>
+    {% endif %}
   </div>
-  {% else %}
-    <p class="empty">조건에 맞는 정책이 없습니다.</p>
-  {% endif %}
-
-  <script>
-    // 시도 변경 시 시군구 선택 초기화하고 폼 제출
-    function resetSigunguAndSubmit() {
-      // 시군구 선택값이 있다면 제거
-      const form = document.getElementById('filterForm');
-      const sigunguInput = form.querySelector('select[name="sigungu"]');
-      if (sigunguInput) {
-        sigunguInput.remove();
-      }
-      form.submit();
-    }
-
-    // 필터 초기화
-    function resetFilters() {
-      window.location.href = window.location.pathname;
-    }
-  </script>
+  
+  <!-- 자바스크립트 없이 구현 -->
 
 </body>
 </html>

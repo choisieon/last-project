@@ -5,7 +5,10 @@
 - pip install -r requirements.txt
 - python manage.py makemigrations/migrate
 - python manage.py init_policy
-- python manage.py import_regions
+- python manage.py init_regions
 - python manage.py init_sido
 - python manage.py fill_sido_to_youthpolicy
 - python manage.py fill_sigungu_to_youthpolicy
+
+# init_policy.py/init_regions.py는 엑셀 파일 바탕화면에 저장한 후 실행
+# 순서 반드시 지킬 것
