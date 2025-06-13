@@ -2,11 +2,13 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import YouthPolicy, PolicyComment, Region, Sigungu, Sido
 from django.core.paginator import Paginator
+from django.db.models import Q
 
 # Create your views here.
 def basic_page(request):
     selected_sido = request.GET.get('sido')
     selected_sigungu = request.GET.get('sigungu')
+    selected_category = request.GET.get('category', 'all')  # 카테고리 파라미터 추가
     
     sido_list = Sido.objects.all().order_by('code')
     
@@ -25,6 +27,22 @@ def basic_page(request):
     if selected_sigungu:
         policies = policies.filter(sigungu_id=selected_sigungu)
 
+    # 카테고리 필터링 (백엔드에서 처리)
+    if selected_category != 'all':
+        category_keywords = {
+            'job': ['일자리', '교육'],
+            'education': ['교육', '학습'],
+            'welfare': ['참여권리', '복지문화'],
+            'housing': ['주거'],
+            'culture': ['문화', '복지문화']
+        }
+        
+        if selected_category in category_keywords:
+            keyword_queries = Q()
+            for keyword in category_keywords[selected_category]:
+                keyword_queries |= Q(정책키워드__icontains=keyword)
+            policies = policies.filter(keyword_queries)
+
 
     if 'sido' in request.GET and not selected_sigungu:
         # 시도만 선택되고 시군구가 없으면, 해당 시도의 시군구 목록만 보여줌
@@ -37,12 +55,13 @@ def basic_page(request):
     context = {
         'policies': page_obj,
         'page_obj': page_obj,
-        'paginator': paginator,
-        'is_paginated': page_obj.has_other_pages(),
+        'paginator': paginator,  # paginator 객체 추가
+        'is_paginated': True,  # 항상 페이지네이션 표시
         'sido_list': sido_list,
         'sigungu_list': sigungu_list,
         'selected_sido': selected_sido,
         'selected_sigungu': selected_sigungu,
+        'selected_category': selected_category,  # 현재 선택된 카테고리 전달
     }
     
     return render(request, 'basic_page.html', context)
