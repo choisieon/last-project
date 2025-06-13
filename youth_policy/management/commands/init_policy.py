@@ -35,6 +35,7 @@ class Command(BaseCommand):
                     '추가신청자격조건내용': row.get('추가신청자격조건내용', ''),
                     '제출서류내용': row.get('제출서류내용', ''),
                     '참여제외대상': row.get('참여제외대상', ''),
+                    '생애주기단계': row.get('생애주기단계', '')
                 }
             )
             if created:

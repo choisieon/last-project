@@ -30,11 +30,10 @@ def basic_page(request):
     # 카테고리 필터링 (백엔드에서 처리)
     if selected_category != 'all':
         category_keywords = {
-            'job': ['일자리', '교육'],
+            'job': ['일자리'],
             'education': ['교육', '학습'],
-            'welfare': ['참여권리', '복지문화'],
+            'welfare': ['복지문화', '참여권리'],
             'housing': ['주거'],
-            'culture': ['문화', '복지문화']
         }
         
         if selected_category in category_keywords:
