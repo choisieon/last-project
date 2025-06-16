@@ -9,4 +9,5 @@ urlpatterns = [
     path('<int:policy_id>/', views.policy_detail, name='policy_detail'),
     path('comment/<int:comment_id>/edit/', views.edit_policy_comment, name='edit_policy_comment'),
     path('comment/<int:comment_id>/delete/', views.delete_policy_comment, name='delete_policy_comment'),
+    path('weekly-pick/', views.weekly_pick_view, name='weekly_pick'),
 ]

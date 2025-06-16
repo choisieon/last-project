@@ -30,6 +30,9 @@ class YouthPolicy(models.Model):
     sido = models.ForeignKey('Sido', on_delete=models.CASCADE, null=True, blank=True)
     sigungu = models.ForeignKey('Sigungu', on_delete=models.CASCADE, null=True, blank=True)
 
+    relation_with = models.ManyToManyField('self', symmetrical=False, blank=True, related_name='추천된_정책들')
+    is_weekly_pick = models.BooleanField(default=False)  # 관리자 주간 추천 여부
+
     def __str__(self):
         return self.정책명
     
@@ -59,3 +62,9 @@ class PolicyComment(models.Model):
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='replies')
+
+
+class PolicyViewLog(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    policy = models.ForeignKey(YouthPolicy, on_delete=models.CASCADE)
+    viewed_at = models.DateTimeField(auto_now_add=True)

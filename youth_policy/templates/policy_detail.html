@@ -12,8 +12,15 @@
       justify-content: center;
     }
 
+    .content-wrapper {
+      display: flex;
+      gap: 2rem;
+      max-width: 1200px;
+      width: 100%;
+    }
+
     .calendar-box {
-      width: 700px;
+      flex: 1;
       background-color: #ffffff;
       border: 4px solid #60a5fa;
       border-radius: 10px;
@@ -76,6 +83,19 @@
       border-radius: 20px;
       cursor: default;
       font-weight: bold;
+    }
+
+    .sidebar {
+      width: 300px;
+    }
+
+    .sidebar-box {
+      background: #ffffff;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     }
 
     .comment-form {
@@ -148,6 +168,7 @@
   </style>
 </head>
 <body>
+<div class="content-wrapper">
   <div class="calendar-box">
     <h1>{{ policy.name }}</h1>
 
@@ -188,7 +209,6 @@
 
     <hr>
     <h2>💬 댓글</h2>
-
     <div id="comment-section">
       {% for comment in comments %}
         <div style="margin-bottom: 1.5rem; border-bottom: 1px solid #ccc; padding-bottom: 1rem;">
@@ -232,5 +252,25 @@
 
     <a href="{% url 'youth_policy:basic_page' %}" class="back-btn">← 목록으로 돌아가기</a>
   </div>
+
+  <aside class="sidebar">
+  <div class="sidebar-box">
+    <h4>🌟 함께 보면 좋은 정책 (관리자 추천)</h4>
+    <p><a href="{% url 'youth_policy:weekly_pick' %}">→ 이번 주 관리자 Pick 보기</a></p>
+  </div>
+
+  <div class="sidebar-box">
+    <h4>🔥 인기 정책 TOP 3</h4>
+    <ol>
+      {% for p in top_viewed_policies %}
+        <li>
+          <a href="{% url 'youth_policy:policy_detail' p.id %}">{{ p.정책명 }}</a><br>
+          <small>{{ p.view_count }}회 조회</small>
+        </li>
+      {% endfor %}
+    </ol>
+  </div>
+</aside>
+</div>
 </body>
 </html>

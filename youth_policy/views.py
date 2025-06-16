@@ -1,8 +1,9 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import YouthPolicy, PolicyComment, Region, Sigungu, Sido
+from .models import YouthPolicy, PolicyComment, Region, Sigungu, Sido, PolicyViewLog
 from django.core.paginator import Paginator
 from django.db.models import Q
+from collections import Counter
 
 # Create your views here.
 def basic_page(request):
@@ -69,6 +70,24 @@ def youth_policy_detail(request, policy_id):
     policy = get_object_or_404(YouthPolicy, id=policy_id)
     return render(request, 'youth_policies.html', {'policy': policy})
 
+def get_next_most_viewed(policy_id):
+    logs = PolicyViewLog.objects.order_by('viewed_at')
+    user_sequences = {}
+
+    for log in logs:
+        user_sequences.setdefault(log.user_id, []).append(log.policy_id)
+
+    next_policies = []
+    for sequence in user_sequences.values():
+        if policy_id in sequence:
+            idx = sequence.index(policy_id)
+            if idx + 1 < len(sequence):
+                next_policies.append(sequence[idx + 1])
+
+    counter = Counter(next_policies)
+    most_common_ids = [pk for pk, _ in counter.most_common(5)]
+    return YouthPolicy.objects.filter(id__in=most_common_ids)
+
 # youth_policy/views.py
 
 @login_required
@@ -86,10 +105,16 @@ def policy_detail(request, policy_id):
     policy.save(update_fields=['view_count'])
 
     comments = policy.comments.filter(parent__isnull=True)
+    recommended_policies = get_next_most_viewed(policy_id)
+    top_viewed_policies = YouthPolicy.objects.order_by('-view_count')[:3]
+
     return render(request, 'policy_detail.html', {
         'policy': policy,
         'comments': comments,
+        'recommended_policies': recommended_policies,
+        'top_viewed_policies': top_viewed_policies,
     })
+
 
 # 댓글 삭제
 @login_required
@@ -97,6 +122,7 @@ def delete_policy_comment(request, comment_id):
     comment = get_object_or_404(PolicyComment, id=comment_id, author=request.user)
     comment.delete()
     return redirect(request.META.get('HTTP_REFERER', '/'))
+
 
 # 댓글 수정 (폼 + 처리)
 @login_required
@@ -109,3 +135,17 @@ def edit_policy_comment(request, comment_id):
         return redirect(request.META.get('HTTP_REFERER', '/'))
 
     return render(request, 'edit_comment.html', {'comment': comment})
+
+def weekly_pick_view(request):
+    categories = ['일자리', '교육', '주거', '복지문화', '참여권리']
+    weekly_picks_by_category = {}
+
+    for category in categories:
+        weekly_picks_by_category[category] = YouthPolicy.objects.filter(
+            is_weekly_pick=True,
+            정책키워드__icontains=category
+        ).order_by('-id')[:5]
+
+    return render(request, 'weekly_pick.html', {
+        'weekly_picks_by_category': weekly_picks_by_category
+    })
