@@ -6,16 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>청년정책 목록</title>
 
-  <!-- Bootstrap 5 CDN -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- 외부 CSS -->
   <link rel="stylesheet" href="{% static 'css/policy.css' %}"/>
 </head>
 <body>
 
-  <!-- 네비게이션 바 -->
   <nav class="navbar navbar-expand-lg">
     <div class="main-container">
       <div class="container-fluid p-0">
@@ -25,9 +22,8 @@
   </nav>
 
   <div class="main-container">
-    <h1>🎯 청년을 위한 정책을 찾아보세요</h1>
+    <h1>🎯 [{{stage}}] 공간에 입장하셨습니다! </h1>
 
-    <!-- 카테고리 필터 -->
     <div class="category-filter">
       <div class="category-buttons">
         <div class="category-btn btn-general {% if selected_category == 'all' %}active{% endif %}" data-category="all">
@@ -53,11 +49,10 @@
       </div>
     </div>
 
-    <!-- 필터 섹션 -->
     <div class="filter-section">
       <form class="filter-form" method="get" id="filterForm">
-        <!-- 숨겨진 카테고리 필드 추가 -->
         <input type="hidden" name="category" value="{{ selected_category }}">
+        <input type="hidden" name="stage" value="{{ stage|default:'all' }}">
         
         <select name="sido" class="form-select" onchange="this.form.submit()">
           <option value="">🗺️ 시도 선택</option>
@@ -73,23 +68,21 @@
           {% endfor %}
         </select>
         
-        <a href="{% url 'youth_policy:basic_page' %}" class="btn btn-outline-secondary">
+        <a href="{% url 'youth_policy:basic_page' %}?stage={{ stage|default:'all' }}" class="btn btn-outline-secondary">
           🔄 필터 초기화
         </a>
       </form>
     </div>
 
-    <!-- 정책 카드 목록 -->
-{% if policies %}
+    {% if policies %}
 <div class="card-grid">
   {% for policy in policies %}
   <a href="{% url 'youth_policy:policy_detail' policy.id %}" class="policy-card-link">
     <div class="policy-card 
-      {% if '일자리' in policy.정책키워드 %}category-job
-      {% elif '교육' in policy.정책키워드 %}category-education
-      {% elif '복지문화' in policy.정책키워드 or '참여권리' in policy.정책키워드 %}category-welfare
-      {% elif '주거' in policy.정책키워드 %}category-housing
-
+      {% if '일자리' in policy.정책키워 %}category-job
+      {% elif '교육' in policy.정책키워 %}category-education
+      {% elif '복지문화' in policy.정책키워 or '참여권리' in policy.정책키워 %}category-welfare
+      {% elif '주거' in policy.정책키워 %}category-housing
       {% else %}category-general{% endif %}">
       
       <div class="policy-title">{{ policy.정책명 }}</div>
@@ -140,14 +133,13 @@
   {% endfor %}
 </div>
 
-<!-- 페이지네이션 -->
 {% if is_paginated %}
 <div class="pagination-container">      
   <nav aria-label="Page navigation">
     <ul class="pagination mb-0">
       {% if page_obj.has_previous %}
         <li class="page-item">
-          <a class="page-link page-prev" href="?{% if selected_category != 'all' %}category={{ selected_category }}&{% endif %}{% if selected_sido %}sido={{ selected_sido }}&{% endif %}{% if selected_sigungu %}sigungu={{ selected_sigungu }}&{% endif %}page={{ page_obj.previous_page_number }}" aria-label="Previous">‹</a>
+          <a class="page-link page-prev" href="?{% if selected_category != 'all' %}category={{ selected_category }}&{% endif %}{% if selected_sido %}sido={{ selected_sido }}&{% endif %}{% if selected_sigungu %}sigungu={{ selected_sigungu }}&{% endif %}{% if stage %}stage={{ stage }}&{% endif %}page={{ page_obj.previous_page_number }}" aria-label="Previous">‹</a>
         </li>
       {% else %}
         <li class="page-item disabled"><span class="page-link page-prev">‹</span></li>
@@ -157,19 +149,19 @@
         {% if page_obj.number == num %}
           <li class="page-item active"><span class="page-link">{{ num }}</span></li>
         {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-          <li class="page-item"><a class="page-link" href="?{% if selected_category != 'all' %}category={{ selected_category }}&{% endif %}{% if selected_sido %}sido={{ selected_sido }}&{% endif %}{% if selected_sigungu %}sigungu={{ selected_sigungu }}&{% endif %}page={{ num }}">{{ num }}</a></li>
+          <li class="page-item"><a class="page-link" href="?{% if selected_category != 'all' %}category={{ selected_category }}&{% endif %}{% if selected_sido %}sido={{ selected_sido }}&{% endif %}{% if selected_sigungu %}sigungu={{ selected_sigungu }}&{% endif %}{% if stage %}stage={{ stage }}&{% endif %}page={{ num }}">{{ num }}</a></li>
         {% elif num == 1 %}
-          <li class="page-item"><a class="page-link" href="?{% if selected_category != 'all' %}category={{ selected_category }}&{% endif %}{% if selected_sido %}sido={{ selected_sido }}&{% endif %}{% if selected_sigungu %}sigungu={{ selected_sigungu }}&{% endif %}page={{ num }}">{{ num }}</a></li>
+          <li class="page-item"><a class="page-link" href="?{% if selected_category != 'all' %}category={{ selected_category }}&{% endif %}{% if selected_sido %}sido={{ selected_sido }}&{% endif %}{% if selected_sigungu %}sigungu={{ selected_sigungu }}&{% endif %}{% if stage %}stage={{ stage }}&{% endif %}page={{ num }}">{{ num }}</a></li>
           {% if page_obj.number > 4 %}<li class="page-item disabled"><span class="page-link">…</span></li>{% endif %}
         {% elif num == paginator.num_pages %}
           {% if page_obj.number < paginator.num_pages|add:'-3' %}<li class="page-item disabled"><span class="page-link">…</span></li>{% endif %}
-          <li class="page-item"><a class="page-link" href="?{% if selected_category != 'all' %}category={{ selected_category }}&{% endif %}{% if selected_sido %}sido={{ selected_sido }}&{% endif %}{% if selected_sigungu %}sigungu={{ selected_sigungu }}&{% endif %}page={{ num }}">{{ num }}</a></li>
+          <li class="page-item"><a class="page-link" href="?{% if selected_category != 'all' %}category={{ selected_category }}&{% endif %}{% if selected_sido %}sido={{ selected_sido }}&{% endif %}{% if selected_sigungu %}sigungu={{ selected_sigungu }}&{% endif %}{% if stage %}stage={{ stage }}&{% endif %}page={{ num }}">{{ num }}</a></li>
         {% endif %}
       {% endfor %}
 
       {% if page_obj.has_next %}
         <li class="page-item">
-          <a class="page-link page-next" href="?{% if selected_category != 'all' %}category={{ selected_category }}&{% endif %}{% if selected_sido %}sido={{ selected_sido }}&{% endif %}{% if selected_sigungu %}sigungu={{ selected_sigungu }}&{% endif %}page={{ page_obj.next_page_number }}" aria-label="Next">›</a>
+          <a class="page-link page-next" href="?{% if selected_category != 'all' %}category={{ selected_category }}&{% endif %}{% if selected_sido %}sido={{ selected_sido }}&{% endif %}{% if selected_sigungu %}sigungu={{ selected_sigungu }}&{% endif %}{% if stage %}stage={{ stage }}&{% endif %}page={{ page_obj.next_page_number }}" aria-label="Next">›</a>
         </li>
       {% else %}
         <li class="page-item disabled"><span class="page-link page-next">›</span></li>
@@ -191,7 +183,8 @@
     const categoryBtns = document.querySelectorAll('.category-btn');
     const filterForm = document.getElementById('filterForm');
     const categoryInput = document.querySelector('input[name="category"]');
-    
+    const stageInput = document.querySelector('input[name="stage"]'); // 추가
+
     // 카테고리 버튼 클릭 이벤트 (서버로 요청)
     categoryBtns.forEach(btn => {
       btn.addEventListener('click', function () {
