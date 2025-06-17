@@ -11,17 +11,27 @@ def basic_page(request):
     selected_sido = request.GET.get('sido')
     selected_sigungu = request.GET.get('sigungu')
     selected_category = request.GET.get('category', 'all')
+    
 
     policies = YouthPolicy.objects.all()
 
-    # 생애 주기 필터링 추가
     if stage and stage != 'all':
         policies = policies.filter(생애주기단계__icontains=stage) # 'contains' 대신 'icontains'를 사용하면 대소문자 구분 없이 검색 가능
 
+    sido_list = Sido.objects.all().order_by('code')
+    
+    sigungu_list = []
     if selected_sido:
-        policies = policies.filter(sido__code=selected_sido)
+        # 시도 코드로 시군구 필터링 (앞 2자리 매칭)
+        sigungu_list = Sigungu.objects.filter(
+            code__startswith=selected_sido
+        ).order_by('code')
+    
+    
+    if selected_sido:
+        policies = policies.filter(sido_id=selected_sido)
     if selected_sigungu:
-        policies = policies.filter(sigungu__code=selected_sigungu)
+        policies = policies.filter(sigungu_id=selected_sigungu)
     if selected_category != 'all':
         # 예시: 대분류 또는 키워드 필터링 구현
         # '정책키워드' 필드에 '일자리', '교육' 등이 포함되어 있다고 가정
@@ -34,27 +44,33 @@ def basic_page(request):
         elif selected_category == 'housing':
             policies = policies.filter(Q(정책키워드__icontains='주거'))
 
-    paginator = Paginator(policies, 10)
-    page = request.GET.get('page')
-    page_obj = paginator.get_page(page)
+    if 'sido' in request.GET and not selected_sigungu:
+        # 시도만 선택되고 시군구가 없으면, 해당 시도의 시군구 목록만 보여줌
+        pass
 
-    # 시도 및 시군구 목록을 템플릿으로 전달
-    sido_list = Sido.objects.all().order_by('name')
-    sigungu_list = Sigungu.objects.all().order_by('name')
+    paginator = Paginator(policies, 9)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
 
-    return render(request, 'basic_page.html', {
+    context = {
         'policies': page_obj,
+        'page_obj': page_obj,
         'stage': stage, # 현재 선택된 생애 주기 정보도 템플릿으로 전달
-        'sido_list': sido_list, # 이름 변경: 'sidos' -> 'sido_list'
-        'sigungu_list': sigungu_list, # 이름 변경: 'sigungus' -> 'sigungu_list'
+        'sido_list': sido_list,
+        'sigungu_list': sigungu_list,
         'selected_sido': selected_sido,
         'selected_sigungu': selected_sigungu,
-        'selected_category': selected_category,
+        'selected_category': selected_category,  # 현재 선택된 카테고리 전달
         'top_viewed_policies': YouthPolicy.objects.order_by('-view_count')[:3],
-        'is_paginated': page_obj.has_other_pages(), # 페이지네이션 존재 여부
-        'paginator': paginator,
-    })
+        'paginator': paginator,  # paginator 객체 추가
+        'is_paginated': True,  # 항상 페이지네이션 표시
+    }
+    
+    return render(request, 'basic_page.html', context)
 
+def youth_policy_detail(request, policy_id):
+    policy = get_object_or_404(YouthPolicy, id=policy_id)
+    return render(request, 'youth_policies.html', {'policy': policy})
 
 def get_next_most_viewed(policy_id):
     logs = PolicyViewLog.objects.order_by('viewed_at')
@@ -81,11 +97,7 @@ def add_policy_comment(request, policy_id):
     policy = get_object_or_404(YouthPolicy, id=policy_id)
     if request.method == 'POST':
         content = request.POST.get('content')
-        parent_id = request.POST.get('parent_id') # 부모 댓글 ID 추가
-        parent_comment = None
-        if parent_id:
-            parent_comment = get_object_or_404(PolicyComment, id=parent_id)
-        PolicyComment.objects.create(policy=policy, author=request.user, content=content, parent=parent_comment)
+        PolicyComment.objects.create(policy=policy, author=request.user, content=content)
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
 # views.py > policy_detail
@@ -95,15 +107,15 @@ def policy_detail(request, policy_id):
     policy.save(update_fields=['view_count'])
 
     comments = policy.comments.filter(parent__isnull=True)
-    recommended_policies = YouthPolicy.objects.exclude(id=policy_id).order_by('-view_count')[:3]
+    recommended_policies = get_next_most_viewed(policy_id)
+    top_viewed_policies = YouthPolicy.objects.order_by('-view_count')[:3]
 
     return render(request, 'policy_detail.html', {
         'policy': policy,
         'comments': comments,
         'recommended_policies': recommended_policies,
-        'top_viewed_policies': YouthPolicy.objects.order_by('-view_count')[:3],
+        'top_viewed_policies': top_viewed_policies,
     })
-
 
 
 # 댓글 삭제
