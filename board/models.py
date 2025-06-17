@@ -2,16 +2,16 @@ from django.db import models
 from django.utils import timezone
 # from django.contrib.auth.models import User
 from django.conf import settings
-from tinymce.models import HTMLField  # ✅ TinyMCE용 필드 import
+from taggit.managers import TaggableManager
+from tinymce.models import HTMLField # ✅ TinyMCE용 필드 import
 
 
 # Create your models here.
 class Post(models.Model):
     CATEGORY_CHOICES = [
-        ('review', '후기'),
-        ('question', '궁금해'),
-        ('share', '자료공유'),
-        ('free', '잡담'),
+    ('review', '후기'),
+    ('share', '자료공유'),
+    ('free', '잡담'),
     ]
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='free')
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -20,6 +20,9 @@ class Post(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     views = models.PositiveIntegerField(default=0)
     likes = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='liked_posts', blank=True)
+    tags = TaggableManager(blank=True)
+    thumbnail = models.ImageField(upload_to='reviews/', null=True, blank=True)  # 후기 전용 썸네일(선택)
+    file = models.FileField(upload_to='files/', null=True, blank=True)  # 일반 파일 업로드
 
     def __str__(self):
         return self.title
@@ -48,17 +51,17 @@ class Follow(models.Model):
     following = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='followers', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    class Meta:
-        unique_together = ('follower', 'following')
+class Meta:
+    unique_together = ('follower', 'following')
 
 class PostImage(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='post_images/')
 
 class Notification(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')  # 알림 받을 사용자
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications') # 알림 받을 사용자
     message = models.CharField(max_length=255)
-    url = models.URLField(blank=True)  # 알림 클릭 시 이동할 주소
+    url = models.URLField(blank=True) # 알림 클릭 시 이동할 주소
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -67,6 +70,5 @@ class Bookmark(models.Model):
     post = models.ForeignKey('Post', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    class Meta:
-        unique_together = ('user', 'post')  # 같은 글 중복 저장 방지
-
+class Meta:
+    unique_together = ('user', 'post') # 같은 글 중복 저장 방지

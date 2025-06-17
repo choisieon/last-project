@@ -30,6 +30,7 @@ urlpatterns = [
     path('mentor/', include('mentor.urls')),  # 멘토멘티 연결 추가
     path('tinymce/', include('tinymce.urls')),
     path('yputh_policy/', include('youth_policy.urls', namespace='youth_policy')),
+    path('taggit_autosuggest/', include('taggit_autosuggest.urls')),
 ]
 
 if settings.DEBUG:

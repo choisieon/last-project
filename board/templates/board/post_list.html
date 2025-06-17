@@ -1,101 +1,159 @@
-
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}커뮤니티 | 청설모{% endblock %}
+{% block title %}
+{% if category == 'review' %}후기 게시판 | 청설모{% else %}커뮤니티 | 청설모{% endif %}
+{% endblock %}
+
 {% block nav_community_active %}active{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css">
+<script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
+{% endblock %}
 
 {% block category_bar %}
 <div class="category-bar">
   <a href="{% url 'board:post_list' %}" class="{% if not category %}active{% endif %}"><button>전체</button></a>
   <a href="{% url 'board:post_list' %}?category=review" class="{% if category == 'review' %}active{% endif %}"><button>후기</button></a>
-  <a href="{% url 'board:post_list' %}?category=question" class="{% if category == 'question' %}active{% endif %}"><button>궁금해</button></a>
   <a href="{% url 'board:post_list' %}?category=share" class="{% if category == 'share' %}active{% endif %}"><button>자료공유</button></a>
   <a href="{% url 'board:post_list' %}?category=free" class="{% if category == 'free' %}active{% endif %}"><button>잡담</button></a>
+</div>
+<div class="tag-cloud">
+  {% for tag in popular_mentor_tags %}
+  <a href="?{% if category %}category={{ category }}&{% endif %}tag={{ tag.name }}"
+     class="tag{% if tag.name in tag_filter %} active{% endif %}">
+    #{{ tag.name }}
+  </a>
+  {% endfor %}
 </div>
 {% endblock %}
 
 {% block content %}
 <div class="wrapper">
-
-  <!-- 🔍 검색창 -->
-  <form method="get" class="search-bar" style="margin-bottom: 16px;">
-    <input type="text" name="keyword" value="{{ keyword|default_if_none:'' }}" placeholder="검색어를 입력하세요" />
-    <button type="submit">🔍</button>
-    {% if sort %}
+  {% if category == 'review' %}
+    <h1>📸 후기 게시판</h1>
+    <a href="{% url 'board:post_new' %}" class="review-write-btn">✏️ 새 글 작성</a>
+    <div class="review-grid">
+      {% for post in posts %}
+      <a href="{% url 'board:post_detail' post.pk %}" class="review-card">
+        {% if post.thumbnail %}
+          <img src="{{ post.thumbnail.url }}" alt="{{ post.title }}">
+        {% endif %}
+        <div class="review-card-body">
+          <h3>{{ post.title }}</h3>
+          <p>👤 {{ post.author.username }}</p>
+          <p>📅 {{ post.created_at|date:"Y.m.d" }}</p>
+        </div>
+      </a>
+      {% empty %}
+      <div style="margin:40px 0; text-align:center; color:#888;">
+        등록된 후기가 없습니다.
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <!-- 🔍 검색창 -->
+    <form method="get" class="search-bar" style="margin-bottom: 16px;">
+      <input type="text" name="keyword" value="{{ keyword|default_if_none:'' }}" placeholder="검색어를 입력하세요" />
+      <button type="submit">🔍</button>
+      {% if sort %}
       <input type="hidden" name="sort" value="{{ sort }}">
-    {% endif %}
-  </form>
+      {% endif %}
+    </form>
 
-  {% if keyword %}
+    {% if keyword %}
     <div class="search-result-label" style="margin-bottom:10px;">
       <strong>"{{ keyword }}"</strong>에 대한 검색 결과
     </div>
-  {% endif %}
+    {% endif %}
 
-  <!-- 정렬 바 -->
-  <div class="sort-bar">
-    <a href="{% url 'board:post_list' %}?sort=" {% if not sort %}class="active"{% endif %}>최신순</a>
-    <a href="{% url 'board:post_list' %}?sort=likes{% if keyword %}&keyword={{ keyword }}{% endif %}" {% if sort == 'likes' %}class="active"{% endif %}>좋아요순</a>
-    <a href="{% url 'board:post_list' %}?sort=comments{% if keyword %}&keyword={{ keyword }}{% endif %}" {% if sort == 'comments' %}class="active"{% endif %}>댓글순</a>
-  </div>
+    <!-- 정렬 바 -->
+    <div class="sort-bar">
+      <a href="{% url 'board:post_list' %}?sort=" {% if not sort %}class="active"{% endif %}>최신순</a>
+      <a href="{% url 'board:post_list' %}?sort=likes{% if keyword %}&keyword={{ keyword }}{% endif %}" {% if sort == 'likes' %}class="active"{% endif %}>좋아요순</a>
+      <a href="{% url 'board:post_list' %}?sort=comments{% if keyword %}&keyword={{ keyword }}{% endif %}" {% if sort == 'comments' %}class="active"{% endif %}>댓글순</a>
+    </div>
 
-  <!-- 게시글 리스트 -->
-  <div class="post-list">
-    {% if posts %}
+    <!-- 게시글 리스트 -->
+    <div class="post-list">
+      {% if posts %}
       {% for post in posts %}
-        <div class="post-item post-item-row">
-          <!-- 왼쪽: 본문/정보 -->
-          <div class="post-item-text">
-            <h4>
-              <a href="{% url 'board:post_detail' post.pk %}?category={{ category }}{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}">{{ post.title }}</a>
-            </h4>
-            <div class="post-meta">
-              <span>작성자: {{ post.author }} | {{ post.created_at|date:"Y-m-d H:i" }}</span>
-              <span> | 조회수: {{ post.views }}</span>
-              <span> | 🤍 {{ post.likes.count }}</span>
-              <span> | 댓글: {{ post.comments.count }}</span>
-            </div>
-            <div class="post-snippet">
-              {{ post.content|truncatechars_html:10|safe }}
-            </div>
+      <div class="post-item post-item-row">
+        <div class="post-item-text">
+          <h4>
+            <a href="{% url 'board:post_detail' post.pk %}?category={{ category }}{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}">{{ post.title }}</a>
+          </h4>
+          <div class="post-meta">
+            <span>작성자: {{ post.author }} | {{ post.created_at|date:"Y-m-d H:i" }}</span>
+            <span> | 조회수: {{ post.views }}</span>
+            <span> | 🤍 {{ post.likes.count }}</span>
+            <span> | 댓글: {{ post.comments.count }}</span>
           </div>
-          <!-- 오른쪽: 이미지만! -->
-          <div class="post-preview">
-            {% if post.images.first %}
-              <img src="{{ post.images.first.image.url }}" alt="미리보기 이미지">
-            {% endif %}
+          <div class="post-snippet">
+            {{ post.content|truncatechars_html:10|safe }}
+          </div>
+          <div class="post-tags" style="margin: 6px 0 0 0;">
+            {% for tag in post.tags.all %}
+            <a href="{% url 'board:tagged' tag.slug %}" style="display:inline-block; margin-right:8px; color:#1976d2; background:#f0f4fa; padding:3px 10px; border-radius:12px; font-size:0.98em; text-decoration:none;">
+              #{{ tag.name }}
+            </a>
+            {% empty %}
+            <span style="color:#aaa;">태그 없음</span>
+            {% endfor %}
           </div>
         </div>
+        <div class="post-preview">
+          {% if post.images.first %}
+          <img src="{{ post.images.first.image.url }}" alt="미리보기 이미지">
+          {% endif %}
+        </div>
+      </div>
       {% endfor %}
-    {% else %}
+      {% else %}
       <div class="post-item">
         <p>검색 결과가 없습니다.</p>
       </div>
-    {% endif %}
-  </div>
+      {% endif %}
+    </div>
 
-  <!-- 페이지네이션 UI -->
-  <div class="pagination" style="margin-top:30px; text-align:center;">
-    {% if posts.has_previous %}
+    <!-- 페이지네이션 UI -->
+    <div class="pagination" style="margin-top:30px; text-align:center;">
+      {% if posts.has_previous %}
       <a href="?page=1{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}">« 처음</a>
       <a href="?page={{ posts.previous_page_number }}{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}">‹ 이전</a>
-    {% endif %}
-
-    {% for num in posts.paginator.page_range %}
-      {% if posts.number == num %}
-        <strong>{{ num }}</strong>
-      {% elif num > posts.number|add:'-3' and num < posts.number|add:'3' %}
-        <a href="?page={{ num }}{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}">{{ num }}</a>
       {% endif %}
-    {% endfor %}
 
-    {% if posts.has_next %}
+      {% for num in posts.paginator.page_range %}
+      {% if posts.number == num %}
+      <strong>{{ num }}</strong>
+      {% elif num > posts.number|add:'-3' and num < posts.number|add:'3' %}
+      <a href="?page={{ num }}{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}">{{ num }}</a>
+      {% endif %}
+      {% endfor %}
+
+      {% if posts.has_next %}
       <a href="?page={{ posts.next_page_number }}{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}">다음 ›</a>
       <a href="?page={{ posts.paginator.num_pages }}{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}">마지막 »</a>
-    {% endif %}
-  </div>
+      {% endif %}
+    </div>
+  {% endif %}
 </div>
+{% endblock %}
+
+{% block extra_script %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  {% comment %} Tagify 예시 {% endcomment %}
+  var tagInput = document.getElementById('custom-tags');
+  if (tagInput) {
+    new Tagify(tagInput, {
+      whitelist: [{% for tag in popular_mentor_tags %}"{{ tag.name }}"{% if not forloop.last %},{% endif %}{% endfor %}],
+      dropdown: { maxItems: 10 }
+    });
+  }
+});
+</script>
 {% endblock %}
 
 {% block extra_style %}
@@ -125,10 +183,6 @@
   background-color: #007aff;
   color: white;
 }
-/* .category-bar .active {
-  background-color: #007aff;
-  color: white;
-} */
 .sort-bar {
   margin-bottom: 18px;
   display: flex;
@@ -197,9 +251,46 @@
   color: #fff;
   font-weight: bold;
 }
-
-
-
+.review-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 24px;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+.review-card {
+  display: block;
+  background: #fff;
+  border: 2px solid #fbc02d;
+  border-radius: 12px;
+  box-shadow: 2px 2px 8px #b9a78233;
+  overflow: hidden;
+  text-decoration: none;
+  color: #222;
+  transition: box-shadow 0.2s, border 0.2s;
+}
+.review-card:hover {
+  border: 2px solid #007aff;
+  box-shadow: 4px 4px 12px #1976d233;
+}
+.review-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  background: #eee;
+}
+.review-card-body {
+  padding: 16px 14px 10px 14px;
+}
+.review-card-body h3 {
+  font-size: 1.13rem;
+  margin-bottom: 7px;
+}
+.review-card-body p {
+  margin: 0 0 4px 0;
+  color: #555;
+  font-size: 0.98em;
+}
 @media (max-width: 600px) {
   .post-item-row {
     flex-direction: column;
@@ -209,7 +300,9 @@
     max-width: 100%;
     max-height: 120px;
   }
+  .review-card img {
+    height: 120px;
+  }
 }
 </style>
 {% endblock %}
-

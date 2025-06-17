@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 from . import views
 
 app_name = 'board'
@@ -20,4 +20,6 @@ urlpatterns = [
     path('notifications/read/<int:noti_id>/', views.notification_read, name='notifications_read'),
     path('notifications/all/', views.notification_list, name='notifications_all'),
     path('bookmark/', views.toggle_bookmark, name='toggle_bookmark'),
+    re_path(r'^tag/(?P<slug>[\w\-가-힣]+)/$', views.tagged, name='tagged'),
+    
 ]

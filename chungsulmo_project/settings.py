@@ -46,6 +46,9 @@ INSTALLED_APPS = [
     'tinymce',
     'youth_policy',
     'mentor.apps.MentorConfig',
+    'taggit.apps.TaggitAppConfig',
+    'taggit_templatetags2',
+    'taggit_autosuggest',
 
     'django.contrib.sites',  # 필수
     'allauth',
@@ -144,7 +147,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # collectstatic 명령으�
 
 # 개발 시 static 파일 경로
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR / "static"),
+    os.path.join(BASE_DIR / 'static'),
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
@@ -175,7 +178,7 @@ TINYMCE_COMPRESSOR = False
 
 
 TINYMCE_DEFAULT_CONFIG = {
-    'height': 500,
+    'height': 600,
     'plugins': '''
         advlist autolink lists link image charmap print preview hr anchor
         pagebreak searchreplace wordcount visualblocks visualchars code
@@ -195,9 +198,10 @@ TINYMCE_DEFAULT_CONFIG = {
     'menubar': True,
     'statusbar': True,
     'theme_advanced_resizing': True,
-    'images_upload_url': '/upload-image/',
+    'images_upload_url': '/board/upload-image/',
     'width': '100%',
     'language': 'ko_KR',
+    'language_url': '/static/tinymce/js/langs/ko_KR.js',
 }
 
   

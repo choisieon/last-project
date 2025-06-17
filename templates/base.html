@@ -1,11 +1,14 @@
 
 {% load static %}
+{% load taggit_templatetags2_tags %}
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <title>{% block title %}청설모{% endblock %}</title>
+  {% block extra_head %}{% endblock %}
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  {{ form.media }}
   <style>
     @font-face {
       font-family: 'MyCustomFont';
@@ -308,6 +311,7 @@
 
     </div>
     {% block category_bar %}{% endblock %}
+    
     {% block search_bar %}{% endblock %}
     {% block content %}{% endblock %}
   </div>
@@ -326,5 +330,6 @@
     }
   });
   </script>
+  {% block extra_script %}{% endblock %}
 </body>
 </html>

@@ -1,6 +1,9 @@
+import re
 from django import forms
 from .models import Post, PostImage, Comment
 from tinymce.widgets import TinyMCE
+from taggit_autosuggest.widgets import TagAutoSuggest
+
 
 class MultipleFileInput(forms.ClearableFileInput):
     allow_multiple_selected = True
@@ -17,41 +20,44 @@ class MultipleFileField(forms.FileField):
             result = [single_file_clean(data, initial)]
         return result
 
+
 class PostForm(forms.ModelForm):
-    images = MultipleFileField(  # ✅ MultipleFileField 사용
+    images = MultipleFileField(
         required=False,
         label="이미지 업로드 (최대 2개)"
     )
+
     class Meta:
         model = Post
-        fields = ['category', 'title', 'content']  # 글 제목, 내용만 입력받음
+        fields = ['category', 'title', 'content', 'thumbnail', 'images', 'tags', 'file']
         widgets = {
-            'category': forms.Select(attrs={'class': 'form-control', 'rows': 10, 'required': False}),   # 드롭다운(select)에도 클래스 적용
+            'category': forms.Select(attrs={'class': 'form-control', 'rows': 10, 'required': False}),
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 10}),
+            'tags': TagAutoSuggest('taggit.tag'),
         }
 
-
-    # 추가된 부분: __init__ 메서드 (카테고리 초기값에 따라 TinyMCE 적용)
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        category = self.initial.get('category') or self.data.get('category')
-        if 'category' == 'review':
-            self.fields['content'].widget = TinyMCE(attrs={'cols': 80, 'rows': 30})
-
-    # 추가된 부분: 이미지 개수 검증
+    def clean(self):
+        cleaned_data = super().clean()
+        category = cleaned_data.get('category')
+        thumbnail = cleaned_data.get('thumbnail')
+        # 후기글일 때 썸네일 필수 검증
+        if category == 'review' and not thumbnail:
+            self.add_error('thumbnail', '후기글은 썸네일 이미지가 필수입니다.')
+        return cleaned_data
+    
     def clean_images(self):
         images = self.files.getlist('images')
         if len(images) > 2:
             raise forms.ValidationError("최대 2개까지 업로드 가능합니다.")
         return images
 
-# 기존 ImageForm과 CommentForm은 그대로 유지
+
+# 기타 폼 (CommentForm, ImageForm 등은 그대로 유지)
 class ImageForm(forms.ModelForm):
     class Meta:
         model = PostImage
         fields = ['image']
-
 
 class CommentForm(forms.ModelForm):
     parent_id = forms.IntegerField(widget=forms.HiddenInput, required=False)

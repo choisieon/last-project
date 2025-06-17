@@ -12,6 +12,8 @@ from django.contrib.auth import get_user_model
 from django.views.decorators.csrf import csrf_exempt   # CSRF 검증 우회
 from django.core.files.storage import default_storage   # 파일 저장을 위해 필요
 from .models import Notification, Bookmark
+from taggit.models import Tag
+from django.db import models
 
 # 게시글 목록 + 검색 + 정렬 + 페이지네이션
 def post_list(request):
@@ -19,7 +21,7 @@ def post_list(request):
     keyword = request.GET.get('keyword', '')
     category = request.GET.get('category', '')
     page = request.GET.get('page', 1)
-    
+    tag_filter = request.GET.getlist('tag', [])  # 키워드(멘토멘티 태그) 필터
     posts = Post.objects.all()
     
     # 카테고리 필터링
@@ -44,18 +46,31 @@ def post_list(request):
     # 페이지네이션 적용
     paginator = Paginator(posts, 10)
     page_obj = paginator.get_page(page)
+
+    # 키워드(멘토멘티 태그) 필터링
+    if tag_filter:
+        posts = posts.filter(tags__name__in=tag_filter).distinct()
+
+    # 멘토멘티 키워드 목록 (태그 모델에서 직접 조회)
+    popular_mentor_tags = Tag.objects.filter(name__in=['대학', '연애', '운동', '인생', '자취', '지갑', '취업'])
     
     return render(request, 'board/post_list.html', {
         'posts': page_obj,
         'sort': sort,
         'keyword': keyword,
         'category': category,  # 현재 카테고리 템플릿에 전달
+        'popular_mentor_tags': popular_mentor_tags,
+        'tag_filter': tag_filter,
     })
 
 # 게시글 작성
 @login_required
 def post_new(request):
     category = request.GET.get('category') or request.POST.get('category')
+    
+    # 인기 태그 10개 조회 (사용 횟수 기준)
+    popular_tags = Tag.objects.annotate(num_posts=models.Count('taggit_taggeditem_items')).order_by('-num_posts')[:10]
+
     if request.method == "POST":
         form = PostForm(request.POST, request.FILES)
         files = request.FILES.getlist('images')
@@ -64,13 +79,21 @@ def post_new(request):
             post.author = request.user
             post.category = category  # 필요시
             post.save()
+            tags_str = request.POST.get('tags', '')
+            if tags_str:
+                tag_list = [tag.strip() for tag in tags_str.split(',') if tag.strip()]
+                post.tags.set(tag_list)
             # 여러 장 이미지 저장
             for f in request.FILES.getlist('images'):  # ✅ getlist('images')
                 PostImage.objects.create(post=post, image=f)
             return redirect('board:post_list')
     else:
         form = PostForm(initial={'category': category})
-    return render(request, 'board/post_new.html', {'form': form, 'category': category})
+    return render(request, 'board/post_new.html', {
+        'form': form, 
+        'category': category, 
+        'popular_tags': popular_tags,   # 템플릿에 전달
+    })
 
 # 게시글 상세
 def post_detail(request, pk):
@@ -239,7 +262,7 @@ def index(request):
     posts = Post.objects.order_by('-created_at')   # 최신순 정렬
     return render(request, 'board/index.html', {'posts': posts})
 
-@csrf_exempt
+
 def upload_image(request):
     if request.method == 'POST' and request.FILES.get('file'):
         file = request.FILES['file']
@@ -297,3 +320,12 @@ def toggle_bookmark(request):
             bookmarked = True
         return JsonResponse({'bookmarked': bookmarked})
     return HttpResponseBadRequest()
+
+def tagged(request, slug):
+    tag = get_object_or_404(Tag, slug=slug)
+    posts = Post.objects.filter(tags=tag)
+    return render(request,'board/tagged.html', {
+        'tag': tag,
+        'posts': posts,
+    })
+
