@@ -7,135 +7,183 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     @font-face {
-      font-family: 'MyCustomFont';
-      src: url("{% static 'fonts/픽셀.woff2' %}") format("woff2");
-    }
+  font-family: 'MyCustomFont';
+  src: url("{% static 'fonts/픽셀.woff2' %}") format("woff2");
+}
 
-    body {
-      font-family: 'MyCustomFont', sans-serif;
-      background-color: #cde4c7;
-      background-image: url("{% static 'images/Frame 13.png' %}");
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: cover;
-      padding: 2rem;
-      display: flex;
-      justify-content: center;
-    }
+body {
+  font-family: 'MyCustomFont', sans-serif;
+  background-color: #cde4c7;
+  background-image: url("{% static 'images/Frame 13.png' %}");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  padding: 2rem;
+  display: flex;
+  justify-content: center;
+}
 
-    .content-wrapper {
-      display: flex;
-      gap: 2rem;
-      max-width: 1200px;
-      width: 100%;
-    }
+.content-wrapper {
+  display: flex;
+  gap: 2rem;
+  max-width: 1200px;
+  width: 100%;
+}
 
-    .calendar-box {
-      flex: 1;
-      background-color: #fdf7e3;
-      border: 4px solid #5a4a2f;
-      border-radius: 10px;
-      padding: 2rem;
-      box-shadow: 4px 4px 0 #b9a782;
-    }
+.calendar-box {
+  flex: 1;
+  background-color: #fdf7e3;
+  border: 4px solid #5a4a2f;
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 4px 4px 0 #b9a782;
+  max-width: 700px;
+  margin: 0 auto;
+}
 
-    h1 {
-      font-size: 1.6rem;
-      font-weight: bold;
-      text-align: center;
-      margin-bottom: 1rem;
-      color: #3c2e1e;
-    }
+h1 {
+  font-size: 1.6rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #3c2e1e;
+}
 
-    .main-keyword {
-      background-color: #ffeaa7;
-      padding: 0.5rem 1rem;
-      font-weight: bold;
-      border-radius: 6px;
-      border-left: 4px solid #e17055;
-      margin-bottom: 1.2rem;
-      display: inline-block;
-      color: #2d3436;
-    }
+.main-keyword {
+  background-color: #ffeaa7;
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  border-radius: 6px;
+  border-left: 4px solid #e17055;
+  margin-bottom: 1.2rem;
+  display: inline-block;
+  color: #2d3436;
+}
 
-    .description-box {
-      background-color: #fffef2;
-      border: 2px dashed #5a4a2f;
-      padding: 1rem;
-      border-radius: 6px;
-      line-height: 1.6;
-      margin-bottom: 1.5rem;
-      color: #2d3436;
-    }
+.description-box {
+  background-color: #fffef2;
+  border: 2px dashed #5a4a2f;
+  padding: 1rem;
+  border-radius: 6px;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  color: #2d3436;
+}
 
-    .keyword-buttons {
-      display: flex;
-      gap: 0.8rem;
-      margin-bottom: 1.5rem;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: flex-end;
-    }
+.keyword-buttons {
+  display: flex;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+}
 
-    .keyword-buttons button {
-      background-color: transparent;
-      border: none;
-      color: #3c2e1e;
-      padding: 0.5rem 1rem;
-      font-weight: bold;
-      cursor: default;
-    }
+.keyword-buttons .action-button {
+  all: unset; /* 버튼 기본 스타일 제거 */
+  cursor: pointer;
+  font-family: 'MyCustomFont', sans-serif;
+  font-weight: bold;
+  font-size: 16px;
+  color: #3c2e1e;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
 
-    .keyword-buttons .action-button {
-      background-color: #ffeaa7;
-      border: 2px solid #5a4a2f;
-      color: #3c2e1e;
-      border-radius: 20px;
-      padding: 0.5rem 1.2rem;
-      font-weight: bold;
-    }
 
-    .comment-form {
-      display: none;
-      background-color: #fffef2;
-      border: 2px solid #5a4a2f;
-      border-radius: 6px;
-      padding: 1rem;
-      margin-top: 1rem;
-    }
+.comment-item {
+  background-color: #fff;
+  border: 1.5px solid #ccc;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  font-size: 15px;
+  line-height: 1.6;
+  box-shadow: 2px 2px 0 #dcd8c0;
+  position: relative;
+}
 
-    .comment-form textarea {
-      width: 100%;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      padding: 0.75rem;
-      resize: vertical;
-    }
+.comment-meta {
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
 
-    .comment-form button {
-      margin-top: 0.75rem;
-      background-color: #5a4a2f;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      padding: 0.5rem 1rem;
-      font-weight: bold;
-    }
+.comment-body {
+  position: relative;
+  padding-right: 2.5rem;
+}
 
-    .reply-box {
-      margin-left: 1.5rem;
-      border-left: 2px solid #ccc;
-      padding-left: 1rem;
-      margin-top: 1rem;
-    }
+.comment-text {
+  margin: 0;
+  color: #3c2e1e;
+}
 
-    .back-btn {
-      display: block;
-      text-align: center;
-      margin-top: 2rem;
-      font-size: 0.9rem;
-      color: #5a4a2f;
-    }
+.comment-icons {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  font-size: 16px;
+}
+
+.comment-icons a {
+  margin-left: 8px;
+  text-decoration: none;
+  color: #5a4a2f;
+}
+
+.comment-icons a:hover {
+  color: #007aff;
+}
+
+.reply-form {
+  text-align: right;
+  margin-top: 0.5rem;
+}
+
+.reply-box {
+  margin-top: 0.8rem;
+  margin-left: 1rem;
+  padding: 0.8rem 1rem;
+  background-color: #fff;
+  border-left: 4px solid #d6c8aa;
+  border-radius: 0 8px 8px 8px;
+}
+
+.reply-box .comment-meta {
+  font-size: 12px;
+  color: #aaa;
+}
+
+.comment-form textarea {
+  font-size: 14px;
+  padding: 0.75rem;
+  background-color: #fcfbf8;
+  border: 1px solid #c9b893;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+
+.comment-form button {
+  font-size: 14px;
+  padding: 6px 14px;
+  background-color: #5a4a2f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  box-shadow: 2px 2px 0 #b9a782;
+}
+
+.back-btn {
+  display: block;
+  text-align: center;
+  margin-top: 2rem;
+  font-size: 0.9rem;
+  color: #5a4a2f;
+}
+
   </style>
   <script>
     function toggleCommentForm() {
@@ -154,7 +202,7 @@
     <div class="description-box">
       <p><strong>정책명</strong><br>{{ policy.정책명|linebreaksbr }}</p>
       <p><strong>설명</strong><br>{{ policy.정책설명|linebreaksbr }}</p>
-      <p><strong>추가 자격</strong><br>{{ policy.추가신청자격조건내용|linebreaksbr }}</p>
+      <!-- <p><strong>추가 자격</strong><br>{{ policy.추가신청자격조건내용|linebreaksbr }}</p> -->
       <p><strong>신청 기간</strong><br>{{ policy.신청기간 }}</p>
       <p><strong>신청URL</strong><br>
         {% if policy.신청URL and policy.신청URL != "nan" %}
@@ -166,10 +214,6 @@
     </div>
 
     <div class="keyword-buttons">
-      <button>#{{ policy.정책키워드|default:"하위분류없음" }}</button>
-      <button>#{{ policy.대상연령 }}</button>
-      <button>#{{ policy.sido.name|default:"없음" }}</button>
-
       {% if user.is_authenticated %}
         <form action="{% url 'youth_policy:toggle_policy_like' policy.id %}" method="post" style="display:inline;">
           {% csrf_token %}
@@ -177,59 +221,79 @@
             {% if user in policy.likes.all %}❤️{% else %}🤍{% endif %} {{ policy.likes.count }}
           </button>
         </form>
-        <button class="action-button" onclick="toggleCommentForm()">💬 댓글</button>
+        <button class="action-button" onclick="toggleCommentForm()">💬</button>
       {% endif %}
     </div>
 
     {% if user.is_authenticated %}
-    <div id="commentForm" class="comment-form">
-      <form action="{% url 'youth_policy:add_policy_comment' policy.id %}" method="post">
-        {% csrf_token %}
-        <textarea name="content" rows="4" placeholder="댓글을 입력하세요."></textarea>
-        <input type="hidden" name="parent_id" value="">
-        <button type="submit">댓글 작성</button>
-      </form>
+  <div id="commentForm" class="comment-form">
+    <form action="{% url 'youth_policy:add_policy_comment' policy.id %}" method="post">
+      {% csrf_token %}
+      <textarea name="content" rows="4" placeholder="댓글을 입력하세요."></textarea>
+      <input type="hidden" name="parent_id" value="">
+      <button type="submit">댓글 작성</button>
+    </form>
+  </div>
+{% else %}
+  <p><a href="{% url 'accounts:login' %}?next={{ request.path }}">로그인</a> 후 댓글 작성이 가능합니다.</p>
+{% endif %}
+
+<hr>
+<h2>댓글</h2>
+{% for comment in comments %}
+  <div class="comment-item">
+    <div class="comment-header">
+      <p class="comment-meta">
+        <strong>{{ comment.author.username }}</strong> | {{ comment.created_at|date:"Y.m.d H:i" }}
+      </p>
     </div>
-    {% else %}
-    <p><a href="{% url 'accounts:login' %}?next={{ request.path }}">로그인</a> 후 댓글 작성이 가능합니다.</p>
-    {% endif %}
 
-    <hr>
-    <h2>댓글</h2>
-    {% for comment in comments %}
-    <div class="description-box">
-      <p><strong>{{ comment.author.username }}</strong> | {{ comment.created_at|date:"Y.m.d H:i" }}</p>
-      <p>{{ comment.content|linebreaks }}</p>
+    <div class="comment-body">
+  <p class="comment-text">{{ comment.content|linebreaks }}</p>
 
-      {% if user.is_authenticated %}
-      <form action="{% url 'youth_policy:add_policy_comment' policy.id %}" method="post" style="margin-top: 1rem;">
-        {% csrf_token %}
-        <textarea name="content" rows="2" placeholder="대댓글 작성"></textarea>
-        <input type="hidden" name="parent_id" value="{{ comment.id }}">
-        <button type="submit">대댓글</button>
-      </form>
-      {% endif %}
+  {% if user.is_authenticated and user == comment.author %}
+  <div class="comment-icons">
+    <a href="javascript:void(0);" onclick="toggleReplyForm({{ comment.id }})" title="대댓글">💬</a>
+    <a href="{% url 'youth_policy:edit_policy_comment' comment.id %}" title="수정">✏️</a>
+    <a href="{% url 'youth_policy:delete_policy_comment' comment.id %}" onclick="return confirm('삭제하시겠습니까?');" title="삭제">🗑️</a>
+  </div>
+  {% endif %}
+</div>
 
-      {% for reply in comment.replies.all %}
+<!-- 대댓글 폼 -->
+{% if user.is_authenticated %}
+<div id="reply-form-{{ comment.id }}" class="reply-form" style="display: none;">
+  <form action="{% url 'youth_policy:add_policy_comment' policy.id %}" method="post">
+    {% csrf_token %}
+    <textarea name="content" rows="2" placeholder="대댓글 작성" class="form-control mb-1"></textarea>
+    <input type="hidden" name="parent_id" value="{{ comment.id }}">
+    <button type="submit" class="btn btn-sm btn-outline-dark">작성</button>
+  </form>
+</div>
+{% endif %}
+
+
+    {% for reply in comment.replies.all %}
       <div class="reply-box">
-        <p><strong>{{ reply.author.username }}</strong> | {{ reply.created_at|date:"Y.m.d H:i" }}</p>
+        <p class="comment-meta"><strong>{{ reply.author.username }}</strong> | {{ reply.created_at|date:"Y.m.d H:i" }}</p>
         <p>{{ reply.content|linebreaks }}</p>
       </div>
-      {% endfor %}
-
-      {% if user.is_authenticated and user == comment.author %}
-      <p style="margin-top: 0.8rem;">
-        <a href="{% url 'youth_policy:edit_policy_comment' comment.id %}">수정</a> |
-        <a href="{% url 'youth_policy:delete_policy_comment' comment.id %}" onclick="return confirm('삭제하시겠습니까?');">삭제</a>
-      </p>
-      {% endif %}
-    </div>
-    {% empty %}
-    <p>아직 댓글이 없습니다.</p>
     {% endfor %}
-
+  </div>
+{% endfor %}
     <a href="{% url 'youth_policy:basic_page' %}" class="back-btn">← 목록으로 돌아가기</a>
   </div>
 </div>
+<script>
+function toggleReplyForm(commentId) {
+  const form = document.getElementById(`reply-form-${commentId}`);
+  if (form.style.display === 'none' || form.style.display === '') {
+    form.style.display = 'block';
+  } else {
+    form.style.display = 'none';
+  }
+}
+</script>
+
 </body>
 </html>

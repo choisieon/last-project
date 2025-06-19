@@ -41,7 +41,7 @@ def basic_page(request):
         elif selected_category == 'education':
             policies = policies.filter(Q(정책키워드__icontains='교육'))
         elif selected_category == 'welfare':
-            policies = policies.filter(Q(정책키워드__icontains='복지문화') | Q(정책키워드__icontains='참여권리'))
+            policies = policies.filter(Q(정책키워드__icontains='금융복지') | Q(정책키워드__icontains='참여권리'))
         elif selected_category == 'housing':
             policies = policies.filter(Q(정책키워드__icontains='주거'))
 
@@ -122,12 +122,14 @@ def delete_policy_comment(request, comment_id):
 # 댓글 수정 (폼 + 처리)
 @login_required
 def edit_policy_comment(request, comment_id):
-    comment = get_object_or_404(PolicyComment, id=comment_id, author=request.user)
+    comment = get_object_or_404(PolicyComment, id=comment_id)
 
     if request.method == 'POST':
         comment.content = request.POST.get('content')
         comment.save()
-        return redirect(request.META.get('HTTP_REFERER', '/'))
+
+        # 🔁 수정 완료 후 해당 정책 상세 페이지로 이동
+        return redirect('youth_policy:policy_detail', policy_id=comment.policy.id)
 
     return render(request, 'edit_comment.html', {'comment': comment})
 

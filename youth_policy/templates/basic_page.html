@@ -23,18 +23,16 @@
     }
 
     .wrapper {
-      max-width: 1300px;
+      max-width: 1000px;
       margin: 0 auto;
       padding: 30px 20px;
     }
 
     .top-nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: none;
-      padding: 10px 16px;
-      margin-bottom: 20px;
+      padding: 6px 12px;
+      margin-bottom: 10px;
+      gap: 6px;
+      margin-top: -35px;   /* 위로 올림 */
     }
 
     .menu-left {
@@ -60,47 +58,146 @@
       color: #007aff;
     }
 
-    .filter-section, .sidebar-box, .policy-card, .pagination {
-      background-image: url("{% static 'images/pixel-paper.png' %}");
-      background-size: 4px 4px;
-      background-repeat: repeat;
-      border: 2.5px solid #5a4a2f;
-      box-shadow: 3px 3px 0 #b9a782;
-      background-color: rgba(250, 235, 180, 0.95);
-    }
-
     .filter-section {
-      border-radius: 10px;
-      padding: 20px;
-      margin-bottom: 20px;
-    }
+  background: none;
+  background-image: none;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
+  margin-bottom: 0;
+}
 
-    .filter-form {
+    .filter-bar {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
-      justify-content: flex-start;
+      gap: 10px;
       align-items: center;
     }
 
-    .form-select, .btn {
-      background-color: rgba(255, 255, 255, 0.9);
+    .filter-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .filter-button {
+      background-color: rgba(250, 235, 180, 0.9);
+      background-image: url("{% static 'images/pixel-paper.png' %}");
+      background-size: 4px 4px;
+      background-repeat: repeat;
       border: 2px solid #5a4a2f;
       box-shadow: 2px 2px 0 #b9a782;
       font-family: 'MyCustomFont';
-      font-size: 14px;
+      font-size: 13px;
       font-weight: bold;
-      color: #3c2e1e;
-      border-radius: 6px;
-      padding: 6px 12px;
+      padding: 6px 10px;
+      cursor: pointer;
+      color: #4a3b28;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      min-width: 100px;
+      justify-content: space-between;
+    }
+
+    .filter-button:hover {
+      background-color: rgba(250, 235, 180, 1);
+    }
+
+    .filter-button.active {
+      background-color: #007aff;
+      color: white;
+    }
+
+    .filter-button .arrow {
+      font-size: 10px;
+      transition: transform 0.3s ease;
+    }
+
+    .filter-button.open .arrow {
+      transform: rotate(180deg);
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background-color: rgba(255, 255, 255, 0.95);
+      border: 2px solid #5a4a2f;
+      box-shadow: 3px 3px 0 #b9a782;
+      border-radius: 5px;
+      margin-top: 2px;
+      z-index: 1000;
+      display: none;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .dropdown-menu.show {
+      display: block;
+    }
+
+    .dropdown-item {
+      padding: 8px 12px;
+      cursor: pointer;
+      font-family: 'MyCustomFont';
+      font-size: 12px;
+      color: #2c1f0f;
+      border-bottom: 1px solid rgba(90, 74, 47, 0.15);
+      background-color: transparent;
+      transition: all 0.2s ease;
+    }
+
+    .dropdown-item:last-child {
+      border-bottom: none;
+    }
+
+    .dropdown-item:hover {
+      background-color: rgba(0, 122, 255, 0.1);
+      color: #007aff;
+    }
+
+    .dropdown-item.selected {
+      background-color: #007aff;
+      color: white;
+    }
+
+    .reset-button {
+      background-color: rgba(250, 235, 180, 0.9);
+      background-size: 4px 4px;
+      background-repeat: repeat;
+      border: 2px solid #dc3545;
+      box-shadow: 2px 2px 0 #b9a782;
+      font-family: 'MyCustomFont';
+      font-size: 13px;
+      font-weight: bold;
+      padding: 6px 10px;
+      cursor: pointer;
+      color: #dc3545;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .reset-button:hover {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .sidebar-box, .policy-card, .pagination {
+      background-size: 4px 4px;
+      background-repeat: repeat;
+      border: 2.5px solid #5a4a2f;
+      box-shadow: 3px 3px 0 #d1c5a6;
+      background-color: #fff9d5; 
     }
 
     .card-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 24px;
-      margin-top: 20px;
-    }
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);  /* 딱 3열로 고정 */
+  gap: 24px;
+  margin-top: 20px;
+}
 
     .policy-card-link {
       text-decoration: none;
@@ -109,25 +206,30 @@
 
     .policy-card {
       border-radius: 10px;
+      overflow: visible;
       padding: 20px;
       min-height: 260px;
       display: flex;
       flex-direction: column;
       transition: all 0.3s ease;
+      height: 300px;
+      justify-content: space-between;
     }
 
     .policy-card:hover {
       transform: translateY(-2px);
-      box-shadow: 5px 5px 0 #b9a782;
+      box-shadow: 3px 3px 0 #d6cbb2;
     }
 
     .badge {
       display: inline-block;
-      padding: 4px 10px;
+      padding: 4px 7px;
       font-size: 13px;
       font-weight: 600;
       border-radius: 999px;
       margin-bottom: 10px;
+      box-shadow: 3px 3px 0 #b9a782;
+      max-width: fit-content; /* 콘텐츠 길이에 맞게 줄이기 */
     }
 
     .policy-title {
@@ -149,7 +251,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
       display: -webkit-box;
-      -webkit-line-clamp: 3;
+      -webkit-line-clamp: 4;
       -webkit-box-orient: vertical;
       margin-bottom: 20px;
     }
@@ -162,9 +264,21 @@
       font-weight: bold;
     }
 
+    .policy-info-box {
+      background-color: #fef9ed;
+      border: 2px solid #a88b4e;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      box-shadow: 2px 2px 0 #d1c5a6;
+      height: 300px;
+      justify-content: space-between;
+    }
+
+
     .sidebar {
       width: 300px;
-      transform: translateX(60px) translateY(20px);
+      transform: translateX(15px) translateY(20px);
     }
 
     .sidebar-box {
@@ -208,6 +322,49 @@
       color: #007aff;
     }
 
+    .wrapper.position-relative {
+  position: relative;
+}
+
+.top-widgets-fixed {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  gap: 12px;
+  z-index: 100;
+}
+
+.top-widget {
+  background-image: url("{% static 'images/pixel-paper.png' %}");
+  background-size: 4px 4px;
+  background-repeat: repeat;
+  border: 2.5px solid #5a4a2f;
+  box-shadow: 3px 3px 0 #b9a782;
+  background-color: rgba(250, 235, 180, 0.95);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.top-widget h5 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.top-widget a {
+  color: #3c2e1e;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.top-widget a:hover {
+  color: #007aff;
+}
+
+
     @media (max-width: 768px) {
       .container-flex {
         flex-direction: column;
@@ -221,11 +378,38 @@
       .card-grid {
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
       }
+
+      .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .filter-dropdown {
+        width: 100%;
+      }
+
+      .filter-button {
+        width: 100%;
+        justify-content: space-between;
+      }
     }
   </style>
 </head>
 <body>
 <div class="wrapper">
+
+  <div class="wrapper position-relative">
+  <div class="top-widgets-fixed">
+    <div class="top-widget">
+      <h5>🌟 관리자 추천</h5>
+      <a href="{% url 'youth_policy:weekly_pick' %}">이번 주 Pick →</a>
+    </div>
+    <div class="top-widget">
+      <h5>🔥 인기 정책</h5>
+      <a href="#popular">TOP 3 보기 →</a>
+    </div>
+  </div>
+
   <div class="top-nav">
     <div class="menu-left">
       <a href="{% url 'index' %}" class="menu-box home-link"><i class="fas fa-home"></i></a>
@@ -237,9 +421,78 @@
   </div>
 
   <div class="filter-section">
-    <form class="filter-form" method="get" id="filterForm">
-      <!-- 필터 코드 생략 (기존 그대로 유지) -->
+    <form class="d-none" method="get" id="filterForm">
+      <!-- 숨겨진 폼 요소들 -->
+      <input type="hidden" name="category" id="categoryInput" value="{{ selected_category|default:'all' }}">
+      <input type="hidden" name="sido" id="sidoInput" value="{{ selected_sido|default:'' }}">
+      <input type="hidden" name="sigungu" id="sigunguInput" value="{{ selected_sigungu|default:'' }}">
+      <input type="hidden" name="stage" id="stageInput" value="{{ stage|default:'all' }}">
     </form>
+
+    <div class="filter-bar">
+      <!-- 정책 분야 드롭다운 -->
+      <div class="filter-dropdown">
+        <button class="filter-button" id="categoryButton" onclick="toggleDropdown('category')">
+          <span id="categoryText">정책 분야</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="dropdown-menu" id="categoryDropdown">
+          <div class="dropdown-item" onclick="selectFilter('category', 'all', '정책 분야')">전체</div>
+          <div class="dropdown-item" onclick="selectFilter('category', 'job', '일자리')">일자리</div>
+          <div class="dropdown-item" onclick="selectFilter('category', 'education', '교육')">교육</div>
+          <div class="dropdown-item" onclick="selectFilter('category', 'welfare', '금융복지')">금융복지</div>
+          <div class="dropdown-item" onclick="selectFilter('category', 'housing', '주거')">주거</div>
+        </div>
+      </div>
+
+      <!-- 시도 드롭다운 -->
+      <div class="filter-dropdown">
+        <button class="filter-button" id="sidoButton" onclick="toggleDropdown('sido')">
+          <span id="sidoText">시도</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="dropdown-menu" id="sidoDropdown">
+          <div class="dropdown-item" onclick="selectFilter('sido', '', '시도')">전체</div>
+          {% for sido in sido_list %}
+            <div class="dropdown-item" onclick="selectFilter('sido', '{{ sido.code }}', '{{ sido.name }}')">{{ sido.name }}</div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- 시군구 드롭다운 -->
+      <div class="filter-dropdown">
+        <button class="filter-button" id="sigunguButton" onclick="toggleDropdown('sigungu')">
+          <span id="sigunguText">시군구</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="dropdown-menu" id="sigunguDropdown">
+          <div class="dropdown-item" onclick="selectFilter('sigungu', '', '시군구')">전체</div>
+          {% for sigungu in sigungu_list %}
+            <div class="dropdown-item" onclick="selectFilter('sigungu', '{{ sigungu.code }}', '{{ sigungu.name }}')">{{ sigungu.name }}</div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- 생애주기 드롭다운 -->
+      <div class="filter-dropdown">
+        <button class="filter-button" id="stageButton" onclick="toggleDropdown('stage')">
+          <span id="stageText">생애 주기</span>
+          <span class="arrow">▼</span>
+        </button>
+        <div class="dropdown-menu" id="stageDropdown">
+          <div class="dropdown-item" onclick="selectFilter('stage', 'all', '생애주기')">전체</div>
+          <div class="dropdown-item" onclick="selectFilter('stage', '진로 탐색기', '진로 탐색기')">진로 탐색기</div>
+          <div class="dropdown-item" onclick="selectFilter('stage', '구직 준비기', '구직 준비기')">구직 준비기</div>
+          <div class="dropdown-item" onclick="selectFilter('stage', '초기 취업기', '초기 취업기')">초기 취업기</div>
+          <div class="dropdown-item" onclick="selectFilter('stage', '생활 기반 마련기', '생활 기반 마련기')">생활 기반 마련기</div>
+          <div class="dropdown-item" onclick="selectFilter('stage', '자기계발/이직기', '자기계발/이직기')">자기계발/이직기</div>
+          <div class="dropdown-item" onclick="selectFilter('stage', '가족 형성기', '가족 형성기')">가족 형성기</div>
+        </div>
+      </div>
+
+      <!-- 필터 초기화 버튼 -->
+      <a href="{% url 'youth_policy:basic_page' %}" class="reset-button">필터 초기화</a>
+    </div>
   </div>
 
   <div class="container-flex d-flex justify-content-between">
@@ -248,26 +501,39 @@
       <div class="card-grid">
         {% for policy in policies %}
         <a href="{% url 'youth_policy:policy_detail' policy.id %}" class="policy-card-link">
-          <div class="policy-card">
-            <span class="badge
-              {% if policy.정책키워드 == '일자리' %} bg-primary text-white
-              {% elif policy.정책키워드 == '교육' %} bg-success text-white
-              {% elif policy.정책키워드 == '금융복지' %} bg-warning text-dark
-              {% elif policy.정책키워드 == '주거' %} bg-info text-dark
-              {% elif policy.정책키워드 == '복지문화' or policy.정책키워드 == '문화복지' %} bg-danger text-white
-              {% else %} bg-secondary text-white
-              {% endif %}
-            ">{{ policy.정책키워드|default:"일반" }}</span>
 
-            <div class="policy-title">{{ policy.정책명 }}</div>
-            <div class="policy-desc">{{ policy.정책설명|truncatechars:120 }}</div>
-            <div class="policy-stats">
-              <div>📊 {{ policy.view_count|default:0 }}</div>
-              <div>🤍 {{ policy.likes.count|default:0 }}</div>
-              <div>💬 {{ policy.comments.count|default:0 }}</div>
-            </div>
-          </div>
-        </a>
+  <div class="policy-card">
+  <div class="d-flex gap-2 mb-2 align-items-center flex-wrap">
+  <img src="{% static 'images/lifestage/{{ policy.정책키워드 }}.png' %}" alt="{{ policy.정책키워드 }}" width="22" height="22">
+  <span class="badge
+    {% if policy.정책키워드 == '일자리' %} bg-primary text-white
+    {% elif policy.정책키워드 == '교육' %} bg-success text-white
+    {% elif policy.정책키워드 == '금융복지' %} bg-warning text-dark
+    {% elif policy.정책키워드 == '주거' %} bg-info text-dark
+    {% elif policy.정책키워드 == '복지문화' or policy.정책키워드 == '문화복지' %} bg-danger text-white
+    {% else %} bg-secondary text-white
+    {% endif %}
+    ">{{ policy.정책키워드|default:"일반" }}</span>
+
+  <span class="badge bg-light text-dark border border-secondary">
+    {{ policy.신청기간|default:"기간 미정" }}
+  </span>
+</div>
+              
+<div class="policy-info-box">
+  <div class="policy-title">{{ policy.정책명 }}</div>
+  <hr class="dashed-divider">
+  <div class="policy-desc">{{ policy.정책설명요약|truncatechars:80 }}</div>
+</div>
+
+
+<div class="policy-stats d-flex justify-content-end">
+  <div>📊 {{ policy.view_count|default:0 }}</div>
+  <div>🤍 {{ policy.likes.count|default:0 }}</div>
+  <div>💬 {{ policy.comments.count|default:0 }}</div>
+</div>
+</div>
+</a>
         {% endfor %}
       </div>
 
@@ -276,46 +542,153 @@
         <nav aria-label="Page navigation">
           <ul class="pagination mb-0">
             {% if page_obj.has_previous %}
-              <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">‹</a></li>
+              <li class="page-item">
+                <a class="page-link page-prev" href="?{% if selected_category != 'all' %}category={{ selected_category }}&{% endif %}{% if selected_sido %}sido={{ selected_sido }}&{% endif %}{% if selected_sigungu %}sigungu={{ selected_sigungu }}&{% endif %}{% if stage and stage != 'all' %}stage={{ stage }}&{% endif %}page={{ page_obj.previous_page_number }}" aria-label="Previous">‹</a>
+              </li>
             {% else %}
-              <li class="page-item disabled"><span class="page-link">‹</span></li>
+              <li class="page-item disabled"><span class="page-link page-prev">‹</span></li>
             {% endif %}
+
             {% for num in page_obj.paginator.page_range %}
               {% if page_obj.number == num %}
                 <li class="page-item active"><span class="page-link">{{ num }}</span></li>
               {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                <li class="page-item"><a class="page-link" href="?{% if selected_category != 'all' %}category={{ selected_category }}&{% endif %}{% if selected_sido %}sido={{ selected_sido }}&{% endif %}{% if selected_sigungu %}sigungu={{ selected_sigungu }}&{% endif %}{% if stage and stage != 'all' %}stage={{ stage }}&{% endif %}page={{ num }}">{{ num }}</a></li>
+              {% elif num == 1 %}
+                <li class="page-item"><a class="page-link" href="?{% if selected_category != 'all' %}category={{ selected_category }}&{% endif %}{% if selected_sido %}sido={{ selected_sido }}&{% endif %}{% if selected_sigungu %}sigungu={{ selected_sigungu }}&{% endif %}{% if stage and stage != 'all' %}stage={{ stage }}&{% endif %}page={{ num }}">{{ num }}</a></li>
+                {% if page_obj.number > 4 %}
+                  <li class="page-item disabled"><span class="page-link">…</span></li>
+                {% endif %}
+              {% elif num == paginator.num_pages %}
+                {% if page_obj.number < paginator.num_pages|add:'-3' %}
+                  <li class="page-item disabled"><span class="page-link">…</span></li>
+                {% endif %}
+                <li class="page-item"><a class="page-link" href="?{% if selected_category != 'all' %}category={{ selected_category }}&{% endif %}{% if selected_sido %}sido={{ selected_sido }}&{% endif %}{% if selected_sigungu %}sigungu={{ selected_sigungu }}&{% endif %}{% if stage and stage != 'all' %}stage={{ stage }}&{% endif %}page={{ num }}">{{ num }}</a></li>
               {% endif %}
             {% endfor %}
+
             {% if page_obj.has_next %}
-              <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">›</a></li>
+              <li class="page-item">
+                <a class="page-link page-next" href="?{% if selected_category != 'all' %}category={{ selected_category }}&{% endif %}{% if selected_sido %}sido={{ selected_sido }}&{% endif %}{% if selected_sigungu %}sigungu={{ selected_sigungu }}&{% endif %}{% if stage and stage != 'all' %}stage={{ stage }}&{% endif %}page={{ page_obj.next_page_number }}" aria-label="Next">›</a>
+              </li>
             {% else %}
-              <li class="page-item disabled"><span class="page-link">›</span></li>
+              <li class="page-item disabled"><span class="page-link page-next">›</span></li>
             {% endif %}
           </ul>
         </nav>
       </div>
       {% endif %}
+
       {% else %}
       <div class="text-center mt-5">🔍 검색 결과가 없습니다.</div>
       {% endif %}
     </div>
-
-    <aside class="sidebar">
-      <div class="sidebar-box">
-        <h4>🌟 관리자 추천</h4>
-        <p><a href="{% url 'youth_policy:weekly_pick' %}">→ 이번 주 Pick 보기</a></p>
-      </div>
-      <div class="sidebar-box">
-        <h4>🔥 인기 정책 TOP 3</h4>
-        <ol>
-          {% for p in top_viewed_policies %}
-          <li><a href="{% url 'youth_policy:policy_detail' p.id %}">{{ p.정책명 }}</a><br><small>{{ p.view_count }}회 조회</small></li>
-          {% endfor %}
-        </ol>
-      </div>
-    </aside>
   </div>
 </div>
+
+<script>
+  // 드롭다운 토글 함수
+  function toggleDropdown(type) {
+    const dropdown = document.getElementById(type + 'Dropdown');
+    const button = document.getElementById(type + 'Button');
+    const isOpen = dropdown.classList.contains('show');
+    
+    // 모든 드롭다운 닫기
+    document.querySelectorAll('.dropdown-menu').forEach(menu => {
+      menu.classList.remove('show');
+    });
+    document.querySelectorAll('.filter-button').forEach(btn => {
+      btn.classList.remove('open');
+    });
+    
+    // 현재 드롭다운이 닫혀있었다면 열기
+    if (!isOpen) {
+      dropdown.classList.add('show');
+      button.classList.add('open');
+    }
+  }
+
+  // 필터 선택 함수
+  function selectFilter(type, value, text) {
+    const input = document.getElementById(type + 'Input');
+    const buttonText = document.getElementById(type + 'Text');
+    const button = document.getElementById(type + 'Button');
+    const dropdown = document.getElementById(type + 'Dropdown');
+    
+    // 값 설정
+    input.value = value;
+    buttonText.textContent = text;
+    
+    // 활성화 상태 업데이트
+    if (value && value !== 'all' && value !== '') {
+      button.classList.add('active');
+    } else {
+      button.classList.remove('active');
+    }
+    
+    // 드롭다운 아이템 선택 상태 업데이트
+    dropdown.querySelectorAll('.dropdown-item').forEach(item => {
+      item.classList.remove('selected');
+    });
+    event.target.classList.add('selected');
+    
+    // 드롭다운 닫기
+    dropdown.classList.remove('show');
+    button.classList.remove('open');
+    
+    // 폼 제출
+    document.getElementById('filterForm').submit();
+  }
+
+  // 외부 클릭시 드롭다운 닫기
+  document.addEventListener('click', function(event) {
+    if (!event.target.closest('.filter-dropdown')) {
+      document.querySelectorAll('.dropdown-menu').forEach(menu => {
+        menu.classList.remove('show');
+      });
+      document.querySelectorAll('.filter-button').forEach(btn => {
+        btn.classList.remove('open');
+      });
+    }
+  });
+
+  // 페이지 로드시 현재 선택된 값들로 버튼 상태 초기화
+  document.addEventListener('DOMContentLoaded', function() {
+    const categoryValue = '{{ selected_category|default:"all" }}';
+    const sidoValue = '{{ selected_sido|default:"" }}';
+    const sigunguValue = '{{ selected_sigungu|default:"" }}';
+    const stageValue = '{{ stage|default:"all" }}';
+    
+    // 카테고리 버튼 상태 설정
+    if (categoryValue && categoryValue !== 'all') {
+      document.getElementById('categoryButton').classList.add('active');
+      const categoryMap = {
+        'job': '일자리',
+        'education': '교육',
+        'welfare': '금융복지',
+        'housing': '주거'
+      };
+      document.getElementById('categoryText').textContent = categoryMap[categoryValue] || '정책 분야';
+    }
+    
+    // 시도 버튼 상태 설정
+    if (sidoValue) {
+      document.getElementById('sidoButton').classList.add('active');
+      // 시도 이름은 템플릿에서 이미 설정됨
+    }
+    
+    // 시군구 버튼 상태 설정
+    if (sigunguValue) {
+      document.getElementById('sigunguButton').classList.add('active');
+      // 시군구 이름은 템플릿에서 이미 설정됨
+    }
+    
+    // 생애주기 버튼 상태 설정
+    if (stageValue && stageValue !== 'all') {
+      document.getElementById('stageButton').classList.add('active');
+      document.getElementById('stageText').textContent = stageValue;
+    }
+  });
+</script>
 </body>
 </html>

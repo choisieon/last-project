@@ -23,6 +23,7 @@ class YouthPolicy(models.Model):
     제출서류내용 = models.TextField(blank=True, null=True)
     참여제외대상 = models.TextField(blank=True, null=True)
     생애주기단계 = models.TextField(blank=True, null=True)
+    정책설명요약 =  models.TextField(blank=True, null=True)
 
     view_count = models.PositiveIntegerField(default=0)
     likes = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='liked_policies', blank=True)

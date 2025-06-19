@@ -79,8 +79,8 @@
         {% for p in policies %}
           <li>
             <a href="{% url 'youth_policy:policy_detail' p.id %}" class="policy-link">{{ p.정책명 }}</a>
-            {% if p.curation_comment %}
-              <div class="comment">📝 {{ p.curation_comment }}</div>
+            {% if p.weekly_comment %}
+              <div class="comment">📝 {{ p.weekly_comment }}</div>
             {% endif %}
           </li>
         {% empty %}
