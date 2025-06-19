@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import YouthPolicy, PolicyComment, Region, Sigungu, Sido, PolicyViewLog
+from .forms import CommentForm
 from django.core.paginator import Paginator
 from django.db.models import Q
 from collections import Counter
@@ -16,7 +17,7 @@ def basic_page(request):
     policies = YouthPolicy.objects.all()
 
     if stage and stage != 'all':
-        policies = policies.filter(생애주기단계__icontains=stage) # 'contains' 대신 'icontains'를 사용하면 대소문자 구분 없이 검색 가능
+        policies = policies.filter(생애주기단계__exact=stage)
 
     sido_list = Sido.objects.all().order_by('code')
     
@@ -95,27 +96,20 @@ def get_next_most_viewed(policy_id):
 @login_required
 def add_policy_comment(request, policy_id):
     policy = get_object_or_404(YouthPolicy, id=policy_id)
+
     if request.method == 'POST':
         content = request.POST.get('content')
-        PolicyComment.objects.create(policy=policy, author=request.user, content=content)
-    return redirect(request.META.get('HTTP_REFERER', '/'))
+        parent_id = request.POST.get('parent_id')
 
-# views.py > policy_detail
-def policy_detail(request, policy_id):
-    policy = get_object_or_404(YouthPolicy, id=policy_id)
-    policy.view_count += 1
-    policy.save(update_fields=['view_count'])
+        parent = PolicyComment.objects.filter(id=parent_id).first() if parent_id else None
 
-    comments = policy.comments.filter(parent__isnull=True)
-    recommended_policies = get_next_most_viewed(policy_id)
-    top_viewed_policies = YouthPolicy.objects.order_by('-view_count')[:3]
-
-    return render(request, 'policy_detail.html', {
-        'policy': policy,
-        'comments': comments,
-        'recommended_policies': recommended_policies,
-        'top_viewed_policies': top_viewed_policies,
-    })
+        PolicyComment.objects.create(
+            policy=policy,
+            author=request.user,
+            content=content,
+            parent=parent
+        )
+    return redirect('youth_policy:policy_detail', policy_id=policy.id)
 
 
 # 댓글 삭제
@@ -124,7 +118,6 @@ def delete_policy_comment(request, comment_id):
     comment = get_object_or_404(PolicyComment, id=comment_id, author=request.user)
     comment.delete()
     return redirect(request.META.get('HTTP_REFERER', '/'))
-
 
 # 댓글 수정 (폼 + 처리)
 @login_required
@@ -137,6 +130,44 @@ def edit_policy_comment(request, comment_id):
         return redirect(request.META.get('HTTP_REFERER', '/'))
 
     return render(request, 'edit_comment.html', {'comment': comment})
+
+# views.py > policy_detail
+def policy_detail(request, policy_id):
+    form = CommentForm()
+    policy = get_object_or_404(YouthPolicy, id=policy_id)
+    policy.view_count += 1
+    policy.save(update_fields=['view_count'])
+
+    comments = PolicyComment.objects.filter(policy=policy, parent=None).order_by('-created_at')
+    recommended_policies = get_next_most_viewed(policy_id)
+    top_viewed_policies = YouthPolicy.objects.order_by('-view_count')[:3]
+    top_level_comments = PolicyComment.objects.filter(policy=policy, parent__isnull=True).select_related('author').prefetch_related('replies__author')
+
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            new_comment = form.save(commit=False)
+            new_comment.policy = policy
+            new_comment.user = request.user
+
+            parent_id = request.POST.get('parent_id')
+            if parent_id:
+                parent_comment = PolicyComment.objects.get(id=parent_id)
+                new_comment.parent = parent_comment
+
+            new_comment.save()
+            return redirect('post_detail', id=parent_id)
+
+    return render(request, 'policy_detail.html', {
+        'policy': policy,
+        'comments': comments,
+        'recommended_policies': recommended_policies,
+        'top_viewed_policies': top_viewed_policies,
+        'top_level_comments': top_level_comments,
+        'form': form
+    })
+
+
 
 def weekly_pick_view(request):
     categories = ['일자리', '교육', '주거', '복지문화', '참여권리']
@@ -152,8 +183,13 @@ def weekly_pick_view(request):
         'weekly_picks_by_category': weekly_picks_by_category
     })
 
-def map_view(request):
-    """
-    RPG 지도 페이지를 렌더링합니다.
-    """
-    return render(request, 'policy_map.html')
+@login_required
+def toggle_policy_like(request, policy_id):
+    policy = get_object_or_404(YouthPolicy, id=policy_id)
+
+    if request.user in policy.likes.all():
+        policy.likes.remove(request.user)
+    else:
+        policy.likes.add(request.user)
+
+    return redirect('youth_policy:policy_detail', policy_id=policy.id)

@@ -1,12 +1,23 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>{{ policy.name }}</title>
+  <title>{{ policy.정책명 }}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
+    @font-face {
+      font-family: 'MyCustomFont';
+      src: url("{% static 'fonts/픽셀.woff2' %}") format("woff2");
+    }
+
     body {
-      font-family: 'Noto Sans KR', sans-serif;
-      background-color: #e0f2fe;
+      font-family: 'MyCustomFont', sans-serif;
+      background-color: #cde4c7;
+      background-image: url("{% static 'images/Frame 13.png' %}");
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: cover;
       padding: 2rem;
       display: flex;
       justify-content: center;
@@ -21,128 +32,101 @@
 
     .calendar-box {
       flex: 1;
-      background-color: #ffffff;
-      border: 4px solid #60a5fa;
+      background-color: #fdf7e3;
+      border: 4px solid #5a4a2f;
       border-radius: 10px;
       padding: 2rem;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-      position: relative;
-    }
-
-    .calendar-box::before {
-      content: '';
-      position: absolute;
-      top: -20px;
-      left: 30px;
-      width: 20px;
-      height: 20px;
-      background-color: #d1d5db;
-      border-radius: 50%;
-      box-shadow: 610px 0 #d1d5db;
+      box-shadow: 4px 4px 0 #b9a782;
     }
 
     h1 {
-      font-size: 1.8rem;
+      font-size: 1.6rem;
       font-weight: bold;
       text-align: center;
-      margin-bottom: 2rem;
-      color: #1f2937;
+      margin-bottom: 1rem;
+      color: #3c2e1e;
     }
 
     .main-keyword {
-      background-color: #bae6fd;
+      background-color: #ffeaa7;
       padding: 0.5rem 1rem;
       font-weight: bold;
       border-radius: 6px;
-      border-left: 4px solid #0284c7;
-      margin-bottom: 1rem;
+      border-left: 4px solid #e17055;
+      margin-bottom: 1.2rem;
       display: inline-block;
+      color: #2d3436;
     }
 
     .description-box {
-      background-color: #f9fafb;
-      border: 1px solid #d1d5db;
+      background-color: #fffef2;
+      border: 2px dashed #5a4a2f;
       padding: 1rem;
       border-radius: 6px;
       line-height: 1.6;
       margin-bottom: 1.5rem;
-      color: #374151;
+      color: #2d3436;
     }
 
     .keyword-buttons {
       display: flex;
-      gap: 1rem;
-      margin-bottom: 2rem;
+      gap: 0.8rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-end;
     }
 
     .keyword-buttons button {
-      background-color: #e0f2fe;
-      border: 1px solid #0284c7;
-      color: #0369a1;
-      padding: 0.5rem 1.2rem;
-      border-radius: 20px;
-      cursor: default;
+      background-color: transparent;
+      border: none;
+      color: #3c2e1e;
+      padding: 0.5rem 1rem;
       font-weight: bold;
+      cursor: default;
     }
 
-    .sidebar {
-      width: 300px;
-    }
-
-    .sidebar-box {
-      background: #ffffff;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      padding: 1rem;
-      margin-bottom: 2rem;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    .keyword-buttons .action-button {
+      background-color: #ffeaa7;
+      border: 2px solid #5a4a2f;
+      color: #3c2e1e;
+      border-radius: 20px;
+      padding: 0.5rem 1.2rem;
+      font-weight: bold;
     }
 
     .comment-form {
-      background-color: #f9fafb;
-      border: 1px solid #d1d5db;
+      display: none;
+      background-color: #fffef2;
+      border: 2px solid #5a4a2f;
       border-radius: 6px;
       padding: 1rem;
-      margin-top: 2rem;
-    }
-
-    .comment-form h3 {
-      margin-bottom: 1rem;
-      font-size: 1.1rem;
-      font-weight: bold;
-      color: #1f2937;
-      display: flex;
-      align-items: center;
-    }
-
-    .comment-form h3::before {
-      content: "✏️";
-      margin-right: 0.5rem;
+      margin-top: 1rem;
     }
 
     .comment-form textarea {
       width: 100%;
-      border: 1px solid #cbd5e1;
+      border: 1px solid #ccc;
       border-radius: 4px;
       padding: 0.75rem;
-      font-size: 0.95rem;
       resize: vertical;
-      box-sizing: border-box;
     }
 
     .comment-form button {
       margin-top: 0.75rem;
-      background-color: #60a5fa;
+      background-color: #5a4a2f;
       color: white;
       border: none;
       border-radius: 4px;
       padding: 0.5rem 1rem;
       font-weight: bold;
-      cursor: pointer;
     }
 
-    .comment-form button:hover {
-      background-color: #3b82f6;
+    .reply-box {
+      margin-left: 1.5rem;
+      border-left: 2px solid #ccc;
+      padding-left: 1rem;
+      margin-top: 1rem;
     }
 
     .back-btn {
@@ -150,34 +134,27 @@
       text-align: center;
       margin-top: 2rem;
       font-size: 0.9rem;
-      color: #0284c7;
-    }
-
-    .back-btn:hover {
-      text-decoration: underline;
-    }
-
-    a {
-      color: #2563eb;
-      text-decoration: none;
-    }
-
-    a:visited {
-      color: #2563eb;
+      color: #5a4a2f;
     }
   </style>
+  <script>
+    function toggleCommentForm() {
+      const form = document.getElementById("commentForm");
+      form.style.display = (form.style.display === "none" || form.style.display === "") ? "block" : "none";
+    }
+  </script>
 </head>
 <body>
 <div class="content-wrapper">
   <div class="calendar-box">
-    <h1>{{ policy.name }}</h1>
+    <h1>{{ policy.정책명 }}</h1>
 
-    <div class="main-keyword">📌 메인 키워드: {{ policy.정책키워드|default:"없음" }}</div>
+    <div class="main-keyword">📌 {{ policy.정책키워드|default:"없음" }}</div>
 
     <div class="description-box">
       <p><strong>정책명</strong><br>{{ policy.정책명|linebreaksbr }}</p>
-      <p><strong>정책 설명</strong><br>{{ policy.정책설명|linebreaksbr }}</p>
-      <p><strong>추가 신청 자격</strong><br>{{ policy.추가신청자격조건내용|linebreaksbr }}</p>
+      <p><strong>설명</strong><br>{{ policy.정책설명|linebreaksbr }}</p>
+      <p><strong>추가 자격</strong><br>{{ policy.추가신청자격조건내용|linebreaksbr }}</p>
       <p><strong>신청 기간</strong><br>{{ policy.신청기간 }}</p>
       <p><strong>신청URL</strong><br>
         {% if policy.신청URL and policy.신청URL != "nan" %}
@@ -192,85 +169,67 @@
       <button>#{{ policy.정책키워드|default:"하위분류없음" }}</button>
       <button>#{{ policy.대상연령 }}</button>
       <button>#{{ policy.sido.name|default:"없음" }}</button>
+
+      {% if user.is_authenticated %}
+        <form action="{% url 'youth_policy:toggle_policy_like' policy.id %}" method="post" style="display:inline;">
+          {% csrf_token %}
+          <button class="action-button" type="submit">
+            {% if user in policy.likes.all %}❤️{% else %}🤍{% endif %} {{ policy.likes.count }}
+          </button>
+        </form>
+        <button class="action-button" onclick="toggleCommentForm()">💬 댓글</button>
+      {% endif %}
     </div>
 
     {% if user.is_authenticated %}
-      <div class="comment-form">
-        <h3>댓글 작성</h3>
-        <form action="{% url 'youth_policy:add_policy_comment' policy.id %}" method="post">
-          {% csrf_token %}
-          <textarea name="content" rows="4" placeholder="댓글을 입력하세요."></textarea>
-          <button type="submit">댓글 작성</button>
-        </form>
-      </div>
+    <div id="commentForm" class="comment-form">
+      <form action="{% url 'youth_policy:add_policy_comment' policy.id %}" method="post">
+        {% csrf_token %}
+        <textarea name="content" rows="4" placeholder="댓글을 입력하세요."></textarea>
+        <input type="hidden" name="parent_id" value="">
+        <button type="submit">댓글 작성</button>
+      </form>
+    </div>
     {% else %}
-      <p>댓글을 작성하려면 <a href="{% url 'login' %}?next={{ request.path }}">로그인</a> 하세요.</p>
+    <p><a href="{% url 'accounts:login' %}?next={{ request.path }}">로그인</a> 후 댓글 작성이 가능합니다.</p>
     {% endif %}
 
     <hr>
-    <h2>💬 댓글</h2>
-    <div id="comment-section">
-      {% for comment in comments %}
-        <div style="margin-bottom: 1.5rem; border-bottom: 1px solid #ccc; padding-bottom: 1rem;">
-          <p><strong>{{ comment.author.username }}</strong> | {{ comment.created_at|date:"Y.m.d H:i" }}</p>
-          <p>{{ comment.content|linebreaks }}</p>
+    <h2>댓글</h2>
+    {% for comment in comments %}
+    <div class="description-box">
+      <p><strong>{{ comment.author.username }}</strong> | {{ comment.created_at|date:"Y.m.d H:i" }}</p>
+      <p>{{ comment.content|linebreaks }}</p>
 
-          {% if user.is_authenticated and user == comment.author %}
-            <p>
-              <a href="{% url 'youth_policy:edit_policy_comment' comment.id %}">수정</a> |
-              <a href="{% url 'youth_policy:delete_policy_comment' comment.id %}" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</a>
-            </p>
-          {% endif %}
+      {% if user.is_authenticated %}
+      <form action="{% url 'youth_policy:add_policy_comment' policy.id %}" method="post" style="margin-top: 1rem;">
+        {% csrf_token %}
+        <textarea name="content" rows="2" placeholder="대댓글 작성"></textarea>
+        <input type="hidden" name="parent_id" value="{{ comment.id }}">
+        <button type="submit">대댓글</button>
+      </form>
+      {% endif %}
 
-          {% for reply in comment.replies.all %}
-            <div style="margin-left: 2rem; border-left: 2px solid #60a5fa; padding-left: 1rem; margin-top: 1rem;">
-              <p><strong>{{ reply.author.username }}</strong> | {{ reply.created_at|date:"Y.m.d H:i" }}</p>
-              <p>{{ reply.content|linebreaks }}</p>
-
-              {% if user.is_authenticated and user == reply.author %}
-                <p>
-                  <a href="{% url 'youth_policy:edit_policy_comment' reply.id %}">수정</a> |
-                  <a href="{% url 'youth_policy:delete_policy_comment' reply.id %}" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</a>
-                </p>
-              {% endif %}
-            </div>
-          {% endfor %}
-
-          {% if user.is_authenticated %}
-            <form action="{% url 'youth_policy:add_policy_comment' policy.id %}" method="post" style="margin-top: 1rem;">
-              {% csrf_token %}
-              <input type="hidden" name="parent_id" value="{{ comment.id }}">
-              <textarea name="content" rows="2" style="width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid #cbd5e1;" placeholder="답글을 입력하세요."></textarea><br>
-              <button type="submit" style="margin-top: 0.5rem; background-color: #60a5fa; color: white; border: none; border-radius: 4px; padding: 0.4rem 0.8rem;">답글 작성</button>
-            </form>
-          {% endif %}
-        </div>
-      {% empty %}
-        <p>아직 댓글이 없습니다.</p>
+      {% for reply in comment.replies.all %}
+      <div class="reply-box">
+        <p><strong>{{ reply.author.username }}</strong> | {{ reply.created_at|date:"Y.m.d H:i" }}</p>
+        <p>{{ reply.content|linebreaks }}</p>
+      </div>
       {% endfor %}
+
+      {% if user.is_authenticated and user == comment.author %}
+      <p style="margin-top: 0.8rem;">
+        <a href="{% url 'youth_policy:edit_policy_comment' comment.id %}">수정</a> |
+        <a href="{% url 'youth_policy:delete_policy_comment' comment.id %}" onclick="return confirm('삭제하시겠습니까?');">삭제</a>
+      </p>
+      {% endif %}
     </div>
+    {% empty %}
+    <p>아직 댓글이 없습니다.</p>
+    {% endfor %}
 
     <a href="{% url 'youth_policy:basic_page' %}" class="back-btn">← 목록으로 돌아가기</a>
   </div>
-
-  <aside class="sidebar">
-  <div class="sidebar-box">
-    <h4>🌟 함께 보면 좋은 정책 (관리자 추천)</h4>
-    <p><a href="{% url 'youth_policy:weekly_pick' %}">→ 이번 주 관리자 Pick 보기</a></p>
-  </div>
-
-  <div class="sidebar-box">
-    <h4>🔥 인기 정책 TOP 3</h4>
-    <ol>
-      {% for p in top_viewed_policies %}
-        <li>
-          <a href="{% url 'youth_policy:policy_detail' p.id %}">{{ p.정책명 }}</a><br>
-          <small>{{ p.view_count }}회 조회</small>
-        </li>
-      {% endfor %}
-    </ol>
-  </div>
-</aside>
 </div>
 </body>
 </html>

@@ -32,6 +32,7 @@ class YouthPolicy(models.Model):
 
     relation_with = models.ManyToManyField('self', symmetrical=False, blank=True, related_name='추천된_정책들')
     is_weekly_pick = models.BooleanField(default=False)  # 관리자 주간 추천 여부
+    weekly_comment = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return self.정책명
@@ -61,7 +62,14 @@ class PolicyComment(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+
     parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='replies')
+
+    def is_reply(self):
+        return self.parent is not None
+
+    def __str__(self):
+        return f"{self.user.username}: {self.content[:20]}"
 
 
 class PolicyViewLog(models.Model):
