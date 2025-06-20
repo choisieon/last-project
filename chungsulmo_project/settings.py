@@ -30,8 +30,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'community',
     'accounts',
-    'mentor',
-    'board',
+    'board.apps.BoardConfig',   # 사용자 프로필/팔로우
+    'mentor.apps.MentorConfig',  # mentor 대신 , mentor 와 같음
+    'tinymce',
+    'taggit.apps.TaggitAppConfig',
+    'taggit_templatetags2',
+    'taggit_autosuggest',
     'youth_policy',
 
     'django.contrib.sites',  # 필수
@@ -66,6 +70,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'board.context_processors.notification_counts',
             ],
         },
     },
@@ -128,8 +133,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATIC_URL = '/static/'
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # collectstatic 명령으로 모일 경로
+
 # 개발 시 static 파일 경로
-STATICFILES_DIRS = []
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR / 'static'),
+]
 
 AUTH_USER_MODEL = 'accounts.User'
 
@@ -148,6 +157,46 @@ AUTHENTICATION_BACKENDS = (
 
 LOGIN_REDIRECT_URL = '/'   # 로그인 성공 시 이동 경로
 LOGOUT_REDIRECT_URL = '/'  # 로그아웃 시 이동 경로
+
+# TinyMCE self-hosted 설정
+TINYMCE_JS_URL = '/static/tinymce/js/tinymce/tinymce.min.js'
+TINYMCE_COMPRESSOR = False
+
+
+# TINYMCE_DEFAULT_CONFIG = {
+#     'height': 400,
+#     'plugins': 'image,link,code',
+#     'toolbar': 'undo redo | image link | code',
+#     'images_upload_url': '/upload-image/',  # 이미지 업로드 URL
+# }  
+
+
+# TINYMCE_DEFAULT_CONFIG = {
+#     'height': 600,
+#     'plugins': '''
+#         advlist autolink lists link image charmap preview anchor
+#         pagebreak searchreplace wordcount visualblocks visualchars code
+#         fullscreen insertdatetime media nonbreaking save table
+#         directionality emoticons codesample
+#     ''',
+#     'toolbar1': '''
+#         fullscreen preview bold italic underline | fontselect fontsizeselect | 
+#         forecolor backcolor | alignleft alignright aligncenter alignjustify | 
+#         indent outdent | bullist numlist table | link image media | codesample
+#     ''',
+#     'toolbar2': '''
+#         visualblocks visualchars | charmap emoticons | insertdatetime
+#         | hr nonbreaking | pagebreak restoredraft | code
+#     ''',
+#     'contextmenu': 'formats | link image',
+#     'menubar': True,
+#     'statusbar': True,
+#     'theme_advanced_resizing': True,
+#     'images_upload_url': '/board/upload-image/',
+#     'width': '100%',
+#     'language': 'ko_KR',
+#     'language_url': '/static/tinymce/js/tinymce/langs/ko_KR.js',
+# }
 
 
 SOCIALACCOUNT_AUTO_SIGNUP = True

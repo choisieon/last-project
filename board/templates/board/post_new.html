@@ -1,59 +1,264 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block title %}글쓰기 | 청설모{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/tagify.css' %}">
+<script src="{% static 'js/tagify.min.js' %}"></script>
+<script src="{% static 'tinymce/js/jquery-3.7.1.min.js' %}"></script>
+<script src="{% static 'tinymce/js/tinymce/tinymce.min.js' %}"></script>
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}
+
 {% block content %}
 <div class="form-outer">
   <div class="form-container">
-    <h2>글쓰기</h2>
+    <h2>✏️ 새 글 작성</h2>
     <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
-      <div class="form-group">
-        {{ form.title.label_tag }}
-        {{ form.title }}
-        {% for error in form.title.errors %}
+
+      <!-- 제목(60%) + 카테고리(40%) 한 줄 배치 -->
+      <div class="form-row">
+        <div class="form-group" style="flex:6;">
+          {{ form.title.label_tag }}
+          {{ form.title }}
+          {% for error in form.title.errors %}
           <div class="error">{{ error }}</div>
-        {% endfor %}
+          {% endfor %}
+        </div>
+        <div class="form-group" style="flex:4;">
+          {{ form.category.label_tag }}
+          {{ form.category }}
+          {% for error in form.category.errors %}
+            <div class="error">{{ error }}</div>
+          {% endfor %}
+        </div>
       </div>
-      <div class="form-group">
-        {{ form.category.label_tag }}
-        {{ form.category }}
-        {% for error in form.category.errors %}
-          <div class="error">{{ error }}</div>
-        {% endfor %}
+
+      <!-- 썸네일/이미지(50%) + 첨부파일(50%) 한 줄 배치 -->
+      <div class="form-row">
+        <!-- 왼쪽: 썸네일/이미지 -->
+        <div class="form-group" style="flex:5;">
+          <div id="thumbnail-field">
+            {{ form.thumbnail.label_tag }}
+            {{ form.thumbnail }}
+            <div style="color:#888; font-size:0.97em; margin-top:6px;">
+              후기글 대표 썸네일로 사용됩니다. (필수)
+            </div>
+            {% for error in form.thumbnail.errors %}
+              <div class="error">{{ error }}</div>
+            {% endfor %}
+          </div>
+          <div id="image-field" style="display:none;">
+            {{ form.images.label_tag }}
+            {{ form.images }}
+            <div style="color:#888; font-size:0.97em; margin-top:6px;">
+              이미지 업로드 (최대 2개)
+            </div>
+            {% for error in form.images.errors %}
+              <div class="error">{{ error }}</div>
+            {% endfor %}
+          </div>
+        </div>
+        
+        <!-- 오른쪽: 첨부파일 -->
+        <div class="form-group" style="flex:5;">
+          <label for="id_files">첨부 파일 (PDF, ZIP 등):</label>
+          <input type="file" name="files" id="id_files" multiple>
+          <div style="color:#888; font-size:0.97em; margin-top:6px;">
+            여러 파일을 선택할 수 있습니다.
+          </div>
+        </div>
       </div>
+
+      <!-- 본문 -->
       <div class="form-group">
         {{ form.content.label_tag }}
         <div id="content_field">
           {{ form.content }}
         </div>
       </div>
-      <div class="form-group" id="image_field">
-        {{ form.images.label_tag }}
-        {{ form.images }}
+
+      <!-- 태그 입력란 -->
+      <div class="form-group">
+        <label for="id_tags">태그 (쉼표로 구분):</label>
+        <input name="tags" id="id_tags" value="">
+        {% for error in form.tags.errors %}
+        <div class="error">{{ error }}</div>
+        {% endfor %}
+        <div style="margin-top:8px;">
+          <span style="color:#888; font-size:0.96em;">추천 태그:</span>
+          {% for tag in popular_tags %}
+          <button type="button" class="tag-suggest-btn" style="margin:2px 4px; padding:2px 8px; border-radius:10px; border:1px solid #1976d2; background:#f0f4fa; color:#1976d2; cursor:pointer;" onclick="addTag('{{ tag.name }}')">#{{ tag.name }}</button>
+          {% endfor %}
+        </div>
       </div>
+
       <button type="submit" class="write-btn">등록</button>
     </form>
   </div>
 </div>
 
-<!-- Self-hosted TinyMCE 스크립트 -->
-<script src="{% static 'tinymce/js/tinymce/tinymce.min.js' %}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const categorySelect = document.getElementById('id_category');
+  const thumbnailField = document.getElementById('thumbnail-field');
+  const imageField = document.getElementById('image-field');
   let tinymceLoaded = false;
+
+  // getCookie 함수 정의 (필수)
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
 
   function enableTinyMCE() {
     if (tinymceLoaded) return;
-    tinymce.init({
-      selector: '#id_content',
-      plugins: 'image',
-      toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright | image link',
-      menubar: false,
+    document.getElementById('id_content').removeAttribute('required');
+    
+    // TinyMCE 설정 객체
+    const tinyConfig = {
+      selector: 'textarea#id_content',
+      width: '100%',
+      min_width: 500,
+      min_height: 300,
+      max_height: 800,
+      height: 600,
       language: 'ko_KR',
-      images_upload_url: '/board/upload-image/', // 이미지 업로드 구현 필요
-      automatic_uploads: true,
-    });
+      language_url: '/static/tinymce/js/tinymce/langs/ko_KR.js',
+      plugins: 'advlist autolink lists link image imagetools charmap preview anchor pagebreak searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking save table directionality emoticons codesample',
+      toolbar: 'fullscreen preview bold italic underline | fontselect fonts极select | forecolor backcolor | alignleft alignright aligncenter alignjustify | indent outdent | bullist numlist table | link image media imageoptions | codesample | visualblocks visualchars | charmap emoticons | insertdatetime | hr nonbreaking | pagebreak restoredraft | code',
+      contextmenu: 'formats | link image',
+      menubar: 'file edit view insert format tools table help',
+      content_css: 'writer',
+      license_key: 'gpl',
+      content_style: `
+        img {
+          display: inline-block;
+          margin: 0 8px 8px 0;
+          // max-width: 32%;
+          height: auto;
+          vertical-align: middle;
+          cursor: move;
+        }
+        p, div {
+          overflow: hidden;
+        }
+        img[style*="float: left"] {
+          float: left;
+          margin-right: 12px;
+          margin-bottom: 8px;
+        }
+        img[style*="float: right"] {
+          float: right;
+          margin-left: 12px;
+          margin-bottom: 8px;
+        }
+        p:after, div:after {
+          content: "";
+          display: block;
+          clear: both;
+        }
+        .mce-resizehandle {
+          background: #4a90e2;
+          border: 2px solid white;
+          border-radius: 50%;
+          width: 12px !important;
+          height: 12px !important;
+          z-index: 1000;
+        }
+      `,
+      object_resizing: true,
+      draggable_modal: true,
+      image_caption: true,
+      image_advtab: true,
+      setup: function(editor) {
+        editor.on('init', function() {
+          editor.dom.setAttrib(editor.getBody(), 'contenteditable', true);
+          if (editor.getContent() === '') {
+            editor.setContent(
+              '<p style="background:#fffbe9; border:1.5px dashed #fbc02d; padding:8px 14px; border-radius:7px; color:#b8860b; margin-bottom:16px;">' +
+                '※ <strong>대표 썸네일 이미지는 위에서 반드시 첨부</strong>해 주세요.<br>' +
+                '본문에는 추가 사진, 자료, 링크 등을 자유롭게 삽입할 수 있습니다.' +
+              '</p>' +
+              '<h3>1. 경험한 일</h3>' +
+              '<p style="color:#bbb;">구체적으로 어떤 상황/사건이었는지 적어주세요.</p>' +
+              '<p><br></p>' +
+              '<hr>' +
+              '<h3>2. 느낀 점</h3>' +
+              '<p style="color:#bbb;">당시 느꼈던 감정, 생각, 배운 점 등을 자유롭게 작성해 주세요.</p>' +
+              '<p><br></p>' +
+              '<hr>' +
+              '<h3>3. 추천/비추천 이유</h3>' +
+              '<p style="color:#bbb;">이 경험을 다른 사람에게 추천하거나 비추천하는 이유를 적어주세요.</p>' +
+              '<p><br></p>' +
+              '<hr>' +
+              '<h3>추가 정보 (선택)</h3>' +
+              '<p style="color:#bbb;">사진, 링크, 참고자료 등 추가적으로 공유하고 싶은 내용이 있다면 첨부해 주세요.</p>'
+            );
+          }
+        });
+      },
+      images_upload_handler: function (blobInfo) {
+        return new Promise((resolve, reject) => {
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', '/board/upload-image/');
+          xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
+          xhr.upload.onprogress = function (e) {};
+          xhr.onload = function() {
+            if (xhr.status === 403) {
+              reject({ message: 'HTTP Error: ' + xhr.status, remove: true });
+              return;
+            }
+            if (xhr.status < 200 || xhr.status >= 300) {
+              reject('HTTP Error: ' + xhr.status);
+              return;
+            }
+            var json = JSON.parse(xhr.responseText);
+            if (!json || typeof json.location != 'string') {
+              reject('Invalid JSON: ' + xhr.responseText);
+              return;
+            }
+            resolve(json.location);
+          };
+          xhr.onerror = function () {
+            reject('Image upload failed due to a XHR Transport error. Code: ' + xhr.status);
+          };
+          var formData = new FormData();
+          formData.append('file', blobInfo.blob(), blobInfo.filename());
+          xhr.send(formData);
+        });
+      }
+    };
+    
+    // TinyMCE 초기화
+    tinymce.init(tinyConfig);
     tinymceLoaded = true;
   }
 
@@ -63,22 +268,69 @@ document.addEventListener('DOMContentLoaded', function() {
     tinymceLoaded = false;
   }
 
-  categorySelect.addEventListener('change', function() {
-    if (this.value === 'review') {
+  function toggleFields() {
+    const value = categorySelect.value;
+    if (value === 'review') {
+      thumbnailField.style.display = 'block';
+      imageField.style.display = 'none';
       enableTinyMCE();
-      document.getElementById('image_field').style.display = 'none';
-    } else {
+    } else if (value === 'share' || value === 'free') {
+      thumbnailField.style.display = 'none';
+      imageField.style.display = 'block';
       disableTinyMCE();
-      document.getElementById('image_field').style.display = 'block';
+      if (tinymce.get('id_content')) {
+        tinymce.get('id_content').setContent('');
+      }
+      document.getElementById('id_content').value = '';
+    } else {
+      thumbnailField.style.display = 'none';
+      imageField.style.display = 'none';
+    }
+  }
+
+  // 초기 상태 반영
+  if (categorySelect.value === 'review') {
+    enableTinyMCE();
+    thumbnailField.style.display = 'block';
+    imageField.style.display = 'none';
+  } else if (categorySelect.value === 'share' || categorySelect.value === 'free') {
+    thumbnailField.style.display = 'none';
+    imageField.style.display = 'block';
+    disableTinyMCE();
+    if (tinymce.get('id_content')) {
+      tinymce.get('id_content').setContent('');
+    }
+    document.getElementById('id_content').value = '';
+  } else {
+    thumbnailField.style.display = 'none';
+    imageField.style.display = 'none';
+  }
+
+  categorySelect.addEventListener('change', toggleFields);
+
+  document.querySelector('form').addEventListener('submit', function() {
+    tinymce.triggerSave();
+  });
+
+  // Tagify 적용
+  var input = document.querySelector('input[name=tags]');
+  window.tagify = new Tagify(input, {
+    whitelist: [{% for tag in popular_tags %}"{{ tag.name }}"{% if not forloop.last %},{% endif %}{% endfor %}],
+    pattern: /^[가-힣a-zA-Z0-9:_-]{2,10}$/,
+    editTags: false,
+    dropdown: {
+      enabled: 0,
+      closeOnSelect: false,
+      maxItems: 100,
+      classname: "tagify__inline__suggestions"
     }
   });
 
-  // 페이지 로드 시 초기 상태 반영
-  if (categorySelect.value === 'review') {
-    enableTinyMCE();
-    document.getElementById('image_field').style.display = 'none';
-  }
+  window.addTag = function(tagName) {
+    window.tagify.addTags([tagName]);
+  };
 });
+
 </script>
 {% endblock %}
 
@@ -93,16 +345,26 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 .form-container {
-  width: 480px;
-  background: rgba(255,255,255,0.95);
-  border: 2.5px solid #5a4a2f;
-  box-shadow: 4px 4px 0 #b9a782;
-  border-radius: 14px;
-  padding: 36px 32px 28px 32px;
+  width: 90%;
+  max-width: 1000px; 
+  margin: 40px auto;
+  background: #fff;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+  border-radius: 16px;
+  padding: 48px 60px 40px 60px;
+}
+body, .form-container {
+  font-size: 18px;
+  line-height: 1.6;
+}
+.form-section {
+  margin-bottom: 36px;
+  border-bottom: 1.5px solid #f0f0f0;
+  padding-bottom: 22px;
 }
 
 .form-group {
-  margin-bottom: 22px;
+  margin-bottom: 12px;
 }
 
 .form-group label {
@@ -135,14 +397,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
 .write-btn {
   background-color: #007aff;
-    color: white;
-    padding: 6px 12px;
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 14px;
-    border: 2px solid #5a4a2f;
-    box-shadow: 3px 3px 0 #b9a782;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+  border: 2px solid #5a4a2f;
+  box-shadow: 3px 3px 0 #b9a782;
 }
 
 .write-btn:hover {
@@ -155,6 +417,76 @@ document.addEventListener('DOMContentLoaded', function() {
   font-size: 0.97rem;
   margin-top: 2px;
   margin-bottom: 4px;
+}
+
+.tox-tinymce {
+  border-radius: 8px;
+  margin-top: 18px;
+  margin-bottom: 24px;
+}
+input[type="text"], select {
+  height: 48px;
+  font-size: 1.1rem;
+  padding: 0 12px;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+textarea.input-content {
+  width: 100%;
+  max-width: 900px;
+  font-size: 16px;
+  padding: 9px;
+  margin-bottom: 10px;
+  line-height: 1.6;
+}
+.title-input {
+  font-size: 2.2rem;
+  font-weight: bold;
+  border: none;
+  border-bottom: 2px solid #eee;
+  width: 100%;
+  margin: 32px 0 18px 0;
+  text-align: center;
+  background: transparent;
+  outline: none;
+}
+.form-row {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.post-images img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 10px 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.post-images img:hover {
+  transform: scale(1.03);
+}
+
+
+@media (max-width: 700px) {
+  .form-row {
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+  .form-group {
+    width: 100%;
+  }
 }
 </style>
 {% endblock %}

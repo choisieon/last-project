@@ -7,6 +7,10 @@
   {% endif %}
   <p>{{ profile.bio }}</p>
   <p>팔로워: {{ followers }} | 팔로잉: {{ following }}</p>
+  <div>
+    팔로잉: {{ profile_user.following_set.count }} 
+    팔로워: {{ profile_user.follower_set.count }}
+  </div>
   {% if request.user != profile_user %}
     <form method="post" action="{% url 'follow_toggle' profile_user.username %}">
       {% csrf_token %}

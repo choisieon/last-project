@@ -1,11 +1,14 @@
 
 {% load static %}
+{% load taggit_templatetags2_tags %}
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <title>{% block title %}청설모{% endblock %}</title>
+  {% block extra_head %}{% endblock %}
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  {{ form.media }}
   <style>
     @font-face {
       font-family: 'MyCustomFont';
@@ -233,6 +236,9 @@
     .post-item-text {
       flex: 1;
     }
+    .unread {
+       font-weight: bold; 
+    }
     .post-item-row {
       display: flex;
       align-items: flex-start;
@@ -264,7 +270,7 @@
     <div class="top-nav">
       <div class="menu-left">
 
-        <a href="{% url 'board:index' %}" class="menu-box home-link">
+        <a href="{% url 'community:index' %}" class="menu-box home-link">
           <i class="fas fa-home"></i>
         </a>
         <a href="{% url 'board:post_list' %}" class="menu-box {% block nav_community_active %}{% endblock %}">커뮤니티</a>
@@ -274,13 +280,56 @@
       </div>
       <div class="menu-right">
         <a href="{% url 'board:post_new' %}" class="write-btn">글쓰기</a>
+        <div class="notification-area" style="position:relative;">
+          <span id="noti-bell" style="cursor:pointer; font-size:20px; position:relative;">
+            🔔
+            
+              {% if unread_count %}
+                <span id="noti-badge" style="position:absolute; top:-6px; right:-8px; background:#e33; color:#fff; border-radius:50%; font-size:11px; padding:2px 6px;">{{ unread_count }}</span>
+              {% endif %}
+              
+          </span>
+          <!-- 드롭다운 알림 목록 (기본 숨김) -->
+          <ul id="noti-list" style="display:none; position:absolute; right:0; top:28px; z-index:100; background:#fffbe9; border:1.5px solid #5a4a2f; min-width:220px; max-height:300px; overflow-y:auto; box-shadow:2px 2px 0 #b9a782; padding:10px; list-style:none;">
+            {% for noti in request.user.notifications.all|slice:":10" %}
+              <li class="{% if not noti.is_read %}unread{% endif %}"style="margin-bottom:8px;">
+                <a href="{% url 'board:notifications_read' noti.id %}" style="text-decoration:none; color:#333;">
+                  {{ noti.message }}
+                </a>
+                <span class="date" style="font-size:12px; color:#888;">{{ noti.created_at|date:"Y-m-d H:i" }}</span>
+              </li>
+            {% empty %}
+              <li>새 알림이 없습니다.</li>
+            {% endfor %}
+            <li style="text-align:center; margin-top:8px;">
+              <a href="{% url 'board:notifications_all' %}" style="font-size:13px; color:#007aff;">알림함으로 이동</a>
+            </li>
+          </ul>
+        </div>
         <div class="login-info">홍길동님 환영합니다</div>
       </div>
 
     </div>
     {% block category_bar %}{% endblock %}
+    
     {% block search_bar %}{% endblock %}
     {% block content %}{% endblock %}
   </div>
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const bell = document.getElementById('noti-bell');
+    const list = document.getElementById('noti-list');
+    if (bell && list) {
+      bell.addEventListener('click', function(e) {
+        e.stopPropagation();
+        list.style.display = (list.style.display === 'none' || list.style.display === '') ? 'block' : 'none';
+      });
+      document.body.addEventListener('click', function() {
+        list.style.display = 'none';
+      });
+    }
+  });
+  </script>
+  {% block extra_script %}{% endblock %}
 </body>
 </html>
