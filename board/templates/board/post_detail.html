@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% load static %}
 
@@ -24,19 +25,24 @@
         </a>
       </span>
     </div>
-    {% if post.image %}
-      <div style="margin-bottom:1rem;">
-        <img src="{{ post.image.url }}" alt="첨부 이미지" style="max-width:100%; border-radius:8px;">
+    {% if post.images.all %}
+      <div class="post-images" style="margin-bottom:1rem;">
+        {% for image in post.images.all %}
+          <img src="{{ image.image.url }}" alt="첨부 이미지" style="max-width:350px; max-height:350px; width:100%; height:auto; border-radius:8px; margin-bottom:8px; display:block;">
+        {% endfor %}
       </div>
     {% endif %}
     <div class="post-content">
-      {{ post.content|linebreaksbr }}
+      {{ post.content|safe }}
     </div>
     <div class="post-actions">
-      <a href="{% url 'post_list' %}">목록으로</a>
+      <a href="{% url 'board:post_list' %}{% if request.GET.category or request.GET.sort or request.GET.keyword %}?{% endif %}
+{% if request.GET.category %}category={{ request.GET.category }}{% endif %}
+{% if request.GET.sort %}{% if request.GET.category %}&{% endif %}sort={{ request.GET.sort }}{% endif %}
+{% if request.GET.keyword %}{% if request.GET.category or request.GET.sort %}&{% endif %}keyword={{ request.GET.keyword }}{% endif %}">목록으로</a>
       {% if request.user == post.author %}
-        <a href="{% url 'post_edit' post.pk %}" style="margin-left:10px; color:#007aff; border-color:#007aff;">수정</a>
-        <form action="{% url 'post_delete' post.pk %}" method="post" style="display:inline; margin-left:10px;">
+        <a href="{% url 'board:post_edit' post.pk %}" style="margin-left:10px; color:#007aff; border-color:#007aff;">수정</a>
+        <form action="{% url 'board:post_delete' post.pk %}" method="post" style="display:inline; margin-left:10px;">
           {% csrf_token %}
           <button type="submit"
                   onclick="return confirm('정말 삭제하시겠습니까?');"
@@ -305,3 +311,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endblock %}
+

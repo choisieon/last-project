@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<head><link rel="stylesheet" href="{% static 'css/style.css' %}"></head>
+
+<div class="mentor-profile" style="padding: 20px; max-width: 700px; margin: 40px auto;
+     border: 2px solid #5a4a2f; background: #fffce8; font-family: 'MyCustomFont'; box-shadow: 4px 4px 0 #ccc;">
+
+  <!-- 프로필 이미지 -->
+  {% if mentor.profile_picture %}
+    <img src="{{ mentor.profile_picture.url }}" alt="{{ mentor.nickname }}" class="mentor-image-large"
+         style="width: 140px; height: 140px; object-fit: cover; border-radius: 50%; border: 2px solid #333;">
+  {% else %}
+    <img src="{% static 'images/default-profile.png' %}" alt="기본 이미지" class="mentor-image-large"
+         style="width: 140px; height: 140px; object-fit: cover; border-radius: 50%; border: 2px solid #333;">
+  {% endif %}
+
+  <h2 style="margin-top: 16px;">👤 {{ mentor.nickname }}님의 프로필</h2>
+  <p><strong>나이대:</strong> {{ mentor.get_age_range_display }}</p>
+  <p><strong>한줄소개:</strong> {{ mentor.bio }}</p>
+  <p><strong>키워드:</strong> {{ mentor.keywords }}</p>
+  <p><strong>고민 분야:</strong> 
+    {% for c in mentor.concerns.all %}
+      <span style="background: #007aff; color: white; padding: 2px 6px; margin: 2px; display: inline-block; border-radius: 4px;">
+        #{{ c.name }}
+      </span>
+    {% endfor %}
+  </p>
+  <p><strong>멘토링 가능 여부:</strong> {% if mentor.is_mentor %}✅ 가능{% else %}❌ 불가능{% endif %}</p>
+
+  <!-- 멘토링 신청 버튼 -->
+  <a href="{% url 'mentor:mentor_request_direct' mentor.id %}" class="btn"
+     style="display:inline-block; margin-top:20px; padding: 10px 14px; background-color: #007aff;
+     color: white; font-weight: bold; border: 2px solid #333;">
+    🤝 이 멘토에게 직접 신청
+  </a>
+
+  <!-- 평점 (예시: mentor.rating) -->
+  {% if mentor.rating %}
+    <p style="margin-top: 20px;"><strong>⭐ 평균 평점:</strong> {{ mentor.rating }} / 5.0</p>
+  {% else %}
+    <p style="margin-top: 20px;"><strong>⭐ 평균 평점:</strong> 아직 평가 없음</p>
+  {% endif %}
+
+  <!-- 후기 리스트 -->
+  <div style="margin-top: 30px;">
+    <h3>💬 후기</h3>
+    {% if mentor.reviews.all %}
+      {% for review in mentor.reviews.all %}
+        <div style="border: 1px dashed #aaa; background: #f9f9f9; padding: 10px; margin-bottom: 10px;">
+          <p>"{{ review.content }}"</p>
+          <small>작성자: {{ review.author.nickname }} | 평점: {{ review.rating }} / 5</small>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>아직 등록된 후기가 없습니다.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

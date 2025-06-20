@@ -1,22 +1,48 @@
+
 {% for reply in replies %}
-  <div class="comment reply"
-       style="margin-left: {% if reply.parent.parent %}0{% else %}2rem{% endif %};"
+  <div class="comment reply" 
+       style="margin-left: {% if reply.parent.parent %}0{% else %}2rem{% endif %};" 
        id="comment-{{ reply.id }}">
+    
+    {# 답글 대상 표시 (3단계 이상) #}
     {% if reply.parent.parent %}
       <span style="color:#888; font-size:0.95em;">↳ {{ reply.parent.author }}님에게 답글</span>
     {% endif %}
+
+    {# 댓글 정보 #}
     <strong>{{ reply.author }}</strong>
     <span>{{ reply.created_at|date:"Y-m-d H:i" }}</span>
     <p>{{ reply.content }}</p>
+
+    {# 수정/삭제 버튼 (작성자만 보임) #}
+    {% if user == reply.author %}
+      <a href="{% url 'board:comment_edit' reply.pk %}" class="edit-btn">수정</a>
+      <form action="{% url 'board:comment_delete' reply.pk %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" 
+                class="delete-btn"
+                onclick="return confirm('정말 삭제하시겠습니까?');">
+          삭제
+        </button>
+      </form>
+    {% endif %}
+
+    {# 답글 버튼 & 대댓글 폼 #}
     <a href="#" class="reply-toggle" data-comment-id="{{ reply.id }}">답글</a>
-    <form method="post" class="comment-form reply-form" data-parent-id="{{ reply.id }}" style="display:none;">
+    <form method="post" 
+          class="comment-form reply-form" 
+          data-parent-id="{{ reply.id }}" 
+          style="display:none;">
       {% csrf_token %}
       {{ comment_form.content }}
       <input type="hidden" name="parent_id" value="{{ reply.id }}">
-      <button type="submit">대댓글 작성</button>
+      <button type="submit" class="write-btn">대댓글 작성</button>
     </form>
+
+    {# 재귀 출력 #}
     {% include "board/comment_replies.html" with replies=reply.replies.all comment_form=comment_form %}
   </div>
 {% endfor %}
+
 
 <!-- 여기서 발생하는 오류는 vscode가 템플릿 문법을 css로 오해해서 오류를 표시하는 것 작동에는 문제없음 -->

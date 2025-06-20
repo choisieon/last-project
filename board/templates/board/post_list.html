@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% load static %}
 
@@ -6,58 +7,128 @@
 
 {% block category_bar %}
 <div class="category-bar">
-  <button class="active">전체</button>
-  <button>후기</button>
-  <button>궁금해</button>
-  <button>자료공유</button>
-  <button>잡담</button>
-</div>
-{% endblock %}
-
-{% block search_bar %}
-<div class="search-bar">
-  <input type="text" placeholder="검색어를 입력하세요" />
-  <button type="submit"></button>
+  <a href="{% url 'board:post_list' %}" class="{% if not category %}active{% endif %}"><button>전체</button></a>
+  <a href="{% url 'board:post_list' %}?category=review" class="{% if category == 'review' %}active{% endif %}"><button>후기</button></a>
+  <a href="{% url 'board:post_list' %}?category=question" class="{% if category == 'question' %}active{% endif %}"><button>궁금해</button></a>
+  <a href="{% url 'board:post_list' %}?category=share" class="{% if category == 'share' %}active{% endif %}"><button>자료공유</button></a>
+  <a href="{% url 'board:post_list' %}?category=free" class="{% if category == 'free' %}active{% endif %}"><button>잡담</button></a>
 </div>
 {% endblock %}
 
 {% block content %}
-<div class="sort-bar">
-  <a href="{% url 'post_list' %}?sort=" {% if not sort %}class="active"{% endif %}>최신순</a>
-  <a href="{% url 'post_list' %}?sort=likes" {% if sort == 'likes' %}class="active"{% endif %}>좋아요순</a>
-  <a href="{% url 'post_list' %}?sort=comments" {% if sort == 'comments' %}class="active"{% endif %}>댓글순</a>
-</div>
-<div class="post-list">
-  {% if posts %}
-    {% for post in posts %}
-      <div class="post-item post-item-row">
-        <div class="post-item-text">
-          <h4>
-            <a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a>
-          </h4>
-          <p>{{ post.content|truncatechars:50 }}</p>
-          <span>작성자: {{ post.author }} | {{ post.created_at|date:"Y-m-d H:i" }}</span>
-          <span> | 조회수: {{ post.views }}</span>
-          <span> | 🤍 {{ post.likes.count }}</span>
-          <span> | 댓글: {{ post.comments.count }}</span>
-        </div>
-        {% if post.image %}
-          <div class="post-item-image">
-            <img src="{{ post.image.url }}" alt="첨부 이미지">
-          </div>
-        {% endif %}
-      </div>
-    {% endfor %}
-  {% else %}
-    <div class="post-item">
-      <p>게시글이 없습니다.</p>
+<div class="wrapper">
+
+  <!-- 🔍 검색창 -->
+  <form method="get" class="search-bar" style="margin-bottom: 16px;">
+    <input type="text" name="keyword" value="{{ keyword|default_if_none:'' }}" placeholder="검색어를 입력하세요" />
+    <button type="submit">🔍</button>
+    {% if sort %}
+      <input type="hidden" name="sort" value="{{ sort }}">
+    {% endif %}
+  </form>
+
+  {% if keyword %}
+    <div class="search-result-label" style="margin-bottom:10px;">
+      <strong>"{{ keyword }}"</strong>에 대한 검색 결과
     </div>
   {% endif %}
+
+  <!-- 정렬 바 -->
+  <div class="sort-bar">
+    <a href="{% url 'board:post_list' %}?sort=" {% if not sort %}class="active"{% endif %}>최신순</a>
+    <a href="{% url 'board:post_list' %}?sort=likes{% if keyword %}&keyword={{ keyword }}{% endif %}" {% if sort == 'likes' %}class="active"{% endif %}>좋아요순</a>
+    <a href="{% url 'board:post_list' %}?sort=comments{% if keyword %}&keyword={{ keyword }}{% endif %}" {% if sort == 'comments' %}class="active"{% endif %}>댓글순</a>
+  </div>
+
+  <!-- 게시글 리스트 -->
+  <div class="post-list">
+    {% if posts %}
+      {% for post in posts %}
+        <div class="post-item post-item-row">
+          <!-- 왼쪽: 본문/정보 -->
+          <div class="post-item-text">
+            <h4>
+              <a href="{% url 'board:post_detail' post.pk %}?category={{ category }}{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}">{{ post.title }}</a>
+            </h4>
+            <div class="post-meta">
+              <span>작성자: {{ post.author }} | {{ post.created_at|date:"Y-m-d H:i" }}</span>
+              <span> | 조회수: {{ post.views }}</span>
+              <span> | 🤍 {{ post.likes.count }}</span>
+              <span> | 댓글: {{ post.comments.count }}</span>
+            </div>
+            <div class="post-snippet">
+              {{ post.content|truncatechars_html:10|safe }}
+            </div>
+          </div>
+          <!-- 오른쪽: 이미지만! -->
+          <div class="post-preview">
+            {% if post.images.first %}
+              <img src="{{ post.images.first.image.url }}" alt="미리보기 이미지">
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="post-item">
+        <p>검색 결과가 없습니다.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- 페이지네이션 UI -->
+  <div class="pagination" style="margin-top:30px; text-align:center;">
+    {% if posts.has_previous %}
+      <a href="?page=1{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}">« 처음</a>
+      <a href="?page={{ posts.previous_page_number }}{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}">‹ 이전</a>
+    {% endif %}
+
+    {% for num in posts.paginator.page_range %}
+      {% if posts.number == num %}
+        <strong>{{ num }}</strong>
+      {% elif num > posts.number|add:'-3' and num < posts.number|add:'3' %}
+        <a href="?page={{ num }}{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}">{{ num }}</a>
+      {% endif %}
+    {% endfor %}
+
+    {% if posts.has_next %}
+      <a href="?page={{ posts.next_page_number }}{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}">다음 ›</a>
+      <a href="?page={{ posts.paginator.num_pages }}{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}">마지막 »</a>
+    {% endif %}
+  </div>
 </div>
 {% endblock %}
 
 {% block extra_style %}
 <style>
+.category-bar {
+  margin-top: 20px;
+  margin-bottom: 15px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.category-bar button {
+  background-color: rgba(250, 235, 180, 0.9);
+  background-image: url("{% static 'images/pixel-paper.png' %}");
+  background-size: 4px 4px;
+  background-repeat: repeat;
+  border: 2px solid #5a4a2f;
+  box-shadow: 2px 2px 0 #b9a782;
+  font-size: 13px;
+  font-weight: bold;
+  padding: 6px 10px;
+  cursor: pointer;
+  color: #4a3b28;
+}
+.category-bar a.active button,
+.category-bar button.active {
+  background-color: #007aff;
+  color: white;
+}
+/* .category-bar .active {
+  background-color: #007aff;
+  color: white;
+} */
 .sort-bar {
   margin-bottom: 18px;
   display: flex;
@@ -78,6 +149,9 @@
   background: #007aff;
   color: #090000;
 }
+.post-list {
+  margin-bottom: 20px;
+}
 .post-item-row {
   display: flex;
   align-items: flex-start;
@@ -94,6 +168,38 @@
   object-fit: cover;
   box-shadow: 1px 1px 5px #b9a78233;
 }
+.pagination {
+  margin-top: 20px;
+  text-align: center;
+}
+.pagination a, .pagination strong {
+  display: inline-block;
+  margin: 0 3px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  text-decoration: none;
+  color: #007aff;
+  font-weight: bold;
+  border: 1px solid #e0e0e0;
+  background: #fff;
+}
+.pagination a:hover {
+  background: #007aff;
+  color: #fff;
+}
+.pagination strong {
+  background: #007aff;
+  color: #090000;
+  border: 1.5px solid #007aff;
+  font-weight: bold;
+}
+.search-result-label {
+  color: #fff;
+  font-weight: bold;
+}
+
+
+
 @media (max-width: 600px) {
   .post-item-row {
     flex-direction: column;
@@ -106,3 +212,4 @@
 }
 </style>
 {% endblock %}
+
