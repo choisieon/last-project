@@ -31,10 +31,6 @@ class YouthPolicy(models.Model):
     sido = models.ForeignKey('Sido', on_delete=models.CASCADE, null=True, blank=True)
     sigungu = models.ForeignKey('Sigungu', on_delete=models.CASCADE, null=True, blank=True)
 
-    relation_with = models.ManyToManyField('self', symmetrical=False, blank=True, related_name='추천된_정책들')
-    is_weekly_pick = models.BooleanField(default=False)  # 관리자 주간 추천 여부
-    weekly_comment = models.CharField(max_length=255, blank=True, null=True)
-
     def __str__(self):
         return self.정책명
     
@@ -70,7 +66,7 @@ class PolicyComment(models.Model):
         return self.parent is not None
 
     def __str__(self):
-        return f"{self.user.username}: {self.content[:20]}"
+        return f"{self.author.username}: {self.content[:20]}"
 
 
 class PolicyViewLog(models.Model):

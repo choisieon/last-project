@@ -7,8 +7,11 @@
 - python manage.py init_policy
 - python manage.py init_regions
 - python manage.py init_sido
-- python manage.py fill_sido_to_youthpolicy
-- python manage.py fill_sigungu_to_youthpolicy
+
+<!-- - python manage.py fill_sido_to_youthpolicy
+- python manage.py fill_sigungu_to_youthpolicy -->
+-> django.db에 있는 전체 파일로 대체
 
 # init_policy.py/init_regions.py는 엑셀 파일 바탕화면에 저장한 후 실행
 # 순서 반드시 지킬 것
+# 경로명은 로컬에 맞게 수정

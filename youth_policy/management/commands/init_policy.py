@@ -7,7 +7,7 @@ class Command(BaseCommand):
     help = '엑셀 파일을 읽어 청년정책 정보를 DB에 저장합니다.'
 
     def handle(self, *args, **kwargs):
-        excel_path = r"C:\Users\1-05\OneDrive\Desktop\병합결과.xlsx"
+        excel_path = r"C:\Users\1-05\OneDrive\Desktop\병합결과_최종.xlsx"
 
         if not os.path.exists(excel_path):
             self.stderr.write(self.style.ERROR(f"❌ 파일이 존재하지 않습니다: {excel_path}"))

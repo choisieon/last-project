@@ -8,11 +8,10 @@ from collections import Counter
 
 # Create your views here.
 def basic_page(request):
-    stage = request.GET.get('stage') # map.html에서 넘어오는 stage 파라미터
+    stage = request.GET.get('stage')
     selected_sido = request.GET.get('sido')
     selected_sigungu = request.GET.get('sigungu')
     selected_category = request.GET.get('category', 'all')
-    
 
     policies = YouthPolicy.objects.all()
 
@@ -34,8 +33,7 @@ def basic_page(request):
     if selected_sigungu:
         policies = policies.filter(sigungu_id=selected_sigungu)
     if selected_category != 'all':
-        # 예시: 대분류 또는 키워드 필터링 구현
-        # '정책키워드' 필드에 '일자리', '교육' 등이 포함되어 있다고 가정
+        
         if selected_category == 'job':
             policies = policies.filter(Q(정책키워드__icontains='일자리'))
         elif selected_category == 'education':
@@ -56,15 +54,15 @@ def basic_page(request):
     context = {
         'policies': page_obj,
         'page_obj': page_obj,
-        'stage': stage, # 현재 선택된 생애 주기 정보도 템플릿으로 전달
+        'stage': stage,
         'sido_list': sido_list,
         'sigungu_list': sigungu_list,
         'selected_sido': selected_sido,
         'selected_sigungu': selected_sigungu,
-        'selected_category': selected_category,  # 현재 선택된 카테고리 전달
+        'selected_category': selected_category, 
         'top_viewed_policies': YouthPolicy.objects.order_by('-view_count')[:3],
-        'paginator': paginator,  # paginator 객체 추가
-        'is_paginated': True,  # 항상 페이지네이션 표시
+        'paginator': paginator, 
+        'is_paginated': True, 
     }
     
     return render(request, 'basic_page.html', context)
@@ -110,7 +108,6 @@ def add_policy_comment(request, policy_id):
             parent=parent
         )
     return redirect('youth_policy:policy_detail', policy_id=policy.id)
-
 
 # 댓글 삭제
 @login_required
@@ -167,22 +164,6 @@ def policy_detail(request, policy_id):
         'top_viewed_policies': top_viewed_policies,
         'top_level_comments': top_level_comments,
         'form': form
-    })
-
-
-
-def weekly_pick_view(request):
-    categories = ['일자리', '교육', '주거', '복지문화', '참여권리']
-    weekly_picks_by_category = {}
-
-    for category in categories:
-        weekly_picks_by_category[category] = YouthPolicy.objects.filter(
-            is_weekly_pick=True,
-            정책키워드__icontains=category
-        ).order_by('-id')[:5]
-
-    return render(request, 'weekly_pick.html', {
-        'weekly_picks_by_category': weekly_picks_by_category
     })
 
 @login_required
