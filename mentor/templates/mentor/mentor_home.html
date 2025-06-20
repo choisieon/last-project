@@ -1,4 +1,3 @@
-
 {% load static %}
 <!DOCTYPE html>
 <html lang="ko">
@@ -6,9 +5,6 @@
   <meta charset="UTF-8" />
   <title>멘토멘티 - 청설모</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
   <style>
     @font-face {
       font-family: 'MyCustomFont';
@@ -32,60 +28,134 @@
       padding: 30px 20px;
     }
 
-    .top-nav {
+    /* .top-nav {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      background: rgba(250, 235, 180, 0.9);
+      background-image: url("{% static 'images/pixel-paper.png' %}");
+      background-size: 4px 4px;
+      background-repeat: repeat;
+      border: 2.5px solid #5a4a2f;
+      box-shadow: 3px 3px 0 #b9a782;
       padding: 10px 16px;
       margin-bottom: 20px;
     }
-    .menu-left, .menu-right {
+
+    .menu-left {
       display: flex;
-      gap: 12px;
+      gap: 14px;
     }
-    .menu-box {
-      background-color: rgba(250, 235, 180, 0.9);
-      background-image: url("{% static 'images/pixel-paper.png' %}");
-      background-size: 4px 4px;
-      background-repeat: repeat;
-      border: 2.5px solid #5a4a2f;
-      box-shadow: 3px 3px 0 #b9a782;
-      padding: 6px 12px;
-      font-weight: bold;
-      color: #3c2e1e;
-      font-size: 14px;
+
+    .menu-left a {
       text-decoration: none;
-    }
-    .menu-box.active {
-      color: #007aff;
+      color: #4a3b28;
       font-weight: bold;
+      font-size: 14px;
+      padding: 4px 8px;
     }
+
+    .menu-left a.active {
+      background-color: #007aff;
+      color: white;
+      border-radius: 4px;
+    }
+
+    .menu-right {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
     .write-btn {
       background-color: #007aff;
       color: white;
-      padding: 6px 12px;
+      font-weight: bold;
+      padding: 6px 10px;
       border: none;
       cursor: pointer;
-      font-weight: bold;
-      font-size: 14px;
-      border: 2px solid #5a4a2f;
-      box-shadow: 3px 3px 0 #b9a782;
+      font-family: 'MyCustomFont';
+      box-shadow: 2px 2px 0 #444;
     }
-    .login-info {
 
+    .login-info {
+      color: #4a3b28;
+      font-size: 13px;
+    } */
+
+  .top-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: none; /* 배경을 개별 박스로 분리하므로 없음 */
+    padding: 10px 16px;
+    margin-bottom: 20px;
+  }
+
+  .menu-left,
+  .menu-right {
+    display: flex;
+    gap: 12px;
+  }
+
+  .menu-box {
+    background-color: rgba(250, 235, 180, 0.9);
+    background-image: url("{% static 'images/pixel-paper.png' %}");
+    background-size: 4px 4px;
+    background-repeat: repeat;
+    border: 2.5px solid #5a4a2f;
+    box-shadow: 3px 3px 0 #b9a782;
+    padding: 6px 12px;
+    font-weight: bold;
+    color: #3c2e1e;
+    font-size: 14px;
+    text-decoration: none;
+  }
+
+  .menu-box.active {
+    color: #007aff;
+    font-weight: bold;
+  }
+
+  .write-btn {
+    background-color: #007aff;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    border: 2px solid #5a4a2f;
+    box-shadow: 3px 3px 0 #b9a782;
+  }
+
+  .login-info {
+    background-color: rgba(250, 235, 180, 0.9);
+    background-image: url("{% static 'images/pixel-paper.png' %}");
+    background-size: 4px 4px;
+    background-repeat: repeat;
+    padding: 6px 12px;
+    border: 2.5px solid #5a4a2f;
+    box-shadow: 3px 3px 0 #b9a782;
+    font-size: 14px;
+    color: #3c2e1e;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+  }
+    /* .page-title {
       background-color: rgba(250, 235, 180, 0.9);
       background-image: url("{% static 'images/pixel-paper.png' %}");
       background-size: 4px 4px;
       background-repeat: repeat;
-      padding: 6px 12px;
+      color: #4a3b28;
       border: 2.5px solid #5a4a2f;
       box-shadow: 3px 3px 0 #b9a782;
-      font-size: 14px;
-      color: #3c2e1e;
+      padding: 10px 14px;
+      display: inline-block;
       font-weight: bold;
-      display: flex;
-      align-items: center;
-    }
+      font-size: 16px;
+    } */
 
     .category-bar {
       margin-top: 20px;
@@ -94,49 +164,6 @@
       flex-wrap: wrap;
       gap: 10px;
     }
-
-    .category-badge {
-  font-size: 12px;
-  background: #007aff;
-  color: white;
-  padding: 2px 6px;
-  border-radius: 4px;
-  margin-right: 8px;
-}
-
-.post-title {
-  font-size: 15px;
-  margin: 6px 0;
-  font-weight: bold;
-  color: #222;
-}
-
-.post-preview {
-  font-size: 13px;
-  color: #555;
-  margin-bottom: 8px;
-}
-
-.post-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.mentor-info {
-  font-size: 12px;
-  color: #333;
-}
-
-.mentor-profile-btn, .apply-mentoring-btn {
-  font-size: 12px;
-  padding: 4px 8px;
-  background-color: #ffcc00;
-  border: 1px solid #5a4a2f;
-  font-family: 'MyCustomFont';
-  cursor: pointer;
-}
-
 
     .category-bar button {
       background-color: rgba(250, 235, 180, 0.9);
@@ -158,48 +185,44 @@
       color: white;
     }
 
-    .search-bar {
-      display: flex;
-      width: 100%;
-      max-width: 600px;
-      height: 42px;
-      background-color: #f0e6cb;
-      border: 3px solid #333;
-      background-image: url("{% static 'images/pixel-paper.png' %}");
-      background-size: 4px 4px;
-      box-shadow: 4px 4px 0 #888;
-      margin: 0 auto 30px;
-      border-radius: 0;
-      overflow: hidden;
-    }
-    .search-bar input {
-      flex: 1;
-      padding: 0 12px;
-      border: none;
-      font-family: 'MyCustomFont', sans-serif;
-      font-size: 14px;
-      background: transparent;
-      color: #000;
-    }
-    .search-bar input::placeholder {
-      color: #000;
-      font-weight: bold;
-    }
-    .search-bar button {
-      width: 44px;
-      background: #444 url("{% static 'images/돋보기.png' %}") no-repeat center center;
-      background-size: 42px 42px;
-      border: none;
-      cursor: pointer;
-    }
-    h3 {
-      margin-top: 40px;
-      color: #333;
-      font-size: 18px;
-      border-bottom: 2px solid #999;
-      padding-bottom: 6px;
-    }
+    /* 검색창 스타일 (기존 search-container 대신 사용) */
+.search-bar {
+  display: flex;
+  width: 100%;
+  max-width: 600px;
+  height: 42px;
+  background-color: #f0e6cb;
+  border: 3px solid #333;
+  background-image: url("{% static 'images/pixel-paper.png' %}");
+  background-size: 4px 4px;
+  box-shadow: 4px 4px 0 #888;
+  border-radius: 0;
+  overflow: hidden;
+  margin: 0 auto 30px;
+}
 
+.search-bar input {
+  flex: 1;
+  padding: 0 12px;
+  border: none;
+  font-family: 'MyCustomFont', sans-serif;
+  font-size: 14px;
+  background: transparent;
+  color: #000;
+}
+
+.search-bar input::placeholder {
+  color: #000;
+  font-weight: bold;
+}
+
+.search-bar button {
+  width: 44px;
+  background: #444 url("{% static 'images/돋보기.png' %}") no-repeat center center;
+  background-size: 42px 42px;
+  border: none;
+  cursor: pointer;
+}
     .post-list {
       display: flex;
       flex-direction: column;
@@ -214,10 +237,6 @@
       border: 2px solid #5a4a2f;
       box-shadow: 2px 2px 0 #b9a782;
       padding: 12px;
-    }
-
-    .post-item.mentoring {
-      border-color: #007aff;
     }
 
     .post-item h4 {
@@ -238,15 +257,13 @@
     <!-- 상단 네비게이션 -->
 <div class="top-nav">
   <div class="menu-left">
-
-    <a href="{% url 'board:index' %}" class="menu-box home-link">
+    <a href="{% url 'index' %}" class="menu-box home-link">
       <i class="fas fa-home"></i>
     </a>
-    <a href="{% url 'board:post_list' %}" class="menu-box">커뮤니티</a>
-
+    <a href="{% url 'post_list' %}" class="menu-box">커뮤니티</a>
     <a href="#" class="menu-box active">멘토멘티</a>
     <a href="#" class="menu-box">마이페이지</a>
-    <a href="#" class="menu-box">청년정책</a>
+    <a href="{% url 'youth_policy:basic_page' %}" class="menu-box">청년정책</a>
   </div>
   <div class="menu-right">
     <button class="write-btn">글쓰기</button>
@@ -267,7 +284,6 @@
       <button>취업선배</button>
       <button>지갑선배</button>
       <button>운동선배</button>
-
     </div>
 
     <!-- 검색창 -->
@@ -277,100 +293,34 @@
   <button type="submit"></button>
 </div>
 
-      <button onclick="location.href='/mentor/list/'">👤 선배 구경하기</button> <!-- NEW -->
-    </div>
-    <div class="category-bar">
-      <button 
-        onclick="location.href='/mentor/questions/'"
-        class="{% if request.path == '/mentor/questions/' %}active{% endif %}">
-        문답
-      </button>
-      <button 
-        onclick="location.href='/mentor/list/'"
-        class="{% if request.path == '/mentor/list/' %}active{% endif %}">
-        선배찾기
-      </button>
-    </div>
-    
-    
+
     <!-- 게시글 리스트 -->
-     <div class="post-list">
-  {% for question in questions %}
-    <div class="post-item {% if question.is_promoted_to_mentoring %}mentoring{% endif %}">
-      <div class="post-header">
-        <span class="category-badge">
-          {% if question.category == 'college' %}🏫 대학선배{% elif question.category == 'life' %}🌱 인생선배
-          {% elif question.category == 'love' %}💘 연애선배{% elif question.category == 'house' %}🏠 자취선배
-          {% elif question.category == 'job' %}💼 취업선배{% elif question.category == 'money' %}💳 지갑선배
-          {% elif question.category == 'fitness' %}💪 운동선배{% else %}📌 기타{% endif %}
-        </span>
-        <h4 class="post-title">{{ question.title }}</h4>
-      </div>
-      <p class="post-preview">{{ question.content|truncatechars:60 }}</p>
-      <div class="post-footer">
-        <div class="mentor-info">
-          👤 <strong>{{ question.author.nickname }}</strong> |
-          {{ question.author.bio|default:"소개 없음" }}
-          <button class="mentor-profile-btn" onclick="location.href='/mentor/profile/{{ question.author.id }}'">프로필</button>
-        </div>
-        {% if question.is_promoted_to_mentoring %}
-          <button class="apply-mentoring-btn">멘토링 진행중..</button>
-        {% endif %}
-      </div>
-    </div>
-  {% empty %}
-    <p>아직 작성된 질문이 없습니다.</p>
-  {% endfor %}
-</div>
     <div class="post-list">
       <div class="post-item">
-        <div class="post-header">
-          <span class="category-badge">🏫 대학선배</span>
-          <h4 class="post-title">MT 안 가면 불이익 있을까요?</h4>
-        </div>
-        <p class="post-preview">처음이라 걱정돼요. 분위기 어떤지, 꼭 가야 하는지 알려주세요!</p>
-        <div class="post-footer">
-          <div class="mentor-info">
-            👤 <strong>낋낋</strong> | 경영학과 4학년
-            <button class="mentor-profile-btn" onclick="location.href='/mentor/profile/1'">프로필</button>
-          </div>
-          <button class="apply-mentoring-btn">멘토링 진행중..</button>
-        </div>
+        <h4>혼자 자취할 때 가장 필요한 꿀팁은?</h4>
+        <p>자취 5년 차 선배입니다. 진짜 유용한 도구들 알려드려요.</p>
       </div>
-    </div>
-<!--     
-    <div class="category-bar">
-      <button class="active">전체</button>
-      <button>인생선배</button>
-      <button>대학선배</button>
-      <button>연애선배</button>
-      <button>자취선배</button>
-      <button>취업선배</button>
-      <button>지갑선배</button>
-      <button>운동선배</button>
-    </div> -->
-<!-- 
-    <div class="search-bar">
-      <input type="text" placeholder="검색창" />
-      <button type="submit"></button>
-    </div>
-
-    <h3>궁금해요 (일반 Q&A)</h3>
-    <div class="post-list">
       <div class="post-item">
-        <h4>자취 꿀팁 좀요</h4>
-        <p>혼자 자취 시작했는데 뭘 사야 할까요?</p>
+        <h4>대학생활 잘 보내려면 어떤 자세가 필요할까요?</h4>
+        <p>후회 없는 대학생활을 위한 조언 몇 가지 드려봅니다.</p>
+      </div>
+      <div class="post-item">
+        <h4>첫 연애, 어떻게 해야 덜 서툴까요?</h4>
+        <p>부끄럽지만 연애 선배로서 정리해봤습니다 😊</p>
+      </div>
+      <div class="post-item">
+        <h4>취준생인데 너무 막막합니다...</h4>
+        <p>취업선배로서 현실적인 조언 드려요. 같이 이겨내요!</p>
+      </div>
+      <div class="post-item">
+        <h4>월급을 받자마자 사라지는 당신을 위해</h4>
+        <p>지갑선배가 알려주는 실속형 소비 전략!</p>
+      </div>
+      <div class="post-item">
+        <h4>운동을 시작하려는데 어떻게 시작할까요?</h4>
+        <p>운동선배로서 루틴 짜는 법부터 알려드립니다.</p>
       </div>
     </div>
-
-    <h3>멘토멘티로 이어진 질문</h3>
-    <div class="post-list">
-      <div class="post-item mentoring">
-        <h4>첫 연애, 어떻게 해야 할까요?</h4>
-        <p>💬 이 질문은 현재 멘토링이 진행 중입니다.</p>
-      </div>
-    </div>
-  </div> -->
+  </div>
 </body>
 </html>
-
