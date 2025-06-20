@@ -21,5 +21,7 @@ urlpatterns = [
     path('notifications/all/', views.notification_list, name='notifications_all'),
     path('bookmark/', views.toggle_bookmark, name='toggle_bookmark'),
     re_path(r'^tag/(?P<slug>[\w\-가-힣]+)/$', views.tagged, name='tagged'),
-    
+    path('post/<int:pk>/report/', views.post_report, name='post_report'),
+    path('post/<int:pk>/report/cancel/', views.report_cancel, name='report_cancel'),
+    path('comment/<int:pk>/report/', views.comment_report, name='comment_report'),
 ]

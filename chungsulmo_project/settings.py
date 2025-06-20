@@ -177,32 +177,32 @@ TINYMCE_COMPRESSOR = False
 # }  
 
 
-TINYMCE_DEFAULT_CONFIG = {
-    'height': 600,
-    'plugins': '''
-        advlist autolink lists link image charmap print preview hr anchor
-        pagebreak searchreplace wordcount visualblocks visualchars code
-        fullscreen insertdatetime media nonbreaking save table contextmenu
-        directionality emoticons template paste textcolor colorpicker textpattern codesample
-    ''',
-    'toolbar1': '''
-        fullscreen preview bold italic underline | fontselect fontsizeselect | 
-        forecolor backcolor | alignleft alignright aligncenter alignjustify | 
-        indent outdent | bullist numlist table | link image media | codesample
-    ''',
-    'toolbar2': '''
-        visualblocks visualchars | charmap emoticons | insertdatetime
-        | hr nonbreaking | template | pagebreak restoredraft | code
-    ''',
-    'contextmenu': 'formats | link image',
-    'menubar': True,
-    'statusbar': True,
-    'theme_advanced_resizing': True,
-    'images_upload_url': '/board/upload-image/',
-    'width': '100%',
-    'language': 'ko_KR',
-    'language_url': '/static/tinymce/js/langs/ko_KR.js',
-}
+# TINYMCE_DEFAULT_CONFIG = {
+#     'height': 600,
+#     'plugins': '''
+#         advlist autolink lists link image charmap preview anchor
+#         pagebreak searchreplace wordcount visualblocks visualchars code
+#         fullscreen insertdatetime media nonbreaking save table
+#         directionality emoticons codesample
+#     ''',
+#     'toolbar1': '''
+#         fullscreen preview bold italic underline | fontselect fontsizeselect | 
+#         forecolor backcolor | alignleft alignright aligncenter alignjustify | 
+#         indent outdent | bullist numlist table | link image media | codesample
+#     ''',
+#     'toolbar2': '''
+#         visualblocks visualchars | charmap emoticons | insertdatetime
+#         | hr nonbreaking | pagebreak restoredraft | code
+#     ''',
+#     'contextmenu': 'formats | link image',
+#     'menubar': True,
+#     'statusbar': True,
+#     'theme_advanced_resizing': True,
+#     'images_upload_url': '/board/upload-image/',
+#     'width': '100%',
+#     'language': 'ko_KR',
+#     'language_url': '/static/tinymce/js/tinymce/langs/ko_KR.js',
+# }
 
   
 SOCIALACCOUNT_AUTO_SIGNUP = True

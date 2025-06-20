@@ -22,7 +22,7 @@ class Post(models.Model):
     likes = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='liked_posts', blank=True)
     tags = TaggableManager(blank=True)
     thumbnail = models.ImageField(upload_to='reviews/', null=True, blank=True)  # 후기 전용 썸네일(선택)
-    file = models.FileField(upload_to='files/', null=True, blank=True)  # 일반 파일 업로드
+    is_blinded = models.BooleanField(default=False)  # 블라인드 여부
 
     def __str__(self):
         return self.title
@@ -33,6 +33,7 @@ class Comment(models.Model):
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='replies')
+    is_blinded = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.author} - {self.content[:20]}"
@@ -72,3 +73,33 @@ class Bookmark(models.Model):
 
 class Meta:
     unique_together = ('user', 'post') # 같은 글 중복 저장 방지
+
+class Report(models.Model):
+    post = models.ForeignKey('Post', on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    reason = models.TextField(blank=True, null=True)  # 신고 사유 (선택)
+
+    class Meta:
+        unique_together = ('post', 'user')  # 중복 신고 방지
+
+class CommentReport(models.Model):
+    comment = models.ForeignKey('Comment', on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    reason = models.TextField(blank=True, null=True)
+
+    class Meta:
+        unique_together = ('comment', 'user')  # 중복 신고 방지
+
+class PostFile(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='files')
+    file = models.FileField(upload_to='files/')  # 일반 파일 저장 경로
+    image = models.ImageField(
+        upload_to='images/',  # 이미지 전용 저장 경로
+        null=True,
+        blank=True
+    )
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+

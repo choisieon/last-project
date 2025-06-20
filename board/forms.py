@@ -29,7 +29,7 @@ class PostForm(forms.ModelForm):
 
     class Meta:
         model = Post
-        fields = ['category', 'title', 'content', 'thumbnail', 'images', 'tags', 'file']
+        fields = ['category', 'title', 'content', 'thumbnail', 'images', 'tags']
         widgets = {
             'category': forms.Select(attrs={'class': 'form-control', 'rows': 10, 'required': False}),
             'title': forms.TextInput(attrs={'class': 'form-control'}),

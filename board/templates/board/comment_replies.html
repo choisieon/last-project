@@ -1,48 +1,188 @@
-
 {% for reply in replies %}
   <div class="comment reply" 
        style="margin-left: {% if reply.parent.parent %}0{% else %}2rem{% endif %};" 
        id="comment-{{ reply.id }}">
     
-    {# 답글 대상 표시 (3단계 이상) #}
-    {% if reply.parent.parent %}
-      <span style="color:#888; font-size:0.95em;">↳ {{ reply.parent.author }}님에게 답글</span>
-    {% endif %}
+    {% if not reply.is_blinded %}
+      {# 답글 대상 표시 (3단계 이상) #}
+      {% if reply.parent.parent %}
+        <span style="color:#888; font-size:0.95em;">↳ {{ reply.parent.author }}님에게 답글</span>
+      {% endif %}
 
-    {# 댓글 정보 #}
-    <strong>{{ reply.author }}</strong>
-    <span>{{ reply.created_at|date:"Y-m-d H:i" }}</span>
-    <p>{{ reply.content }}</p>
+      {# 댓글 정보 #}
+      <strong>{{ reply.author }}</strong>
+      <span>{{ reply.created_at|date:"Y-m-d H:i" }}</span>
+      <p>{{ reply.content }}</p>
 
-    {# 수정/삭제 버튼 (작성자만 보임) #}
-    {% if user == reply.author %}
-      <a href="{% url 'board:comment_edit' reply.pk %}" class="edit-btn">수정</a>
-      <form action="{% url 'board:comment_delete' reply.pk %}" method="post" style="display:inline;">
-        {% csrf_token %}
-        <button type="submit" 
-                class="delete-btn"
-                onclick="return confirm('정말 삭제하시겠습니까?');">
-          삭제
+      {# 수정/삭제 버튼 (작성자만 보임) #}
+      {% if user == reply.author %}
+        <a href="{% url 'board:comment_edit' reply.pk %}" class="edit-btn">수정</a>
+        <form action="{% url 'board:comment_delete' reply.pk %}" method="post" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" 
+                  class="delete-btn"
+                  onclick="return confirm('정말 삭제하시겠습니까?');">
+            삭제
+          </button>
+        </form>
+      {% endif %}
+
+      {# 댓글/대댓글 신고 버튼 (작성자 본인 제외, 비동기) #}
+      {% if user.is_authenticated and user != reply.author %}
+        <button type="button"
+                class="comment-report-btn"
+                data-comment-id="{{ reply.id }}"
+                style="margin-left:10px; color:#e53935; border:1px solid #e53935; padding:3px 10px; border-radius:4px; background:#fff7f7; font-size:0.97em; font-weight:bold; cursor:pointer;">
+          🚨 신고
         </button>
+        <span id="comment-report-count-{{ reply.id }}" style="color:#e53935; font-size:0.95em; margin-left:4px;">
+          {% if reply.report_count %}신고 {{ reply.report_count }}회{% endif %}
+        </span>
+      {% endif %}
+
+      {# 답글 버튼 & 대댓글 폼 #}
+      <a href="#" class="reply-toggle" data-comment-id="{{ reply.id }}">답글</a>
+      <form method="post" 
+            class="comment-form reply-form" 
+            data-parent-id="{{ reply.id }}" 
+            style="display:none;">
+        {% csrf_token %}
+        {{ comment_form.content }}
+        <input type="hidden" name="parent_id" value="{{ reply.id }}">
+        <button type="submit" class="write-btn">대댓글 작성</button>
       </form>
+    {% else %}
+      <div class="blinded-comment" style="color:#e53935; background:#fff7f7; padding:6px 12px; border-radius:4px; font-size:0.96em;">
+        🚫 블라인드 처리된 댓글입니다
+      </div>
     {% endif %}
 
-    {# 답글 버튼 & 대댓글 폼 #}
-    <a href="#" class="reply-toggle" data-comment-id="{{ reply.id }}">답글</a>
-    <form method="post" 
-          class="comment-form reply-form" 
-          data-parent-id="{{ reply.id }}" 
-          style="display:none;">
-      {% csrf_token %}
-      {{ comment_form.content }}
-      <input type="hidden" name="parent_id" value="{{ reply.id }}">
-      <button type="submit" class="write-btn">대댓글 작성</button>
-    </form>
-
-    {# 재귀 출력 #}
     {% include "board/comment_replies.html" with replies=reply.replies.all comment_form=comment_form %}
   </div>
 {% endfor %}
 
+<!-- 🚨 신고 모달 (페이지 내 한 번만!) -->
+<div id="report-modal" style="display:none; position:fixed; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.3); z-index:9999;">
+  <div style="background:#fff; padding:24px; border-radius:8px; max-width:350px; margin:120px auto; position:relative; box-shadow:0 4px 24px rgba(0,0,0,0.13);">
+    <label for="report-reason" style="font-weight:bold; display:block; margin-bottom:8px;">신고 사유를 입력해 주세요:</label>
+    <textarea id="report-reason" rows="4" maxlength="200" style="width:100%; margin-bottom:8px; padding:6px; resize:vertical;"></textarea>
+    <div style="font-size:0.95em; color:#888; margin-bottom:10px;">
+      (최대 200자, Enter로 제출 / Shift+Enter 줄바꿈 / ESC로 닫기)
+    </div>
+    <div style="text-align:right;">
+      <button id="report-submit" style="margin-right:8px;">신고</button>
+      <button id="report-cancel">취소</button>
+    </div>
+  </div>
+</div>
 
-<!-- 여기서 발생하는 오류는 vscode가 템플릿 문법을 css로 오해해서 오류를 표시하는 것 작동에는 문제없음 -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  let isReporting = false;
+  let currentCommentId = null;
+  const modal = document.getElementById('report-modal');
+  const reasonInput = document.getElementById('report-reason');
+  const submitBtn = document.getElementById('report-submit');
+  const cancelBtn = document.getElementById('report-cancel');
+  const MAX_LENGTH = 200;
+
+  // 신고 버튼 클릭 시 모달 오픈
+  document.querySelectorAll('.comment-report-btn').forEach(function(btn) {
+    btn.addEventListener('click', function(event) {
+      event.preventDefault();
+      if (isReporting) return;
+      currentCommentId = this.dataset.commentId;
+      reasonInput.value = '';
+      modal.style.display = 'block';
+      reasonInput.focus();
+    });
+  });
+
+  // 모달 취소 버튼
+  cancelBtn.onclick = function() {
+    modal.style.display = 'none';
+    currentCommentId = null;
+  };
+
+  // textarea에서 엔터(Submit) 또는 ESC(닫기) 처리
+  reasonInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      submitBtn.click();
+    }
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      cancelBtn.click();
+    }
+  });
+
+  // 모달 바깥 클릭 시 닫기
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) {
+      modal.style.display = 'none';
+      currentCommentId = null;
+    }
+  });
+
+  // 신고 버튼 클릭
+  submitBtn.onclick = function() {
+    if (isReporting) return;
+    const reason = reasonInput.value.trim();
+    if (!reason) {
+      alert("신고 사유를 입력해야 합니다.");
+      reasonInput.focus();
+      return;
+    }
+    if (reason.length > MAX_LENGTH) {
+      alert(`신고 사유는 최대 ${MAX_LENGTH}자까지 입력할 수 있습니다.`);
+      reasonInput.focus();
+      return;
+    }
+    isReporting = true;
+    submitBtn.disabled = true;
+    modal.style.display = 'none';
+
+    fetch(`/board/comment/${currentCommentId}/report/`, {
+      method: "POST",
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken'),
+        'X-Requested-With': 'XMLHttpRequest',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ reason: reason })
+    })
+    .then(response => {
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    })
+    .then(data => {
+      if (data.success) {
+        const countElement = document.getElementById(`comment-report-count-${currentCommentId}`);
+        if (countElement) {
+          countElement.innerText = `신고 ${data.report_count}회`;
+          countElement.style.display = 'none';
+          countElement.offsetHeight;
+          countElement.style.display = '';
+        }
+        if (data.blinded) {
+          alert("신고 누적으로 블라인드 처리되었습니다.");
+          location.reload();
+        } else {
+          alert("신고가 접수되었습니다.");
+        }
+      } else {
+        alert(data.message || "신고 처리 실패");
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert("신고 처리 중 오류 발생");
+    })
+    .finally(() => {
+      isReporting = false;
+      submitBtn.disabled = false;
+      currentCommentId = null;
+    });
+  };
+});
+</script>
