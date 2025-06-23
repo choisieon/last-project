@@ -5,6 +5,10 @@ from .forms import CommentForm
 from django.core.paginator import Paginator
 from django.db.models import Q, Count
 from collections import Counter
+from datetime import date, datetime
+from calendar import monthrange
+import calendar
+from datetime import timedelta
 
 # Create your views here.
 def basic_page(request):
@@ -12,7 +16,6 @@ def basic_page(request):
     selected_sido = request.GET.get('sido')
     selected_sigungu = request.GET.get('sigungu')
     selected_category = request.GET.get('category', 'all')
-    top_viewed_policies = YouthPolicy.objects.order_by('-view_count')[:3]
 
     policies = YouthPolicy.objects.all()
 
@@ -61,7 +64,6 @@ def basic_page(request):
         'selected_sido': selected_sido,
         'selected_sigungu': selected_sigungu,
         'selected_category': selected_category, 
-        'top_viewed_policies': top_viewed_policies,
         'paginator': paginator, 
         'is_paginated': True, 
     }
@@ -139,8 +141,6 @@ def policy_detail(request, policy_id):
     policy.save(update_fields=['view_count'])
 
     comments = PolicyComment.objects.filter(policy=policy, parent=None).order_by('-created_at')
-    recommended_policies = get_next_most_viewed(policy_id)
-    top_viewed_policies = YouthPolicy.objects.order_by('-view_count')[:3]
     top_level_comments = PolicyComment.objects.filter(policy=policy, parent__isnull=True).select_related('author').prefetch_related('replies__author')
 
     if request.method == 'POST':
@@ -161,8 +161,6 @@ def policy_detail(request, policy_id):
     return render(request, 'policy_detail.html', {
         'policy': policy,
         'comments': comments,
-        'recommended_policies': recommended_policies,
-        'top_viewed_policies': top_viewed_policies,
         'top_level_comments': top_level_comments,
         'form': form
     })
@@ -177,3 +175,55 @@ def toggle_policy_like(request, policy_id):
         policy.likes.add(request.user)
 
     return redirect('youth_policy:policy_detail', policy_id=policy.id)
+
+def popular_policies(request):
+    top_viewed_policies = YouthPolicy.objects.order_by('-view_count')[:5]
+
+    return render(request, 'popular_policies.html', {
+        'top_viewed_policies': top_viewed_policies,
+    })
+
+def get_calendar(year, month):
+    cal = calendar.Calendar(firstweekday=6)
+    return cal.monthdatescalendar(year, month)
+
+def calendar_view(request):
+    today = date.today()
+
+    # URL에서 year/month 파라미터 받아오기
+    year = int(request.GET.get('year', today.year))
+    month = int(request.GET.get('month', today.month))
+
+    start_of_month = date(year, month, 1)
+    end_of_month = date(year, month, calendar.monthrange(year, month)[1])
+
+    policies = YouthPolicy.objects.filter(
+        application_start__lte=end_of_month,
+        application_end__gte=start_of_month
+    )
+
+    start_dict = {}
+    end_dict = {}
+
+    for policy in policies:
+        if policy.application_start and start_of_month <= policy.application_start <= end_of_month:
+            key = policy.application_start.date() if isinstance(policy.application_start, datetime) else policy.application_start
+            start_dict.setdefault(key, []).append(policy)
+
+        if policy.application_end and start_of_month <= policy.application_end <= end_of_month:
+            key = policy.application_end.date() if isinstance(policy.application_end, datetime) else policy.application_end
+            end_dict.setdefault(key, []).append(policy)
+
+    calendar_data = get_calendar(year, month)
+
+    context = {
+        'year': year,
+        'month': month,
+        'today': today,
+        'calendar': calendar_data,
+        'policies': policies,
+        'start_dict': start_dict,
+        'end_dict': end_dict,
+    }
+
+    return render(request, 'calendar.html', context)

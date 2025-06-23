@@ -1,0 +1,93 @@
+{% load static %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ year }}년 {{ month }}월 정책 달력</title>
+  <style>
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ccc; width: 14%; height: 100px; vertical-align: top; padding: 5px; text-align: left; }
+    .start-badge {
+      display: block;
+      background-color: #fff3cd;
+      padding: 4px;
+      border-radius: 4px;
+      margin-bottom: 4px;
+      color: #856404;
+      font-weight: bold;
+    }
+    .end-badge {
+      display: block;
+      background-color: #f8d7da;
+      padding: 4px;
+      border-radius: 4px;
+      margin-bottom: 4px;
+      color: #721c24;
+      font-weight: bold;
+    }
+    .calendar-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 16px 0;
+    }
+    .calendar-nav a {
+      text-decoration: none;
+      font-weight: bold;
+      color: #007bff;
+    }
+    .other-month {
+      color: #bbb;
+    }
+  </style>
+</head>
+<body>
+
+<h2 style="text-align: center;">{{ year }}년 {{ month }}월 정책 달력</h2>
+
+<!-- 📆 달 이동 링크 -->
+<div class="calendar-nav">
+  <a href="{% url 'youth_policy:calendar_view' %}?year={% if month == 1 %}{{ year|add:"-1" }}{% else %}{{ year }}{% endif %}&month={% if month == 1 %}12{% else %}{{ month|add:"-1" }}{% endif %}">← prev</a>
+
+  <a href="{% url 'youth_policy:calendar_view' %}?year={% if month == 12 %}{{ year|add:"1" }}{% else %}{{ year }}{% endif %}&month={% if month == 12 %}1{% else %}{{ month|add:"1" }}{% endif %}">next →</a>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for week in calendar %}
+      <tr>
+        {% for day in week %}
+          <td>
+            <strong class="{% if day.month != month %}other-month{% endif %}">{{ day.day }}</strong>
+
+            {% with start_dict|get_item:day as starts %}
+              {% if starts %}
+                {% for policy in starts %}
+                  <div class="start-badge">🟡 {{ policy.정책명 }}</div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            {% with end_dict|get_item:day as ends %}
+              {% if ends %}
+                {% for policy in ends %}
+                  <div class="end-badge">🔴 {{ policy.정책명 }}</div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+          </td>
+        {% endfor %}
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+</body>
+</html>

@@ -437,13 +437,18 @@
   <div class="top-widgets-fixed">
     <div class="top-widget">
       <h5>🔥 인기 정책</h5>
-      <a href="#popular">TOP 3 보기 →</a>
+      <a href="{% url 'youth_policy:popular_policies' %}">TOP 3 보기 →</a>
+    </div>
+
+    <div class="top-widget">
+      <h5>📅 이번 달 정책</h5>
+      <a href="{% url 'youth_policy:calendar_view' %}">달력 보기 →</a>
     </div>
   </div>
 
   <div class="top-nav">
     <div class="menu-left">
-      <a href="{% url 'index' %}" class="menu-box home-link"><i class="fas fa-home"></i></a>
+      <a href="{% url 'community:index' %}" class="menu-box home-link"><i class="fas fa-home"></i></a>
       <a href="{% url 'board:post_list' %}" class="menu-box">커뮤니티</a>
       <a href="{% url 'mentor:mentor_home' %}" class="menu-box">멘토멘티</a>
       <a href="#" class="menu-box">마이페이지</a>
@@ -569,7 +574,7 @@
   </span>
 
   <span class="badge date">
-    {{ policy.신청기간|default:"기간 미정" }}
+    {{ policy.application_period|default:"기간 미정" }}
   </span>
 </div>
               

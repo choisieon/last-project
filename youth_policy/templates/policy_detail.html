@@ -204,7 +204,7 @@ h1 {
       <p><strong>정책명</strong><br>{{ policy.정책명|linebreaksbr }}</p>
       <p><strong>설명</strong><br>{{ policy.정책설명|linebreaksbr }}</p>
       <!-- <p><strong>추가 자격</strong><br>{{ policy.추가신청자격조건내용|linebreaksbr }}</p> -->
-      <p><strong>신청 기간</strong><br>{{ policy.신청기간 }}</p>
+      <p><strong>신청 기간</strong><br>{{ policy.application_period }}</p>
       <p><strong>신청URL</strong><br>
         {% if policy.신청URL and policy.신청URL != "nan" %}
           <a href="{{ policy.신청URL }}" target="_blank">{{ policy.신청URL }}</a>
