@@ -1,125 +1,483 @@
 {% extends "base.html" %}
 {% load static %}
+
 {% block title %}글쓰기 | 청설모{% endblock %}
 
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/tagify.css' %}">
+<script src="{% static 'js/tagify.min.js' %}"></script>
+<script src="{% static 'tinymce/js/jquery-3.7.1.min.js' %}"></script>
+<script src="{% static 'tinymce/js/tinymce/tinymce.min.js' %}"></script>
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}
+
 {% block content %}
-<div class="form-container">
-  <h2>글쓰기</h2>
-  <form method="post" enctype="multipart/form-data" style="background: white; border-radius: 8px; padding: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="write-btn">저장</button>
-  </form>
+<div class="form-outer">
+  <div class="form-container">
+    <h2>✏️ 새 글 작성</h2>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <!-- 제목(60%) + 카테고리(40%) 한 줄 배치 -->
+      <div class="form-row">
+        <div class="form-group" style="flex:6;">
+          {{ form.title.label_tag }}
+          {{ form.title }}
+          {% for error in form.title.errors %}
+          <div class="error">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="form-group" style="flex:4;">
+          {{ form.category.label_tag }}
+          {{ form.category }}
+          {% for error in form.category.errors %}
+            <div class="error">{{ error }}</div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- 썸네일/이미지(50%) + 첨부파일(50%) 한 줄 배치 -->
+      <div class="form-row">
+        <!-- 왼쪽: 썸네일/이미지 -->
+        <div class="form-group" style="flex:5;">
+          <div id="thumbnail-field">
+            {{ form.thumbnail.label_tag }}
+            {% if form.instance.pk and form.instance.thumbnail %}
+              <div style="margin-bottom:10px;">
+                <img src="{{ form.instance.thumbnail.url }}" alt="현재 썸네일" style="max-width:180px; border-radius:8px;">
+              </div>
+            {% endif %}
+            {{ form.thumbnail }}
+            <div style="color:#888; font-size:0.97em; margin-top:6px;">
+              후기글 대표 썸네일로 사용됩니다. (필수)
+            </div>
+            {% for error in form.thumbnail.errors %}
+              <div class="error">{{ error }}</div>
+            {% endfor %}
+          </div>
+          <div id="image-field" style="display:none;">
+            {{ form.images.label_tag }}
+            {% if form.instance.pk and form.instance.images.all %}
+              <div style="margin-bottom:10px;">
+                {% for image in form.instance.images.all %}
+                  <img src="{{ image.image.url }}" alt="첨부 이미지" style="max-width:140px; border-radius:8px; margin-right:8px;">
+                {% endfor %}
+              </div>
+            {% endif %}
+            {{ form.images }}
+            <div style="color:#888; font-size:0.97em; margin-top:6px;">
+              이미지 업로드 (최대 2개)
+            </div>
+            {% for error in form.images.errors %}
+              <div class="error">{{ error }}</div>
+            {% endfor %}
+          </div>
+        </div>
+        
+        <!-- 오른쪽: 첨부파일 -->
+        <div class="form-group" style="flex:5;">
+          <label for="id_files">첨부 파일 (PDF, ZIP 등):</label>
+          {# 첨부파일 미리보기 추가 #}
+          {% if form.instance.pk and form.instance.files.all %}
+            <ul style="margin-bottom:10px;">
+              {% for f in form.instance.files.all %}
+                {% with ext=f.file.url|lower|slice:"-4:" ext5=f.file.url|lower|slice:"-5:" %}
+                  {% if ext != ".jpg" and ext5 != ".jpeg" and ext != ".png" and ext != ".gif" and ext != ".bmp" and ext5 != ".webp" %}
+                    <li>
+                      <a href="{{ f.file.url }}" download>{{ f.file.name }}</a>
+                    </li>
+                  {% endif %}
+                {% endwith %}
+              {% endfor %}
+            </ul>
+          {% endif %}
+          <input type="file" name="files" id="id_files" multiple>
+          <div style="color:#888; font-size:0.97em; margin-top:6px;">
+            여러 파일을 선택할 수 있습니다.
+          </div>
+        </div>
+      </div>
+
+      <!-- 본문 -->
+      <div class="form-group">
+        {{ form.content.label_tag }}
+        <div id="content_field">
+          {{ form.content }}
+        </div>
+      </div>
+
+      <!-- 태그 입력란 -->
+      <div class="form-group">
+        <label for="id_tags">태그 (쉼표로 구분):</label>
+        <input name="tags" id="id_tags" value="">
+        {% for error in form.tags.errors %}
+        <div class="error">{{ error }}</div>
+        {% endfor %}
+        <div style="margin-top:8px;">
+          <span style="color:#888; font-size:0.96em;">추천 태그:</span>
+          {% for tag in popular_tags %}
+          <button type="button" class="tag-suggest-btn" style="margin:2px 4px; padding:2px 8px; border-radius:10px; border:1px solid #1976d2; background:#f0f4fa; color:#1976d2; cursor:pointer;" onclick="addTag('{{ tag.name }}')">#{{ tag.name }}</button>
+          {% endfor %}
+        </div>
+      </div>
+
+      <button type="submit" class="write-btn">등록</button>
+    </form>
+  </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const categorySelect = document.getElementById('id_category');
+  const thumbnailField = document.getElementById('thumbnail-field');
+  const imageField = document.getElementById('image-field');
+  let tinymceLoaded = false;
+
+  function enableTinyMCE() {
+    if (tinymceLoaded) return;
+    document.getElementById('id_content').removeAttribute('required');
+    tinymce.init({
+      selector: 'textarea#id_content',
+      width: '100%',
+      min_width: 500,
+      min_height: 300,
+      max_height: 800,
+      height: 600,
+      language: 'ko_KR',
+      language_url: '/static/tinymce/js/tinymce/langs/ko_KR.js',
+      plugins: 'advlist autolink lists link image charmap preview anchor pagebreak searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking save table directionality emoticons codesample',
+      toolbar: 'fullscreen preview bold italic underline | fontselect fontsizeselect | forecolor backcolor | alignleft alignright aligncenter alignjustify | indent outdent | bullist numlist table | link image media | codesample | visualblocks visualchars | charmap emoticons | insertdatetime | hr nonbreaking | pagebreak restoredraft | code',
+      contextmenu: 'formats | link image',
+      menubar: 'file edit view insert format tools table help',
+      content_css: 'writer',
+      license_key: 'gpl',
+      content_style: `
+        img {
+          display: inline-block;
+          margin: 0 8px 8px 0;
+          max-width: 32%;
+          height: auto;
+          vertical-align: middle;
+        }
+        p, div {
+          overflow: hidden;
+        }
+        img[style*="float: left"] {
+          float: left;
+          margin-right: 12px;
+          margin-bottom: 8px;
+        }
+        img[style*="float: right"] {
+          float: right;
+          margin-left: 12px;
+          margin-bottom: 8px;
+        }
+        p:after, div:after {
+          content: "";
+          display: block;
+          clear: both;
+        }
+      `,
+      setup: function(editor) {
+        editor.on('init', function() {
+          if (editor.getContent() === '') {
+            editor.setContent(
+              '<p style="background:#fffbe9; border:1.5px dashed #fbc02d; padding:8px 14px; border-radius:7px; color:#b8860b; margin-bottom:16px;">' +
+                '※ <strong>대표 썸네일 이미지는 위에서 반드시 첨부</strong>해 주세요.<br>' +
+                '본문에는 추가 사진, 자료, 링크 등을 자유롭게 삽입할 수 있습니다.' +
+              '</p>' +
+              '<h3>1. 경험한 일</h3>' +
+              '<p style="color:#bbb;">구체적으로 어떤 상황/사건이었는지 적어주세요.</p>' +
+              '<p><br></p>' +
+              '<hr>' +
+              '<h3>2. 느낀 점</h3>' +
+              '<p style="color:#bbb;">당시 느꼈던 감정, 생각, 배운 점 등을 자유롭게 작성해 주세요.</p>' +
+              '<p><br></p>' +
+              '<hr>' +
+              '<h3>3. 추천/비추천 이유</h3>' +
+              '<p style="color:#bbb;">이 경험을 다른 사람에게 추천하거나 비추천하는 이유를 적어주세요.</p>' +
+              '<p><br></p>' +
+              '<hr>' +
+              '<h3>추가 정보 (선택)</h3>' +
+              '<p style="color:#bbb;">사진, 링크, 참고자료 등 추가적으로 공유하고 싶은 내용이 있다면 첨부해 주세요.</p>'
+            );
+          }
+        });
+      },
+      images_upload_handler: function (blobInfo) {
+        return new Promise((resolve, reject) => {
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', '/board/upload-image/');
+          xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
+          xhr.upload.onprogress = function (e) {};
+          xhr.onload = function() {
+            if (xhr.status === 403) {
+              reject({ message: 'HTTP Error: ' + xhr.status, remove: true });
+              return;
+            }
+            if (xhr.status < 200 || xhr.status >= 300) {
+              reject('HTTP Error: ' + xhr.status);
+              return;
+            }
+            var json = JSON.parse(xhr.responseText);
+            if (!json || typeof json.location != 'string') {
+              reject('Invalid JSON: ' + xhr.responseText);
+              return;
+            }
+            resolve(json.location);
+          };
+          xhr.onerror = function () {
+            reject('Image upload failed due to a XHR Transport error. Code: ' + xhr.status);
+          };
+          var formData = new FormData();
+          formData.append('file', blobInfo.blob(), blobInfo.filename());
+          xhr.send(formData);
+        });
+      }
+    });
+    tinymceLoaded = true;
+  }
+
+  function disableTinyMCE() {
+    if (!tinymceLoaded) return;
+    tinymce.remove('#id_content');
+    tinymceLoaded = false;
+  }
+
+  function toggleFields() {
+    const value = categorySelect.value;
+    if (value === 'review') {
+      thumbnailField.style.display = 'block';
+      imageField.style.display = 'none';
+      enableTinyMCE();
+    } else if (value === 'share' || value === 'free') {
+      thumbnailField.style.display = 'none';
+      imageField.style.display = 'block';
+      disableTinyMCE();
+      if (tinymce.get('id_content')) {
+        tinymce.get('id_content').setContent('');
+      }
+      document.getElementById('id_content').value = '';
+    } else {
+      thumbnailField.style.display = 'none';
+      imageField.style.display = 'none';
+    }
+  }
+
+  // 초기 상태 반영
+  if (categorySelect.value === 'review') {
+    enableTinyMCE();
+    thumbnailField.style.display = 'block';
+    imageField.style.display = 'none';
+  } else if (categorySelect.value === 'share' || categorySelect.value === 'free') {
+    thumbnailField.style.display = 'none';
+    imageField.style.display = 'block';
+    disableTinyMCE();
+    if (tinymce.get('id_content')) {
+      tinymce.get('id_content').setContent('');
+    }
+    document.getElementById('id_content').value = '';
+  } else {
+    thumbnailField.style.display = 'none';
+    imageField.style.display = 'none';
+  }
+
+  categorySelect.addEventListener('change', toggleFields);
+
+  document.querySelector('form').addEventListener('submit', function() {
+    tinymce.triggerSave();
+  });
+
+  // Tagify 적용
+  var input = document.querySelector('input[name=tags]');
+  window.tagify = new Tagify(input, {
+    whitelist: [{% for tag in popular_tags %}"{{ tag.name }}"{% if not forloop.last %},{% endif %}{% endfor %}],
+    pattern: /^[가-힣a-zA-Z0-9:_-]{2,10}$/,
+    editTags: false,
+    dropdown: {
+      enabled: 0,
+      closeOnSelect: false,
+      maxItems: 100,
+      classname: "tagify__inline__suggestions"
+    }
+  });
+
+  window.addTag = function(tagName) {
+    window.tagify.addTags([tagName]);
+  };
+});
+</script>
 {% endblock %}
 
 {% block extra_style %}
 <style>
-/* 드래그(선택) 시 색상 변경 */
-.form-container ::selection,
-.form-container ::-moz-selection {
-  background: #1976d2;  /* 파랑 */
-  color: #fff700;       /* 노랑 */
+.form-outer {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding-top: 40px;
 }
 
-/* 폼 전체 박스 */
 .form-container {
-  max-width: 500px;
+  width: 90%;
+  max-width: 1000px; 
   margin: 40px auto;
-  padding: 32px 28px 24px 28px;
-  background: rgba(250,235,180,0.96);
-  background-image: url("{% static 'images/pixel-paper.png' %}");
-  background-size: 4px 4px;
-  border: 2.5px solid #5a4a2f;
-  box-shadow: 4px 4px 0 #b9a782;
-  border-radius: 8px;
-}
-
-/* 제목 */
-.form-container h2 {
-  margin-bottom: 24px;
-  font-size: 2rem;
-  color: #00070d;
-  font-weight: bold;
-  letter-spacing: -1px;
-  text-align: center;
-  text-shadow: 1px 1px 4px #fff8;
-}
-
-/* 레이블 */
-.form-container label {
-  display: block;
-  margin-bottom: 6px;
-  color: #00070d;
-  font-weight: bold;
-  font-size: 1.05rem;
-  letter-spacing: -0.5px;
-}
-
-/* 입력창 */
-.form-container input[type="text"],
-.form-container textarea {
-  width: 100%;
-  padding: 12px 14px;
-  margin-bottom: 18px;
-  border: 2px solid #5a4a2f;
-  background: rgba(255,255,255,0.98);
-  font-family: 'MyCustomFont', sans-serif;
-  font-size: 1.08rem;
-  border-radius: 4px;
-  resize: vertical;
-  box-sizing: border-box;
-  color: #222831;
-  transition: border 0.2s;
-}
-
-.form-container input[type="text"]:focus,
-.form-container textarea:focus {
-  border: 2px solid #1976d2;
-  outline: none;
   background: #fff;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+  border-radius: 16px;
+  padding: 48px 60px 40px 60px;
+}
+body, .form-container {
+  font-size: 18px;
+  line-height: 1.6;
+}
+.form-section {
+  margin-bottom: 36px;
+  border-bottom: 1.5px solid #f0f0f0;
+  padding-bottom: 22px;
 }
 
-/* 텍스트에어리어 크기 */
-.form-container textarea {
-  min-height: 140px;
-  max-height: 400px;
-  font-size: 1.08rem;
+.form-group {
+  margin-bottom: 12px;
 }
 
-/* 버튼 */
-.form-container .write-btn {
-  margin-top: 10px;
-  width: 120px;
-  font-size: 1.1rem;
-  font-weight: bold;
-  background: #007aff;
-  color: #fff;
-  border: 2px solid #5a4a2f;
-  border-radius: 4px;
-  box-shadow: 2px 2px 0 #b9a782;
-  padding: 12px 0;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
+.form-group label {
   display: block;
-  margin-left: auto;
-  margin-right: auto;
-  letter-spacing: 1px;
+  color: #222;
+  font-weight: bold;
+  font-size: 1.12rem;
+  margin-bottom: 7px;
+  text-shadow: 1px 1px 3px #fff, 0 0 2px #0008;
 }
 
-.form-container .write-btn:hover {
+.form-control {
+  width: 100%;
+  border: 2px solid #1976d2;
+  border-radius: 7px;
+  padding: 13px 14px;
+  font-size: 1.09rem;
+  background: #fffbe9;
+  color: #222831;
+  box-shadow: 2px 2px 0 #b9a78233;
+  margin-bottom: 13px;
+}
+
+.form-control:focus {
+  border: 2px solid #007aff;
+  background: #fff;
+  outline: none;
+  box-shadow: 0 0 8px #007aff33;
+}
+
+.write-btn {
+  background-color: #007aff;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+  border: 2px solid #5a4a2f;
+  box-shadow: 3px 3px 0 #b9a782;
+}
+
+.write-btn:hover {
   background: #005bb5;
   color: #fff700;
 }
 
-/* 폼 전체 폰트/크기 */
-.form-container,
-.form-container input,
-.form-container textarea,
-.form-container label {
-  font-family: 'MyCustomFont', 'Noto Sans KR', sans-serif;
+.error {
+  color: #d32f2f;
+  font-size: 0.97rem;
+  margin-top: 2px;
+  margin-bottom: 4px;
+}
+
+.tox-tinymce {
+  border-radius: 8px;
+  margin-top: 18px;
+  margin-bottom: 24px;
+}
+input[type="text"], select {
+  height: 48px;
+  font-size: 1.1rem;
+  padding: 0 12px;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+textarea.input-content {
+  width: 100%;
+  max-width: 900px;
+  font-size: 16px;
+  padding: 9px;
+  margin-bottom: 10px;
+  line-height: 1.6;
+}
+.title-input {
+  font-size: 2.2rem;
+  font-weight: bold;
+  border: none;
+  border-bottom: 2px solid #eee;
+  width: 100%;
+  margin: 32px 0 18px 0;
+  text-align: center;
+  background: transparent;
+  outline: none;
+}
+.form-row {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.post-images img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 10px 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.post-images img:hover {
+  transform: scale(1.03);
 }
 
 
+@media (max-width: 700px) {
+  .form-row {
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+  .form-group {
+    width: 100%;
+  }
+}
 </style>
 {% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>#{{ tag.name }} 태그가 달린 글</h2>
+  {% if posts %}
+    <ul>
+      {% for post in posts %}
+        <li style="margin-bottom: 18px;">
+          <a href="{% url 'board:post_detail' post.pk %}" style="font-weight:bold;">{{ post.title }}</a>
+          <span style="color:#888;">({{ post.created_at|date:"Y-m-d H:i" }})</span>
+          <div style="margin: 4px 0 6px 0; color:#444;">
+            {{ post.content|truncatechars:60 }}
+          </div>
+          <div style="font-size:0.97em; color:#1976d2;">
+            작성자: {{ post.author }} |
+            댓글: {{ post.comments.count }}
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>이 태그가 달린 글이 없습니다.</p>
+  {% endif %}
+{% endblock %}

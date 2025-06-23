@@ -286,7 +286,7 @@
     <div class="top-left">
       <div class="identity-box">청년들의 인생설계 모임, <strong>청설모</strong></div>
       <div class="nav-menu">
-       <a href="{% url 'post_list' %}" class="menu-box {% block nav_community_active %}{% endblock %}">커뮤니티</a>
+       <a href="{% url 'board:post_list' %}" class="menu-box {% block nav_community_active %}{% endblock %}">커뮤니티</a>
        <a href="{% url 'mentor:mentor_home' %}">멘토멘티</a>
        <a href="{% url 'accounts:my_page' %}">마이페이지</a>
         <a href="{% url 'youth_policy:basic_page' %}">청년정책</a>
@@ -297,12 +297,12 @@
         <span>{{ user.username }}님 환영합니다</span>
         <a href="{% url 'accounts:logout' %}">로그아웃</a>
       <a href="#">문의</a>
-      <a href="{% url 'post_new' %}" class="write">글쓰기</a>  
+      <a href="{% url 'board:post_new' %}" class="write">글쓰기</a>  
          {% else %}
       <a href="{% url 'accounts:login' %}">로그인</a>
       <a href="{% url 'accounts:signup' %}">회원가입</a>
       <a href="#">문의</a>
-      <a href="{% url 'accounts:login' %}?next={% url 'post_new' %}" class="write-btn">글쓰기</a>
+      <a href="{% url 'accounts:login' %}?next={% url 'board:post_new' %}" class="write-btn">글쓰기</a>
       {% endif %}
         </div>
         <div class="mailbox-wrapper">
@@ -324,7 +324,7 @@
           <div class="post-item"><strong>🔥 인기 게시글 배너</strong></div>
           {% for post in popular_posts %}
           <div class="post-item">
-            <h4><a href="{% url 'post_detail' post.id %}">{{ post.title }}</a></h4>
+            <h4><a href="{% url 'board:post_detail' post.id %}">{{ post.title }}</a></h4>
             <p>{{ post.content|truncatechars:80 }}</p>
             <div class="meta-info">
               <span>{{ post.created_at|date:"Y-m-d H:i" }}</span>

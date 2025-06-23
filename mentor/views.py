@@ -120,8 +120,11 @@ def question_create(request):
             # ✅ 내공 +5점
             profile.points += 5
             profile.save()
-
             return redirect('mentor:mentor_home')
+    else:
+        form = QuestionForm()
+    
+    return render(request, 'mentor/question_form.html', {'form': form})
 
 
 @login_required

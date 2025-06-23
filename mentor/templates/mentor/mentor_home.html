@@ -5,12 +5,12 @@
   <meta charset="UTF-8" />
   <title>선배찾기 - 청설모</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     @font-face {
       font-family: 'MyCustomFont';
       src: url("{% static 'fonts/픽셀.woff2' %}") format('woff2');
     }
+
     body {
       font-family: 'MyCustomFont', sans-serif;
       margin: 0;
@@ -19,11 +19,13 @@
       background-size: cover;
       background-color: #cde4c7;
     }
+
     .wrapper {
       max-width: 900px;
       margin: 0 auto;
       padding: 30px 20px;
     }
+
     .top-nav {
       display: flex;
       justify-content: space-between;
@@ -32,7 +34,7 @@
     }
     .menu-left {
       display: flex;
-      gap: 12px;
+      gap: 14px;
     }
     .menu-box {
       background-color: rgba(250, 235, 180, 0.9);
@@ -157,7 +159,7 @@
     <div class="top-nav">
       <div class="menu-left">
         <a href="{% url 'index' %}" class="menu-box home-link"><i class="fas fa-home"></i></a>
-        <a href="{% url 'post_list' %}" class="menu-box">커뮤니티</a>
+        <a href="{% url 'board:post_list' %}" class="menu-box">커뮤니티</a>
         <a href="#" class="menu-box active">선배찾기</a>
         <a href="#" class="menu-box">마이페이지</a>
         <a href="#" class="menu-box">청년정책</a>

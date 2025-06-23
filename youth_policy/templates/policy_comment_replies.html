@@ -1,0 +1,17 @@
+{% for reply in replies %}
+  <div class="reply-box" style="margin-left: 2rem;">
+    <p><strong>{{ reply.author.username }}</strong> | {{ reply.created_at|date:"Y.m.d H:i" }}</p>
+    <p>{{ reply.content|linebreaks }}</p>
+
+    {% if user.is_authenticated %}
+      <form method="post" action="{% url 'youth_policy:add_policy_comment' policy.id %}" class="comment-form reply-form" style="margin-top: 0.5rem;">
+        {% csrf_token %}
+        <textarea name="content" rows="2" placeholder="대댓글을 입력하세요."></textarea>
+        <input type="hidden" name="parent_id" value="{{ reply.id }}">
+        <button type="submit">대댓글</button>
+      </form>
+    {% endif %}
+
+    {% include "policy/comment_replies.html" with replies=reply.replies.all %}
+  </div>
+{% endfor %}
