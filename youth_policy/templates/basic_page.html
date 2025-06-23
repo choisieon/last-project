@@ -485,7 +485,11 @@
         <div class="dropdown-menu" id="sidoDropdown">
           <div class="dropdown-item" onclick="selectFilter('sido', '', '시도')">전체</div>
           {% for sido in sido_list %}
-            <div class="dropdown-item" onclick="selectFilter('sido', '{{ sido.code }}', '{{ sido.name }}')">{{ sido.name }}</div>
+            <div class="dropdown-item"
+                data-value="{{ sido.code }}"
+                onclick="selectFilter('sido', '{{ sido.code }}', '{{ sido.name }}')">
+              {{ sido.name }}
+            </div>
           {% endfor %}
         </div>
       </div>
@@ -499,7 +503,11 @@
         <div class="dropdown-menu" id="sigunguDropdown">
           <div class="dropdown-item" onclick="selectFilter('sigungu', '', '시군구')">전체</div>
           {% for sigungu in sigungu_list %}
-            <div class="dropdown-item" onclick="selectFilter('sigungu', '{{ sigungu.code }}', '{{ sigungu.name }}')">{{ sigungu.name }}</div>
+            <div class="dropdown-item"
+                data-value="{{ sigungu.code }}"
+                onclick="selectFilter('sigungu', '{{ sigungu.code }}', '{{ sigungu.name }}')">
+              {{ sigungu.name }}
+            </div>
           {% endfor %}
         </div>
       </div>
