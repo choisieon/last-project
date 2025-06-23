@@ -24,15 +24,13 @@ from . import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
-    path('accounts/', include('accounts.urls')),
     path('', include('community.urls')),  # community 앱으로 연결,
     path('auth/', include('accounts.urls')),
     path('board/', include('board.urls', namespace='board')),
     path('mentor/', include('mentor.urls')),  # 멘토멘티 연결 추가
-    path('policy/', include('youth_policy.urls')), # youth_policy 앱으로 연결
     path('social/', include('allauth.urls')),  # allauth 기본 경로
     path('tinymce/', include('tinymce.urls')),
-    path('yputh_policy/', include('youth_policy.urls', namespace='youth_policy')),
+    path('youth_policy/', include('youth_policy.urls', namespace='youth_policy')),
     path('taggit_autosuggest/', include('taggit_autosuggest.urls')),
     path('accounts/', include('allauth.urls')),  # allauth 기본 경로
     path('advice/', include('advice.urls')),

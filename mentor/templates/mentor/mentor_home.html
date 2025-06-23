@@ -10,22 +10,19 @@
       font-family: 'MyCustomFont';
       src: url("{% static 'fonts/픽셀.woff2' %}") format('woff2');
     }
-
     body {
       font-family: 'MyCustomFont', sans-serif;
       margin: 0;
       padding: 0;
       background: url("{% static 'images/Frame 13.png' %}") no-repeat center center fixed;
       background-size: cover;
-      background-color: #cde4c7;
+      background-color: #CDE4C7;
     }
-
     .wrapper {
       max-width: 900px;
       margin: 0 auto;
       padding: 30px 20px;
     }
-
     .top-nav {
       display: flex;
       justify-content: space-between;
@@ -39,17 +36,17 @@
     .menu-box {
       background-color: rgba(250, 235, 180, 0.9);
       background-image: url("{% static 'images/pixel-paper.png' %}");
-      border: 2px solid #5a4a2f;
+      border: 2px solid #5A4A2F;
       padding: 6px 12px;
-      box-shadow: 3px 3px 0 #b9a782;
+      box-shadow: 3px 3px 0 #B9A782;
       font-size: 14px;
-      color: #3c2e1e;
+      color: #3C2E1E;
       font-weight: bold;
       text-decoration: none;
     }
-    .menu-box.active { color: #007aff; }
+    .menu-box.active { color: #007AFF; }
     .write-button {
-      background-color: #007aff;
+      background-color: #007AFF;
       color: white;
       margin-left: auto;
     }
@@ -63,22 +60,21 @@
     .sub-category-bar button {
       background-color: rgba(250, 235, 180, 0.9);
       background-image: url("{% static 'images/pixel-paper.png' %}");
-      border: 2px solid #5a4a2f;
+      border: 2px solid #5A4A2F;
       padding: 6px 10px;
       font-size: 12px;
       font-family: 'MyCustomFont';
-      box-shadow: 2px 2px 0 #b9a782;
+      box-shadow: 2px 2px 0 #B9A782;
       cursor: pointer;
     }
-
     .filter-bar {
       margin-bottom: 10px;
     }
     .filter-trigger {
-      background-color: #ffeb99;
+      background-color: #FFEB99;
       padding: 4px 8px;
       font-size: 13px;
-      border: 2px solid #5a4a2f;
+      border: 2px solid #5A4A2F;
       cursor: pointer;
       font-family: 'MyCustomFont';
       box-shadow: 2px 2px 0 #aaa;
@@ -93,7 +89,7 @@
       display: flex;
     }
     .filter-options button {
-      background-color: #f9e3a1;
+      background-color: #F9E3A1;
       border: 2px solid #333;
       padding: 4px 8px;
       font-family: 'MyCustomFont';
@@ -101,7 +97,6 @@
       box-shadow: 2px 2px 0 #999;
       font-size: 12px;
     }
-
     .category-badge {
       display: inline-block;
       padding: 1px 6px;
@@ -110,19 +105,18 @@
       color: white;
       width: fit-content;
     }
-    .college { background-color: #7f78d2; }
-    .life { background-color: #6aaa64; }
-    .love { background-color: #e36bae; }
-    .house { background-color: #c58c55; }
-    .job { background-color: #4b9cd3; }
-    .money { background-color: #e3b041; }
-    .fitness { background-color: #e45757; }
+    .college { background-color: #7F78D2; }
+    .life { background-color: #6AAA64; }
+    .love { background-color: #E36BAE; }
+    .house { background-color: #C58C55; }
+    .job { background-color: #4B9CD3; }
+    .money { background-color: #E3B041; }
+    .fitness { background-color: #E45757; }
     .etc { background-color: #999999; }
-
     .post-item {
       background-color: rgba(250, 235, 180, 0.95);
-      border: 2px solid #5a4a2f;
-      box-shadow: 2px 2px 0 #b9a782;
+      border: 2px solid #5A4A2F;
+      box-shadow: 2px 2px 0 #B9A782;
       padding: 4px;
       margin-bottom: 8px;
       font-size: 11px;
@@ -131,8 +125,8 @@
     .post-preview { font-size: 11px; color: #555; margin: 2px 0; }
     .post-footer { font-size: 10px; display: flex; justify-content: space-between; flex-wrap: wrap; }
     .mentor-profile-btn {
-      background: #ffcc00;
-      border: 1px solid #5a4a2f;
+      background: #FFCC00;
+      border: 1px solid #5A4A2F;
       cursor: pointer;
       padding: 2px 5px;
       font-size: 10px;
@@ -140,8 +134,8 @@
     .metrics { margin-top: 2px; font-size: 10px; color: #333; }
     .fun-box {
       margin-top: 30px;
-      background: #fef3c7;
-      border: 2px dashed #5a4a2f;
+      background: #FEF3C7;
+      border: 2px dashed #5A4A2F;
       padding: 12px;
       box-shadow: 2px 2px 0 #aaa;
       font-size: 13px;
@@ -156,38 +150,6 @@
 </head>
 <body>
   <div class="wrapper">
-<<<<<<< HEAD
-    <!-- 상단 네비게이션 -->
-<div class="top-nav">
-  <div class="menu-left">
-    <a href="{% url 'community:index' %}" class="menu-box home-link">
-      <i class="fas fa-home"></i>
-    </a>
-    <a href="{% url 'board:post_list' %}" class="menu-box">커뮤니티</a>
-    <a href="#" class="menu-box active">멘토멘티</a>
-    <a href="#" class="menu-box">마이페이지</a>
-    <a href="{% url 'youth_policy:basic_page' %}" class="menu-box">청년정책</a>
-  </div>
-  <div class="menu-right">
-    <button class="write-btn">글쓰기</button>
-    <div class="login-info">홍길동님 환영합니다</div>
-  </div>
-</div>
-
-    <!-- 페이지 타이틀
-    <div class="page-title">멘토멘티</div> -->
-
-    <!-- 카테고리 바 -->
-    <div class="category-bar">
-      <button class="active">전체</button>
-      <button>인생선배</button>
-      <button>대학선배</button>
-      <button>연애선배</button>
-      <button>자취선배</button>
-      <button>취업선배</button>
-      <button>지갑선배</button>
-      <button>운동선배</button>
-=======
     <div class="top-nav">
       <div class="menu-left">
         <a href="{% url 'index' %}" class="menu-box home-link"><i class="fas fa-home"></i></a>
@@ -197,41 +159,34 @@
         <a href="#" class="menu-box">청년정책</a>
       </div>
       <a href="{% url 'mentor:question_create' %}" class="menu-box write-button">글쓰기</a>
->>>>>>> 73a765fd5dd5640790d0f90aa47e0c97626b9cc1
     </div>
-
 <div class="sub-category-bar">
   {% for code, label in categories.items %}
     <button
       onclick="location.href='{% url 'mentor:mentor_home' %}?category={{ code }}{% if sort %}&sort={{ sort }}{% endif %}'"
-      {% if current_category == code %}style="color: #007aff;"{% endif %}
+      {% if current_category == code %}style="color: #007AFF;"{% endif %}
     >
       {{ label }}
     </button>
   {% endfor %}
-  <button onclick="location.href='/mentor/list/'">👤 선배 구경하기</button>
+  <button onclick="location.href='/mentor/list/'">:상반신_그림자: 선배 구경하기</button>
 </div>
-
-
-
-
     <div class="filter-bar">
-      <button class="filter-trigger" onclick="toggleFilters()">📋 정렬 옵션</button>
+      <button class="filter-trigger" onclick="toggleFilters()">:클립보드: 정렬 옵션</button>
     </div>
     <div class="filter-options" id="filterOptions">
-      <a href="?sort=latest"><button class="{% if sort == 'latest' %}active{% endif %}">🆕 최신순</button></a>
-      <a href="?sort=views"><button class="{% if sort == 'views' %}active{% endif %}">👀 조회순</button></a>
-      <a href="?sort=likes"><button class="{% if sort == 'likes' %}active{% endif %}">❤️ 공감순</button></a>
+      <a href="?sort=latest"><button class="{% if sort == 'latest' %}active{% endif %}">:새_항목: 최신순</button></a>
+      <a href="?sort=views"><button class="{% if sort == 'views' %}active{% endif %}">:두_눈: 조회순</button></a>
+      <a href="?sort=likes"><button class="{% if sort == 'likes' %}active{% endif %}">:하트2: 공감순</button></a>
     </div>
-
     <div class="post-list">
       {% for question in questions %}
         <div class="post-item {% if question.is_promoted_to_mentoring %}mentoring{% endif %}">
           <span class="category-badge {{ question.category }}">
-            {% if question.category == 'college' %}🏫 대학선배{% elif question.category == 'life' %}🌱 인생선배
-            {% elif question.category == 'love' %}💘 연애선배{% elif question.category == 'house' %}🏠 자취선배
-            {% elif question.category == 'job' %}💼 취업선배{% elif question.category == 'money' %}💳 지갑선배
-            {% elif question.category == 'fitness' %}💪 운동선배{% else %}📌 기타{% endif %}
+            {% if question.category == 'college' %}:학교: 대학선배{% elif question.category == 'life' %}:새싹: 인생선배
+            {% elif question.category == 'love' %}:큐피드: 연애선배{% elif question.category == 'house' %}:집: 자취선배
+            {% elif question.category == 'job' %}:서류_가방: 취업선배{% elif question.category == 'money' %}:신용_카드: 지갑선배
+            {% elif question.category == 'fitness' %}:근육: 운동선배{% else %}:압정: 기타{% endif %}
           </span>
           <h4 class="post-title">
             <a href="{% url 'mentor:question_detail' question.id %}">{{ question.title }}</a>
@@ -240,12 +195,12 @@
 <div class="metrics" style="display: flex; align-items: center; gap: 6px;">
   <img src="{% static 'images/12.png' %}" alt="like" style="width: 13px; height: 12px;" />
   <span style="font-size: 11px;">{{ question.likes.count }}</span>
-  <span>| 💬 {{ question.answers.count }}</span>
-  <span>| 👀 {{ question.views }}</span>
+  <span>| :말풍선: {{ question.answers.count }}</span>
+  <span>| :두_눈: {{ question.views }}</span>
 </div>
           <div class="post-footer">
             <div>
-              👤 <strong>{{ question.author.nickname }}</strong> |
+              :상반신_그림자: <strong>{{ question.author.nickname }}</strong> |
               {{ question.author.bio|default:"소개 없음" }}
             </div>
             <div>
@@ -260,9 +215,8 @@
         <p>아직 질문이 없습니다.</p>
       {% endfor %}
     </div>
-
     <div class="fun-box">
-      💡 <strong>선배팁:</strong> 오늘의 꿀팁! 자취방 냉장고엔 물과 계란, 그리고 냉동만두는 필수야!
+      :전구: <strong>선배팁:</strong> 오늘의 꿀팁! 자취방 냉장고엔 물과 계란, 그리고 냉동만두는 필수야!
     </div>
   </div>
 </body>
