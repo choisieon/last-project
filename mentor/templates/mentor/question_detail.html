@@ -1,106 +1,522 @@
-{% extends 'base.html' %}
-{% block content %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>질문 상세 - 청설모</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    .question-box, .answer-box {
-      background-color: #fffce8;
-      padding: 16px;
-      margin-bottom: 20px;
-      border: 2px solid #ccc084;
-      box-shadow: 2px 2px 0 #aaa;
-      font-family: 'MyCustomFont', sans-serif;
+    @font-face {
+      font-family: 'MyCustomFont';
+      src: url("{% static 'fonts/픽셀.woff2' %}") format('woff2');
     }
+    body {
+      font-family: 'MyCustomFont', sans-serif;
+      background: url("{% static 'images/Frame 13.png' %}") no-repeat center center fixed;
+      background-size: cover;
+      background-color: #cde4c7;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .menu-left, .menu-right {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .menu-box {
+      background-color: rgba(250, 235, 180, 0.9);
+      background-image: url("{% static 'images/pixel-paper.png' %}");
+      background-size: 4px 4px;
+      background-repeat: repeat;
+      border: 2.5px solid #5a4a2f;
+      box-shadow: 3px 3px 0 #b9a782;
+      padding: 6px 12px;
+      font-weight: normal;
+      color: #3c2e1e;
+      font-size: 14px;
+      text-decoration: none;
+      font-family: 'MyCustomFont';
+      text-align: center;
+    }
+    .menu-box.active {
+      color: #007aff;
+      font-weight: bold;
+    }
+    .menu-home {
+      background-image: url("{% static 'images/home-icon.png' %}");
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 24px 24px;
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      text-indent: -9999px;
+      border: 2.5px solid #5a4a2f;
+      box-shadow: 3px 3px 0 #b9a782;
+      background-color: rgba(250, 235, 180, 0.9);
+    }
+.question-box {
+  position: relative;
+  background-color: rgba(250, 235, 180, 0.95);
+  border: 2px solid #5a4a2f;
+  box-shadow: 2px 2px 0 #b9a782;
+  padding: 16px;
+  padding-bottom: 80px;
+  margin-bottom: 24px;
+  margin-left: 48px; /* 아바타 여백 확보 */
+  border-radius: 8px;
+}
+
+.question-box::before {
+  content: "";
+  position: absolute;
+  top: 30px;
+  left: -16px;
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-right: 16px solid rgba(250, 235, 180, 0.95);
+}
+
     .question-title {
       font-size: 20px;
       font-weight: bold;
-      margin-bottom: 10px;
+      color: #333;
+      margin-bottom: 6px;
     }
     .question-meta {
       font-size: 13px;
       color: #666;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
     .category-badge {
       display: inline-block;
-      background-color: #007aff;
-      color: white;
+      font-size: 12px;
+      font-weight: bold;
       padding: 2px 8px;
-      font-size: 12px;
-      border-radius: 4px;
       margin-left: 8px;
+      border-radius: 3px;
+      color: white;
     }
-    .answer-box {
-      background-color: #f7f7f7;
-      border-left: 4px solid #007aff;
-    }
-    .answer-meta {
-      font-size: 12px;
-      color: #444;
-      margin-top: 6px;
-    }
+    .life { background-color: #6aaa64; }
+    .college { background-color: #7f78d2; }
+    .love { background-color: #e36bae; }
+    .house { background-color: #c58c55; }
+    .job { background-color: #4b9cd3; }
+    .money { background-color: #e3b041; }
+    .fitness { background-color: #e45757; }
+    .etc { background-color: #999; }
+
     .action-buttons {
-      margin-top: 30px;
-      display: flex;
-      gap: 12px;
+      margin-bottom: 20px;
     }
     .action-buttons a {
-      padding: 8px 14px;
       background-color: #007aff;
       color: white;
-      font-weight: bold;
+      padding: 6px 12px;
+      margin-right: 10px;
+      font-size: 14px;
       text-decoration: none;
+      font-weight: bold;
       border: 2px solid #3c2e1e;
       box-shadow: 2px 2px 0 #b9a782;
-      font-size: 14px;
+      font-family: 'MyCustomFont';
     }
+
+    .like-comment-box {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #444;
+    }
+.answer-box {
+  position: relative;
+  background-color: #f6f6f6;
+  border: 2px solid #ccc;
+  padding: 12px;
+  margin-bottom: 16px;
+  box-shadow: 2px 2px 0 #ccc;
+  font-family: 'MyCustomFont';
+  margin-right: 48px; /* 아바타 여백 확보 */
+  border-radius: 8px;
+}
+
+.answer-box::before {
+  content: "";
+  position: absolute;
+  top: 30px;
+  right: -16px;
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 16px solid #f6f6f6;
+}
+    .answer-meta {
+      font-size: 12px;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+    .no-answer {
+      color: #777;
+      margin-bottom: 20px;
+    }
+.adopted-label {
+  display: inline-block;
+  font-size: 14px;
+  font-weight: bold;
+  background-color: #ffe066;
+  padding: 6px 12px;
+  margin-left: 6px;
+  border: 2px solid #caa911;
+  border-radius: 4px;
+  color: #3c2e1e;
+  box-shadow: 2px 2px 0 #b9a782;
+  font-family: 'MyCustomFont';
+}
+.comment-container {
+  margin-top: 8px;
+  padding: 8px;
+  background: #fff; /* 마음에 든 박스 색감 유지 */
+  border: 1px dashed #bbb;
+  font-size: 12px;
+  font-family: 'MyCustomFont';
+}
+
+/* 내부 댓글 리스트 + 폼: 투명하게 만들기 */
+.comment-box {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  
+}
+.comment-input {
+  font-family: 'Apple SD Gothic Neo', sans-serif;
+  font-size: 12px;
+  padding: 4px;
+  background: transparent;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  flex: 1;
+}
+.avatar-question {
+  float: left;
+  width: 120px;
+  height: 140px;
+  margin-right: -160px;   /* 박스와 거리 확보 */
+  margin-left: -80px;     /* 아예 왼쪽으로 빼버림 */
+  margin-top: -8px;
+  border-radius: 8px;
+  box-shadow: 3px 3px 0 #5a4a2f;
+  object-fit: cover;
+}
+.avatar-answer {
+  float: right;
+  width: 120px;
+  height: 140px;
+  margin-left: -180px;   /* 말풍선에서 확실히 멀어짐 */
+  margin-right: -100px;  /* 오른쪽 여백 확보해서 더 오른쪽으로 밀림 */
+  margin-top: -8px;
+  border-radius: 8px;
+  box-shadow: -3px 3px 0 #888;
+  object-fit: cover;
+}
+.profile-box {
+  width: 100px;  /* ✅ 가로도 줄임 */
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid #5a4a2f;
+  border-radius: 8px;
+  padding: 4px 5px;
+  font-size: 9.5px;
+  font-family: 'MyCustomFont';
+  margin-top: 6px;
+  box-shadow: 2px 2px 0 #b9a782;
+  line-height: 1.1;
+}
+
+.profile-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.profile-cell {
+  width: 48%;
+  text-align: center;
+  font-weight: bold;
+  color: #3c2e1e;
+  font-size: 9.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+
   </style>
-
-  <!-- 질문 블럭 -->
-  <div class="question-box">
-    <div class="question-title">
-      {{ question.title }}
-      <span class="category-badge">
-        {% if question.category == 'college' %}🏫 대학선배
-        {% elif question.category == 'life' %}🌱 인생선배
-        {% elif question.category == 'love' %}💘 연애선배
-        {% elif question.category == 'house' %}🏠 자취선배
-        {% elif question.category == 'job' %}💼 취업선배
-        {% elif question.category == 'money' %}💳 지갑선배
-        {% elif question.category == 'fitness' %}💪 운동선배
-        {% else %}📌 기타
-        {% endif %}
-      </span>
-    </div>
-    <p>{{ question.content }}</p>
-    <div class="question-meta">
-      작성자: {{ question.author.nickname }} |
-      작성일: {{ question.created_at|date:"Y-m-d H:i" }}
-    </div>
-  </div>
-
-  <!-- 답변 리스트 -->
-  <h3>💬 답변</h3>
-  {% for answer in question.answers.all %}
-    <div class="answer-box">
-      <p>{{ answer.content }}</p>
-      <div class="answer-meta">
-        ⬩ {{ answer.author.nickname }} | {{ answer.created_at|date:"Y-m-d H:i" }}
+</head>
+<body>
+  <div class="container">
+    <div class="top-nav">
+      <div class="menu-left">
+        <a href="{% url 'index' %}" class="menu-box home-link"></a>
+        <a href="{% url 'board:post_list' %}" class="menu-box">커뮤니티</a>
+        <a href="{% url 'mentor:mentor_home' %}" class="menu-box">멘토멘티</a>
+        <a href="#" class="menu-box">마이페이지</a>
+        <a href="#" class="menu-box">청년정책</a>
       </div>
     </div>
-  {% empty %}
-    <p>아직 답변이 없습니다.</p>
-  {% endfor %}
+ <div style="float: left; width: 120px; margin-left: -80px; margin-top: -8px;">
+  <!-- 아바타 이미지 -->
+  <img src="{% static 'images/avatar_pixel.png' %}" 
+       alt="질문자 아바타" 
+       class="avatar-question" 
+       style="margin: 0; float: none;" />
 
-  <!-- 답변하기/멘토링 신청 버튼 -->
+  <!-- 네모 상자: 유저 정보 -->
+<div class="profile-box" style="width: 100px; padding: 6px 4px; font-size: 13px; text-align: center;">
+  👤 {{ question.author.nickname }}
+</div>
+</div>
 
-  <div class="action-buttons">
-    {% if request.user.is_authenticated %}
-      {% if request.user.id != question.author.user.id %}
-        <a href="{% url 'mentor:mentor_request' question.author.id %}">🤝 멘토링 신청</a>
-      {% else %}
-        <a href="{% url 'mentor:answer_create' question.id %}">✍ 답변 작성하기</a>
-      {% endif %}
+
+<!-- 질문 박스: margin-left만 추가 -->
+<div class="question-box" style="margin-left: 64px;">
+  <div class="question-title">
+    {{ question.title }}
+    <span class="category-badge {{ question.category }}">
+      {% if question.category == 'college' %}🏫 대학선배
+      {% elif question.category == 'life' %}🌱 인생선배
+      {% elif question.category == 'love' %}💘 연애선배
+      {% elif question.category == 'house' %}🏠 자취선배
+      {% elif question.category == 'job' %}💼 취업선배
+      {% elif question.category == 'money' %}💳 지갑선배
+      {% elif question.category == 'fitness' %}💪 운동선배
+      {% else %}📌 기타{% endif %}
+    </span>
+  </div>
+  <div class="question-meta">
+    👤 {{ question.author.nickname }} | {{ question.created_at|date:"Y-m-d H:i" }}
+  </div>
+  <p>{{ question.content }}</p>
+{% load static %}
+<div class="like-box-wrapper" style="
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;  /* 👈 오른쪽도 여유 주면 조회수랑 같이 줄 정렬 가능 */
+  display: flex;
+  justify-content: space-between;  /* 👈 왼쪽/오른쪽으로 분산 정렬 */
+  align-items: center;
+  background-color: #999;
+  border: 2.5px solid #4d4d4d;
+  box-shadow: 3px 3px 0 #666;
+  padding: 6px 12px;
+  font-family: 'MyCustomFont';
+  color: #fff;
+  gap: 16px;
+">
+  <!-- 왼쪽: 좋아요/답변수/궁금해요 -->
+  <div style="display: flex; gap: 16px; align-items: center;">
+    <form method="post" action="{% url 'mentor:question_like' question.pk %}" style="display:flex; align-items:center;">
+  {% csrf_token %}
+  <button type="submit" style="background:none; border:none; padding:0; cursor:pointer;">
+    <img src="{% if request.user in question.likes.all %}
+                {% static 'images/12.png' %}
+              {% else %}
+                {% static 'images/13.png' %}
+              {% endif %}"
+         alt="like"
+         style="width: 16px; height: 14px; margin-right: 4px;" />
+  </button>
+  <span style="font-size: 12px; color:#f66;">{{ question.likes.count }}</span>
+</form>
+
+    <div style="font-size: 12px;">💬 {{ question.answers.count }}개</div>
+
+    <form method="post" action="{% url 'mentor:question_curious' question.pk %}" 
+      style="background-color: #eee; color: #090a0a; border: 2px solid #5a4a2f; box-shadow: 2px 2px 0 #888; padding: 2px 8px; font-size: 12px; font-family: 'MyCustomFont'; display: flex; align-items: center; gap: 4px;">
+  {% csrf_token %}
+  <button type="submit" style="background:none; border:none; font-size:12px; cursor:pointer; font-family: 'MyCustomFont'; color:#111214;">
+    ❓ 나도 궁금해요  
+  </button>
+  <strong style="color:#06111c; font-size: 12px;">{{ question.curious.count }}</strong>
+</form>
+
+  </div>
+
+  <!-- 오른쪽: 조회수 -->
+  <div style="font-size: 12px; color: #eee;">
+     조회수 {{ question.views }}회
+  </div>
+</div>
+
+</div>
+{% if request.user.is_authenticated %}
+<div class="action-buttons" style="
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  margin-left: 70px;  /* ✅ 질문박스와 맞추기 위해 추가 */
+">
+    <a href="{% url 'mentor:answer_create' question.id %}">✍ 답변 작성하기</a>
+
+    <!-- 오른쪽: 질문 삭제 -->
+    {% if request.user == question.author.user %}
+      <button onclick="location.href='{% url 'mentor:question_delete' question.pk %}'" style="
+        background-color: #ff9900;
+        color: white;
+        padding: 6px 12px;
+        font-size: 14px;
+        text-decoration: none;
+        font-weight: bold;
+        border: 2px solid #3c2e1e;
+        box-shadow: 2px 2px 0 #d87c00;
+        font-family: 'MyCustomFont';
+        cursor: pointer;
+      ">🗑 질문 삭제</button>
     {% endif %}
   </div>
-  
+{% endif %}
 
-{% endblock %}
+    <h3>💬 답변</h3>
+    {% for answer in answers %}
+<!-- 답변자 아바타 + 프로필 박스 묶음 -->
+<div style="float: right; width: 120px; margin-right: -100px; margin-top: -8px;">
+  <img src="{% static 'images/avatar_pixel.png' %}" 
+       alt="답변자 아바타" 
+       class="avatar-answer" 
+       style="margin: 0; float: none;" />
+
+  <div class="profile-box" style="width: 120px; padding: 6px 6px; font-size: 12px; text-align: center; margin-top: 4px;">
+    <div style="margin-bottom: 2px;">👤 {{ answer.author.nickname }}</div>
+    <div style="margin-bottom: 2px;">💼 {{ answer.author.job_title }}</div>
+    <div>💠 {{ answer.author.points }}점</div>
+  </div>
+</div>
+      <div class="answer-box">
+        <div class="answer-meta">
+          👤 {{ answer.author.nickname }} | {{ answer.created_at|date:"Y-m-d H:i" }}
+          {% if answer.is_adopted %}
+            <span class="adopted-label">채택됨</span>
+          {% endif %}
+        </div>
+        <p>{{ answer.content }}</p>
+  {% if request.user == question.author.user %}
+  <form method="post" action="{% url 'mentor:answer_adopt' answer.pk %}" style="margin-top: 6px; text-align: right;">
+    {% csrf_token %}
+    <button type="submit" style="
+      background-color: {% if answer.is_adopted %}#ddd{% else %}#ffe066{% endif %};
+      color: #3c2e1e;
+      font-size: 11px;
+      padding: 3px 8px;
+      border: 1.5px solid #caa911;
+      box-shadow: 1.5px 1.5px 0 #b9a782;
+      font-family: 'MyCustomFont';
+      cursor: pointer;
+    ">
+      {% if answer.is_adopted %}
+        ❎ 채택 취소
+      {% else %}
+        ✅ 채택하기
+      {% endif %}
+    </button>
+  </form>
+{% endif %}
+
+        <div class="like-comment-box">
+          ❤️ {{ answer.likes }} · 💬 댓글 0 (예시)
+        </div>
+ <div class="comment-container" style="margin-top:8px; font-family:'MyCustomFont', sans-serif;">
+  <!-- 댓글 리스트 -->
+  <div id="comments-{{ answer.id }}">
+    {% for comment in answer.comments.all %}
+      <div class="comment-item" style="margin-bottom:6px;">
+        👤 <strong>{{ comment.author.nickname }}</strong> |
+        {{ comment.created_at|date:"Y-m-d H:i" }}<br>
+        {{ comment.content }}
+      </div>
+    {% empty %}
+      <div class="comment-item no-comment" id="no-comment-{{ answer.id }}" style="color:#777; margin-bottom:6px;">
+        
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- 댓글 입력 폼 -->
+  {% if request.user.is_authenticated %}
+    <form method="post" action="{% url 'mentor:comment_create' answer.id %}"
+          style="margin-top:6px; display:flex; background:transparent; border:none; padding:0;"
+          onsubmit="document.getElementById('no-comment-{{ answer.id }}')?.remove();">
+      {% csrf_token %}
+      <input name="content"
+            class="content-input"
+             placeholder="댓글 달기…"
+             required
+             style="flex:1; font-size:12px; padding:4px; background:transparent; border:1px solid #ccc; border-radius:4px;"
+             onfocus="document.getElementById('no-comment-{{ answer.id }}')?.remove()" />
+      <button type="submit"
+              style="margin-left:4px; font-size:12px; padding:4px 8px; background:#007aff; color:white; border:none; border-radius:4px;">
+        댓글
+      </button>
+    </form>
+  {% endif %}
+</div>
+
+        
+
+        {% if request.user.is_authenticated and request.user != answer.author.user %}
+          <div style="margin-top: 10px;">
+            <a href="{% url 'mentor:mentor_request_direct' answer.author.id %}">
+              <button style="
+                font-size: 13px;
+                font-family: 'MyCustomFont';
+                padding: 6px 12px;
+                background-color: #007aff;
+                color: white;
+                border: 2px solid #3c2e1e;
+                box-shadow: 2px 2px 0 #b9a782;
+                cursor: pointer;
+              ">💬 조언 구하기</button>
+            </a>
+          </div>
+        {% endif %}
+
+        {% if request.user.is_authenticated and request.user == answer.author.user %}
+          <div style="margin-top: 10px; text-align: right;">
+            <a href="{% url 'mentor:answer_delete' answer.pk %}">
+              <button style="
+                font-size: 13px;
+                font-family: 'MyCustomFont';
+                padding: 6px 12px;
+                background-color: #ff9900;
+                color: white;
+                border: 2px solid #3c2e1e;
+                box-shadow: 2px 2px 0 #d87c00;
+                cursor: pointer;
+              ">🗑 답변 삭제</button>
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    {% empty %}
+      <p class="no-answer">아직 답변이 없습니다.</p>
+    {% endfor %}
+
+   
+  </div>
+</body>
+</html>

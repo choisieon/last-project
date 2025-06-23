@@ -1,5 +1,9 @@
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+load_dotenv()
+
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,7 +35,6 @@ INSTALLED_APPS = [
     'community',
     'accounts',
     'board.apps.BoardConfig',   # 사용자 프로필/팔로우
-    'mentor.apps.MentorConfig',  # mentor 대신 , mentor 와 같음
     'tinymce',
     'taggit.apps.TaggitAppConfig',
     'taggit_templatetags2',
@@ -45,6 +48,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.kakao',  # 카카오 로그인
     'allauth.socialaccount.providers.naver',  # 네이버 로그인
     'allauth.socialaccount.providers.google', # 구글 로그인
+    'mentor.apps.MentorConfig',
+    'advice',
 ]
 
 MIDDLEWARE = [
@@ -144,10 +149,6 @@ AUTH_USER_MODEL = 'accounts.User'
 
 
 
-
-
-
-
 SITE_ID = 2
 
 AUTHENTICATION_BACKENDS = (
@@ -203,7 +204,7 @@ SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_LOGIN_ON_GET = True
 ACCOUNT_ADAPTER = 'allauth.account.adapter.DefaultAccountAdapter'
 
-
+LOGIN_URL = '/accounts/login/'
 
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -229,3 +230,4 @@ SOCIALACCOUNT_PROVIDERS = {
         },
     }
 }
+

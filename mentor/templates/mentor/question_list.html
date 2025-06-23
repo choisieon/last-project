@@ -73,9 +73,6 @@
       box-shadow: 2px 2px 0 #b9a782;
       padding: 12px;
     }
-    .post-item.mentoring {
-      border-color: #007aff;
-    }
     .post-header {
       display: flex;
       align-items: center;
@@ -123,25 +120,51 @@
       font-family: 'MyCustomFont';
       cursor: pointer;
     }
+    .sub-category-bar button.active {
+    color: #007aff;
+    border-color: #007aff;
+    font-weight: bold;
+  }
   </style>
 </head>
 <body>
   <div class="wrapper">
-    <h2>💬 멘토멘티 문답 리스트</h2>
+    <h2>💬 멘토멘티 문단 리스트</h2>
+    <div class="meta-info">
+  👀 {{ question.views }} |  
+  <button class="like-btn" onclick="location.href='{% url 'mentor:question_like' question.id %}'">
+    {% if question.user_has_liked %}
+      <img src="{% static 'images/heart_filled.png' %}" alt="좋아요" />
+    {% else %}
+      <img src="{% static 'images/heart_empty.png' %}" alt="좋아요" />
+    {% endif %}
+    {{ question.likes }}
+  </button> |
+  💬 {{ question.answers.count }}
+</div>
 
-    <!-- 카테고리 필터 -->
+    <div class="sub-category-bar">
+  {% for code, label in categories.items %}
+    <button
+      onclick="location.href='?category={{ code }}{% if sort %}&sort={{ sort }}{% endif %}'"
+      class="{% if current_category == code %}active{% endif %}"
+    >
+      {{ label }}
+    </button>
+  {% endfor %}
+</div>
+
+<div class="filter-options" id="filterOptions">
+  <a href="?category={{ current_category }}&sort=latest"><button class="{% if sort == 'latest' %}active{% endif %}">🆕 최신순</button></a>
+  <a href="?category={{ current_category }}&sort=views"><button class="{% if sort == 'views' %}active{% endif %}">👀 조회순</button></a>
+  <a href="?category={{ current_category }}&sort=likes"><button class="{% if sort == 'likes' %}active{% endif %}">❤️ 공감순</button></a>
+  <a href="?category={{ current_category }}&sort=answers"><button class="{% if sort == 'answers' %}active{% endif %}">💬 답변순</button></a>
+</div>
+    
     <div class="category-bar">
       <button class="active">전체</button>
-      <button>인생선배</button>
-      <button>대학선배</button>
-      <button>연애선배</button>
-      <button>자취선배</button>
-      <button>취업선배</button>
-      <button>지갑선배</button>
-      <button>운동선배</button>
+      <button>인생선배</button><button>대학선배</button><button>연애선배</button><button>자취선배</button><button>취업선배</button><button>지갑선배</button><button>운동선배</button>
     </div>
-
-    <!-- 정렬 필터 -->
     <div class="category-bar">
       <a href="?sort=latest"><button class="{% if sort == 'latest' %}active{% endif %}">최신순</button></a>
       <a href="?sort=views"><button class="{% if sort == 'views' %}active{% endif %}">조회순</button></a>
@@ -151,38 +174,43 @@
 
     <button class="write-btn" onclick="location.href='{% url 'mentor:question_create' %}'">글쓰기</button>
 
-    <!-- 질문 리스트 -->
     <div class="post-list">
       {% for question in questions %}
-        <div class="post-item {% if question.is_promoted_to_mentoring %}mentoring{% endif %}">
+        <div class="post-item">
           <div class="post-header">
             <span class="category-badge">
-              {% if question.category == 'college' %}🏫 대학선배{% elif question.category == 'life' %}🌱 인생선배
-              {% elif question.category == 'love' %}💘 연애선배{% elif question.category == 'house' %}🏠 자취선배
-              {% elif question.category == 'job' %}💼 취업선배{% elif question.category == 'money' %}💳 지갑선배
-              {% elif question.category == 'fitness' %}💪 운동선배{% else %}📌 기타{% endif %}
+              {% if question.category == 'college' %}🏫 대학선박
+              {% elif question.category == 'life' %}🌱 인생선박
+              {% elif question.category == 'love' %}💘 연애선박
+              {% elif question.category == 'house' %}🏠 자치선박
+              {% elif question.category == 'job' %}💼 친역선박
+              {% elif question.category == 'money' %}💳 지갑선박
+              {% elif question.category == 'fitness' %}💪 운동선박
+              {% else %}📌 기타{% endif %}
             </span>
             <h4 class="post-title">
               <a href="{% url 'mentor:question_detail' question.id %}">{{ question.title }}</a>
             </h4>
           </div>
-
           <p class="post-preview">{{ question.content|truncatechars:60 }}</p>
-
           <div class="meta-info">
             조회수: {{ question.views }} | 공감: {{ question.likes }} | 답변: {{ question.answers.count }} |
             {{ question.created_at|date:"Y-m-d H:i" }}
           </div>
-
           <div class="post-footer">
             <div class="mentor-info">
               👤 <strong>{{ question.author.nickname }}</strong> |
               {{ question.author.bio|default:"소개 없음" }}
-              <button class="mentor-profile-btn" onclick="location.href='/mentor/profile/{{ question.author.id }}'">프로필</button>
-            </div>
-            {% if question.is_promoted_to_mentoring %}
-              <button class="apply-mentoring-btn">멘토링 진행중..</button>
-            {% endif %}
+              <button class="mentor-profile-btn" onclick="location.href='/mentor/profile/{{ question.author.id }}'">프리포일</button>
+            
+      </div>
+            {% with answer=question.answers.all.0 %}
+            {% if question.first_answer %}
+  <a href="{% url 'mentor:mentor_request_direct' question.first_answer.author.id %}">
+    <button class="apply-mentoring-btn">💬 이 답변자에게 조언 구하기</button>
+  </a>
+{% endif %}
+            {% endwith %}
           </div>
         </div>
       {% empty %}

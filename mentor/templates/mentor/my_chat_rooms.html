@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h2>💬 나의 채팅방</h2>
+  <ul>
+    {% for room in rooms %}
+      <li>
+        🧑 멘토: {{ room.mentor_request.mentor.nickname }} |
+        <a href="{% url 'mentor:chat_room' room.id %}">채팅 들어가기</a>
+      </li>
+    {% empty %}
+      <li>아직 채팅방이 없어요.</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

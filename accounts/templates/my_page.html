@@ -1,0 +1,104 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>마이페이지 - 인생 보드게임</title>
+  <link rel="stylesheet" href="{% static 'css/profile.css' %}" />
+</head>
+<body>
+  <h1>나의 인생 마이페이지</h1>
+
+  <!-- 상단: 프로필 + 정책 -->
+  <div class="top-section">
+    <div class="profile-box">
+      <div class="avatar-section">
+        {% if profile.avatar_image %}
+          <img id="avatarImg" src="{{ profile.avatar_image.url }}" alt="아바타" width="100" height="100">
+        {% elif profile.avatar_url %}
+          <img id="avatarImg" src="{{ profile.avatar_url }}" alt="아바타" width="100" height="100">
+        {% else %}
+          <p>아바타가 아직 없습니다. 아래 내용을 채워 첫 아바타를 생성하세요!</p>
+        {% endif %}
+
+        {% if profile.avatar_edit_count < 3 %}
+        <form id="avatarPromptForm" action="{% url 'accounts:upload_avatar' %}" method="post">
+          {% csrf_token %}
+          <div>
+            <label>성별:</label>
+            <input type="text" name="gender" placeholder="예: 남자 / 여자 / 중성 등">
+          </div>
+          <div>
+            <label>생김새:</label>
+            <input type="text" name="appearance" placeholder="예: 밝은 피부, 큰 눈, 귀여운 인상 등">
+          </div>
+          <div>
+            <label>머리스타일:</label>
+            <input type="text" name="hair" placeholder="예: 긴 갈색 머리, 단발, 포니테일 등">
+          </div>
+          <div>
+            <label>옷 스타일:</label>
+            <input type="text" name="outfit" placeholder="예: 교복, 후드티, 캐주얼 등">
+          </div>
+          <div>
+            <label>추가 설명 (선택):</label>
+            <textarea name="custom_detail" rows="2" placeholder="예: 고양이 귀, 무기 들고 있음, 배경에 하늘 등 자유롭게 적기"></textarea>
+          </div>
+          <div>
+            <button type="submit">아바타 {{ profile.avatar_image|yesno:"수정하기,생성하기" }} ({{ 3|add:-profile.avatar_edit_count }}회 남음)</button>
+          </div>
+        </form>
+        {% else %}
+          <p>더 이상 아바타를 수정할 수 없습니다.</p>
+        {% endif %}
+
+        <div class="nickname">{{ profile.nickname }}</div>
+      </div>
+      <div class="info-section-container">
+        <div class="info-row"><div class="info-label">레벨</div><div class="info-value">{{ profile.age_range }}</div></div>
+        <div class="info-row"><div class="info-label">직업</div><div class="info-value">{{ profile.job }}</div></div>
+        <div class="info-row"><div class="info-label">내공</div><div class="info-value">{{ profile.points }}점</div></div>
+        <div class="info-row"><div class="info-label">관심</div><div class="info-value">{{ profile.interests }}</div></div>
+        <div class="info-row"><div class="info-label">한줄</div><div class="info-value">{{ profile.tagline }}</div></div>
+      </div>
+    </div>
+    <div class="policy-banner">
+      <h3>📌 청년 정책 추천</h3>
+      <ul>
+        <li><strong>청년내일채용공제:</strong> 중소기업 재직 청년에게 목도만년 지원</li>
+        <li><strong>전세보증금 대주 이자 지원:</strong> 자치/독립 청년 대상</li>
+        <li><strong>청년 월세 지원:</strong> 만 19~34세 대상, 최대 월 20만원 지원</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 중단: 인생 그래프 + 다른사람 -->
+  <h2>🌯 나의 인생 여정</h2>
+  <div class="middle-section">
+    <svg width="100%" height="800" xmlns="http://www.w3.org/2000/svg" style="position:absolute; z-index:0;">
+      {% for path in paths %}
+        <path d="{{ path }}" stroke="#e1b382" fill="none" stroke-width="4"/>
+      {% endfor %}
+    </svg>
+    <div class="board-map" style="position:relative; z-index:1;">
+      {% for event in life_events %}
+      <div class="tile" style="width: {{ event.width }}px; height: {{ event.height }}px; left: {{ event.x }}px; top: {{ event.y|default:0 }}px;">
+        <div class="year">{{ event.date }}</div>
+        <div class="event">{{ event.title }}</div>
+        <div class="note">{{ event.note }}</div>
+        <div class="metrics"><span>{{ event.feeling }}</span><span>{{ event.score }}</span></div>
+        <div class="detail">{{ event.detail }}</div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="others-activity">
+      <h3>👥 같은 시기 다른 사람들은...</h3>
+      <div class="activity-box">
+        {% for person in others %}
+        <p>🔹 <strong>{{ person.name }}</strong> - {{ person.activity }}</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</body>
+</html>

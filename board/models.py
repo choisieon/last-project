@@ -39,7 +39,7 @@ class Comment(models.Model):
         return f"{self.author} - {self.content[:20]}"
 
 class Profile(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='boardprofile')
     nickname = models.CharField(max_length=30, blank=True)
     bio = models.TextField(blank=True)
     image = models.ImageField(upload_to='profiles/', blank=True, null=True)

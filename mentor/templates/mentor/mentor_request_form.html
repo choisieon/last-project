@@ -1,9 +1,15 @@
 {% extends 'base.html' %}
+
 {% block content %}
   <h2>멘토링 신청</h2>
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
+
+    {% if request.GET.question_id %}
+      <input type="hidden" name="question_id" value="{{ request.GET.question_id }}">
+    {% endif %}
+
     <button type="submit">신청하기</button>
   </form>
 {% endblock %}

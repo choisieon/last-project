@@ -1,6 +1,6 @@
 from django import forms
-from .models import Question, Answer, MentorRequest, UserProfile, Concern
-
+from django.apps import apps
+from .models import Question, Answer, MentorRequest, UserProfile  # 여기 OK
 
 class QuestionForm(forms.ModelForm):
     class Meta:
@@ -13,10 +13,9 @@ class QuestionForm(forms.ModelForm):
             'is_anonymous': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
-
 class OnboardingForm(forms.ModelForm):
     concerns = forms.ModelMultipleChoiceField(
-        queryset=Concern.objects.all(),
+        queryset=apps.get_model('accounts', 'Concern').objects.all(),  # ✅ 요기
         widget=forms.CheckboxSelectMultiple,
         required=False
     )
@@ -25,8 +24,6 @@ class OnboardingForm(forms.ModelForm):
         model = UserProfile
         fields = ['role', 'concerns', 'keywords']
 
-
-
 class AnswerForm(forms.ModelForm):
     class Meta:
         model = Answer
@@ -34,7 +31,6 @@ class AnswerForm(forms.ModelForm):
         widgets = {
             'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
         }
-
 
 class MentorRequestForm(forms.ModelForm):
     class Meta:
@@ -45,8 +41,13 @@ class MentorRequestForm(forms.ModelForm):
             'message': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
         }
 
-
 class UserProfileForm(forms.ModelForm):
+    concerns = forms.ModelMultipleChoiceField(
+        queryset=apps.get_model('accounts', 'Concern').objects.all(),  # ✅ 요기도
+        widget=forms.CheckboxSelectMultiple,
+        required=False
+    )
+
     class Meta:
         model = UserProfile
         fields = ['role', 'concerns', 'keywords']

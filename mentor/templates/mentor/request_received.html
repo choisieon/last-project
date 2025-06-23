@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+  @font-face {
+    font-family: 'MyCustomFont';
+    src: url("{% static 'fonts/픽셀.woff2' %}") format('woff2');
+  }
+
+  body {
+    font-family: 'MyCustomFont', monospace;
+    background-color: #000000;
+    color: #39ff14;
+  }
+
+  .received-wrapper {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+    border: 3px solid #39ff14;
+    background-color: #0a0a0a;
+    box-shadow: 0 0 12px #39ff14;
+  }
+
+  .request-box {
+    background-color: #0f0f0f;
+    border: 2px solid #39ff14;
+    box-shadow: 0 0 6px #39ff14;
+    padding: 16px;
+    margin-bottom: 18px;
+    color: #39ff14;
+  }
+
+  .request-box p {
+    font-size: 15px;
+    margin: 6px 0;
+  }
+
+  .request-box a {
+    color: #00e5ff;
+    text-decoration: underline;
+  }
+
+  .accept-btn {
+    margin-top: 10px;
+    padding: 8px 16px;
+    background-color: #39ff14;
+    color: #000;
+    font-family: 'MyCustomFont';
+    border: 2px solid #39ff14;
+    box-shadow: 2px 2px 0 #0f0;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .accept-btn:hover {
+    background-color: #66ff66;
+  }
+
+  .accepted-text {
+    background-color: #001100;
+    color: #39ff14;
+    padding: 8px;
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    border: 1px dashed #39ff14;
+  }
+
+  h2 {
+    font-size: 22px;
+    color: #66ff66;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #39ff14;
+    padding-bottom: 5px;
+    text-shadow: 0 0 3px #39ff14;
+  }
+</style>
+
+<div class="received-wrapper">
+  <h2>📥 받은 멘토링 신청</h2>
+
+  {% for req in requests %}
+    <div class="request-box">
+      <p><strong>👤 신청자:</strong> {{ req.mentee.nickname }}</p>
+      <p><strong>📝 요청 내용:</strong> {{ req.message }}</p>
+      <p><strong>⏰ 신청 시간:</strong> {{ req.created_at }}</p>
+      {% if req.question %}
+        <p><strong>🔗 관련 질문:</strong> 
+          <a href="{% url 'mentor:question_detail' req.question.id %}">{{ req.question.title }}</a>
+        </p>
+      {% endif %}
+
+      {% if not req.is_accepted %}
+        <form method="post" action="{% url 'mentor:accept_mentor_request' req.id %}">
+          {% csrf_token %}
+          <button type="submit" class="accept-btn">💬 수락하고 채팅 시작</button>
+        </form>
+      {% elif req.room %}
+        <p class="accepted-text">✅ 수락됨 - <a href="{% url 'mentor:chat_room' req.room.id %}">채팅 바로가기</a></p>
+      {% else %}
+        <p class="accepted-text">✅ 수락됨 - 채팅방 연결 준비 중</p>
+      {% endif %}
+    </div>
+  {% empty %}
+    <p class="accepted-text">아직 받은 신청이 없습니다.</p>
+  {% endfor %}
+</div>
+{% endblock %}

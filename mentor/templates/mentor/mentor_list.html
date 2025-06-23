@@ -67,8 +67,7 @@
           <p><strong>소개:</strong> {{ mentor.bio|truncatechars:50 }}</p>
           <p><strong>키워드:</strong> {{ mentor.keywords }}</p>
           <p><strong>역할:</strong> {% if mentor.role == 'mentor' %}멘토{% elif mentor.role == 'mentee' %}멘티{% else %}둘다{% endif %}</p>
-          <button class="apply-btn" onclick="location.href='/mentor/request/{{ mentor.id }}/'">멘토링 신청</button>
-        <!-- 기존 mentor-card 내부에 추가 -->
+          <button class="apply-btn" onclick="location.href='{% url 'mentor:mentor_request_direct' mentor.id %}'">멘토링 신청</button>
           <button class="apply-btn" onclick="location.href='{% url 'mentor:mentor_profile' mentor.id %}'">
   📖 선배 더 알아보기
 </button>

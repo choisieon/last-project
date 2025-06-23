@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+  @font-face {
+    font-family: 'MyCustomFont';
+    src: url("{% static 'fonts/픽셀.woff2' %}") format('woff2');
+  }
+
+  body {
+    background-color: #000;
+    color: #00FF00;
+    font-family: 'MyCustomFont', monospace;
+    font-size: 15px;
+  }
+
+  .chat-room-wrapper {
+    max-width: 900px;
+    margin: 40px auto;
+    border: 1px solid #00FF00;
+    background-color: #000;
+  }
+
+  .window-header {
+    background-color: #000;
+    color: #00FF00;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 12px;
+    font-weight: bold;
+    border-bottom: 1px solid #00FF00;
+    font-size: 14px;
+  }
+
+  .window-controls span {
+    display: inline-block;
+    border: 1px solid #00FF00;
+    padding: 0 6px;
+    margin-left: 4px;
+    cursor: default;
+  }
+
+  .chat-log {
+    background-color: #000;
+    border: none;
+    padding: 12px;
+    height: 400px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    font-size: 15px;
+  }
+
+  .message {
+    margin-bottom: 12px;
+  }
+
+  .message .sender {
+    color: #00e5ff;
+    font-weight: bold;
+  }
+
+  .message .text {
+    color: #00FF00;
+    margin-left: 12px;
+  }
+
+  .message.you {
+    text-align: right;
+  }
+
+  .message.you .text {
+    color: #66ff66;
+  }
+
+  .chat-input-form {
+    display: flex;
+    gap: 10px;
+    border-top: 1px solid #00FF00;
+    padding: 10px;
+  }
+
+  .chat-input-form input[type="text"] {
+    flex-grow: 1;
+    padding: 6px;
+    background-color: #000;
+    color: #00FF00;
+    border: 1px dashed #00FF00;
+    font-family: 'MyCustomFont', monospace;
+    font-size: 14px;
+    outline: none;
+  }
+
+  .chat-input-form input[type="text"]::placeholder {
+    color: #00FF00;
+    opacity: 0.6;
+  }
+
+  .chat-input-form button {
+    padding: 6px 10px;
+    background-color: #00FF00;
+    color: #000;
+    font-family: 'MyCustomFont', monospace;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+  }
+
+  .delete-chat {
+    text-align: right;
+    margin: 8px 12px;
+  }
+
+  .delete-chat a {
+    font-size: 12px;
+    color: #ff6600;
+    text-decoration: none;
+    border: 1px solid #ff6600;
+    padding: 4px 8px;
+    display: inline-block;
+    font-family: 'MyCustomFont', monospace;
+  }
+</style>
+
+<div class="chat-room-wrapper">
+  <div class="window-header">
+    조언가와의 만남
+    <div class="window-controls">
+      <span>-</span><span>□</span><span>X</span>
+    </div>
+  </div>
+
+  <div class="delete-chat">
+    <a href="{% url 'mentor:delete_chatroom' chatroom.id %}" onclick="return confirm('채팅방을 삭제하시겠어요?')">🗑️ 채팅방 삭제</a>
+  </div>
+
+  <div class="chat-log" id="chat-log">
+  {% for message in messages %}
+    <div class="message {% if message.sender.user == user %}you{% endif %}">
+      <div style="display: flex; justify-content: space-between; align-items: center;
+                  {% if message.sender.user == user %} flex-direction: row-reverse; text-align: right; {% endif %}">
+        <span class="sender">{{ message.sender.nickname }}</span>
+        {% if message.sender.user == user %}
+          <!-- 오른쪽 정렬일 경우 삭제 버튼이 왼쪽에 나올 수도 있음. 위치 조정 필요하면 여기에 -->
+        {% endif %}
+      </div>
+      <div class="text">{{ message.content }}</div>
+    </div>
+  {% endfor %}
+</div>
+
+
+  <form method="post" class="chat-input-form">
+    {% csrf_token %}
+    <input type="text" name="content" placeholder="메시지를 입력하세요...">
+    <button type="submit">전송</button>
+  </form>
+</div>
+
+<script>
+  function scrollToBottom() {
+    const chatLog = document.getElementById('chat-log');
+    if (chatLog) {
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
+  }
+
+  window.onload = scrollToBottom;
+
+  document.querySelector('.chat-input-form').addEventListener('submit', function () {
+    setTimeout(scrollToBottom, 100);
+  });
+</script>
+{% endblock %}
