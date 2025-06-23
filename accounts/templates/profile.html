@@ -1,0 +1,449 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>마이페이지 - 인생 보드게임</title>
+  <style>
+    @font-face {
+      font-family: 'MyCustomFont';
+      src: url("{% static 'fonts/픽셀.woff2' %}") format('woff2');
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: 'MyCustomFont', sans-serif;
+      background: url("{% static 'images/Frame 13.png' %}") no-repeat center center fixed;
+      background-size: cover;
+    }
+
+    h1 {
+      text-align: center;
+      color: #4e3b2b;
+    }
+
+    .top-container {
+      display: flex;
+      justify-content: space-between;
+      max-width: 1200px;
+      margin: 20px auto;
+    }
+
+    .profile-box {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background-color: #f3f3f3;
+      border: 4px solid #444;
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: inset 0 0 0 4px #c2a178;
+      width: 420px;
+      position: relative;
+    }
+
+    .profile-upper {
+      display: flex;
+    }
+
+    .left-profile {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 160px;
+    }
+
+    .avatar-wrapper {
+      border: 4px solid #444;
+      background: white;
+      padding: 4px;
+      border-radius: 8px;
+      margin-bottom: 6px;
+      width: 140px;
+      height: 140px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .avatar-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .nickname-box {
+      margin-top: 4px;
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
+      width: 140px;
+      background: #bde0fe;
+      border: 2px solid #444;
+      border-radius: 4px;
+      padding: 6px 0;
+    }
+
+    .right-profile {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      padding-left: 10px;
+    }
+
+    .action-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .action-buttons button {
+      background-color: #ffc107;
+      border: 3px solid #444;
+      border-radius: 6px;
+      font-family: 'MyCustomFont';
+      padding: 6px 10px;
+      font-weight: bold;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .info-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .info-row {
+      display: flex;
+    }
+
+    .info-label {
+      width: 70px;
+      background-color: #444;
+      color: white;
+      padding: 6px;
+      font-size: 13px;
+      font-weight: bold;
+      border-radius: 4px 0 0 4px;
+    }
+
+.info-value {
+  flex: 1;
+  background: white;
+  padding: 6px;
+  font-size: 13px;
+  border: 2px solid #444;
+  border-left: none;
+  border-radius: 0 4px 4px 0;
+
+  /* 👇 아래 두 줄만 추가하면 가운데 딱 맞음 */
+  display: flex;
+  align-items: center;
+}
+
+
+    
+
+    .edit-button-container {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+    }
+
+    .edit-button-container a button {
+      background-color: #8ecae6;
+      border: 2px solid #444;
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      font-family: 'MyCustomFont';
+    }
+
+
+    .middle-section {
+      max-width: 1200px;
+      margin: 40px auto;
+    }
+
+    .board-map {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+      background: #fffef9;
+      border: 4px dashed #c2a178;
+      border-radius: 32px;
+      padding: 2rem;
+    }
+
+    .tile {
+      width: 100px;
+      height: 100px;
+      background: #fff;
+      border-radius: 16px;
+      padding: 0.5rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s ease;
+      position: relative;
+      font-family: 'MyCustomFont';
+    }
+
+    .tile:hover {
+      transform: scale(1.05);
+    }
+
+    .tile .year { font-weight: bold; font-size: 0.9rem; }
+    .tile .event { font-size: 0.85rem; }
+    .tile .note { font-size: 0.75rem; color: #555; }
+    .tile .metrics {
+      font-size: 0.7rem;
+      display: flex;
+      justify-content: space-between;
+    }
+  .policy-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: #f3f3f3;
+  border: 4px solid #444;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: inset 0 0 0 4px #c2a178;
+  width: 420px;
+  height: 100%;
+  font-family: 'MyCustomFont';
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.policy-box h3 {
+  font-size: 16px;
+  margin-bottom: 10px;
+  color: #4e3b2b;
+}
+
+.policy-box ul {
+  margin-bottom: 12px;
+  padding-left: 20px;
+}
+
+.policy-box select,
+.policy-box button {
+  background-color: #8ecae6;
+  border: 2px solid #444;
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: 'MyCustomFont';
+  margin-top: 10px;
+}
+.top-container {
+  display: flex;
+  justify-content: flex-start;  /* 왼쪽 정렬 */
+  align-items: flex-start;      /* 위쪽 정렬로 맞추기 */
+  gap: 24px;                    /* 박스 간 여백 */
+  max-width: 1200px;
+  margin: 20px auto;
+}
+
+.policy-box button {
+  background-color: #ccc;
+  border: 2px solid #444;
+  border-radius: 6px;
+  cursor: not-allowed;
+}
+
+    .detail {
+      display: none;
+      position: absolute;
+      bottom: -80px;
+      left: 0;
+      width: 100%;
+      background: #fff8e1;
+      padding: 0.5rem;
+      font-size: 0.75rem;
+      color: #444;
+      border-radius: 0 0 16px 16px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      z-index: 10;
+    }
+
+    .tile:hover .detail {
+      display: block;
+    }
+
+    .form-section {
+      background-color: #fffef9;
+      border: 4px dotted #c2a178;
+      border-radius: 16px;
+      padding: 20px;
+      max-width: 800px;
+      margin: 20px auto;
+    }
+
+    .form-section input,
+    .form-section textarea {
+      margin-bottom: 8px;
+      padding: 6px;
+      width: calc(50% - 10px);
+    }
+
+    .form-section textarea {
+      width: 100%;
+    }
+
+    .form-section button {
+      margin-top: 10px;
+      padding: 6px 12px;
+      background-color: #c2a178;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>나의 인생 마이페이지</h1>
+
+  <div class="top-container" style="position: relative;">
+    <div class="profile-box">
+      <div class="profile-upper">
+        <div class="left-profile">
+          <div class="avatar-wrapper">
+            {% if profile.avatar_image %}
+            <img src="{{ profile.avatar_image.url }}" alt="아바타">
+            {% elif profile.avatar_url %}
+            <img src="{{ profile.avatar_url }}" alt="아바타">
+            {% else %}
+            <span>아바타 없음</span>
+            {% endif %}
+          </div>
+          <div class="nickname-box">{{ profile.nickname|default:"닉네임 없음" }}</div>
+        </div>
+
+        <div class="right-profile">
+          <div class="action-buttons">
+            <button class="mentor-button">멘토 신청</button>
+            <button class="review-button">후기</button>
+            <button class="recommend-button">추천</button>
+          </div>
+          <div class="info-group">
+<div class="info-row">
+  <div class="info-label">나이</div>
+  <div class="info-value">{{ profile.age }}</div>
+</div>
+<div class="info-row">
+  <div class="info-label">직업</div>
+  <div class="info-value">{{ profile.job }}</div>
+</div>
+<div class="info-row">
+  <div class="info-label">내공</div>
+  <div class="info-value">{{ profile.points|default:"00점" }}</div>
+</div>
+<div class="info-row">
+  <div class="info-label">관심</div>
+  <div class="info-value">{{ profile.interests }}</div>
+</div>
+<div class="info-row">
+  <div class="info-label">한줄 소개</div>
+  <div class="info-value">{{ profile.tagline }}</div>
+</div>
+        </div>
+      </div>
+        <div style="position: absolute; right: 0; top: calc(100% + 8px);">
+    <a href="{% url 'accounts:profile_edit' %}">
+      <button style="background-color: #8ecae6; border: 2px solid #444; border-radius: 6px; padding: 5px 12px; font-size: 12px; font-weight: bold; cursor: pointer; font-family: 'MyCustomFont';">수정하기</button>
+    </a>
+  </div>
+</div>
+        </a>
+      </div>
+    </div>
+<!-- 기존: .policy-banner 대신 이 코드로 교체 -->
+<div class="policy-banner policy-box">
+  <h3>📌 청년 정책 추천</h3>
+
+  <!-- 예비 추천 리스트 -->
+  <ul id="policy-list">
+    <li>🔍 지역과 관심사를 선택하면 맞춤 정책을 보여드려요</li>
+    <li>예: <strong>서울 청년 월세 지원</strong> - 최대 20만원</li>
+    <li>예: <strong>취업성공 패키지</strong> - 맞춤형 취업 지원</li>
+  </ul>
+
+  <!-- 정책 선택 폼은 나중에 연동할 수 있게 기본 구조만 둠 -->
+  <form method="GET" action="#">
+    <label for="region">지역 선택</label><br>
+    <select name="region" id="region">
+      <option value="">-- 선택 --</option>
+      <option value="seoul">서울</option>
+      <option value="busan">부산</option>
+      <option value="etc">그 외 지역</option>
+    </select><br><br>
+
+    <label for="interest">관심사 선택</label><br>
+    <select name="interest" id="interest">
+      <option value="">-- 선택 --</option>
+      <option value="job">취업</option>
+      <option value="housing">주거</option>
+      <option value="finance">금융지원</option>
+    </select><br><br>
+
+    <button type="button" disabled>맞춤 정책 보기 (준비중)</button>
+  </form>
+</div>
+
+  <!-- 제출 버튼 -->
+  <div class="edit-button-container" style="position: static; text-align: right; margin-top: 12px;">
+    <button type="submit">추천받기</button>
+  </div>
+  </form>
+
+  <!-- 추천된 정책 예시 -->
+  <ul style="margin-top: 12px; font-size: 13px;">
+    <li><strong>청년내일채움공제:</strong> 중소기업 재직 청년에게 목돈 마련 지원</li>
+    <li><strong>청년 월세 지원:</strong> 만 19~34세, 최대 월 20만원</li>
+  </ul>
+</div>
+
+  <div class="middle-section">
+    <h2>🎲 나의 인생 여정</h2>
+    <div class="board-map">
+      {% for event in life_events %}
+      <div class="tile">
+        <div class="year">{{ event.date }}</div>
+        <div class="event">{{ event.title }}</div>
+        <div class="note">{{ event.note }}</div>
+        <div class="metrics"><span>{{ event.feeling }}</span><span>{{ event.score }}</span></div>
+        <div class="detail">{{ event.detail }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="form-section">
+    <h3>➕ 새로운 인생 이벤트 추가하기</h3>
+    <form action="{% url 'accounts:add_life_event' %}" method="post">
+      {% csrf_token %}
+      <input type="text" name="date" placeholder="예: 2025년 4월" required />
+      <input type="text" name="title" placeholder="이벤트 제목" required />
+      <input type="text" name="note" placeholder="간단 메모" />
+      <input type="text" name="feeling" placeholder="기분점수" />
+      <input type="text" name="score" placeholder="성과점수" />
+      <textarea name="detail" placeholder="상세 내용" rows="2"></textarea>
+      <button type="submit">이벤트 추가하기</button>
+    </form>
+  </div>
+</body>
+</html>

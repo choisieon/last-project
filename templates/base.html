@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">  
   <meta charset="UTF-8" />
   <title>{% block title %}청설모{% endblock %}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -175,11 +176,17 @@
         <a href="#" class="menu-box {% block nav_policy_active %}{% endblock %}">청년정책</a>
       </div>
 
-      <div class="menu-right">
-        <a href="{% url 'post_new' %}" class="write-btn">글쓰기</a>
-        <div class="login-info">홍길동님 환영합니다</div>
-      </div>
-
+    <div class="menu-right">
+ 
+    {% if user.is_authenticated %}
+    <a href="{% url 'post_new' %}" class="write-btn">글쓰기</a>
+    <div class="login-info">{{user.username}}님 환영합니다</div>
+    {% else %}
+    <a href="{% url 'accounts:login' %}?next={% url 'post_new' %}" class="write-btn">글쓰기</a>
+    <!-- <div class="login-info">{{user.username}}님 환영합니다</div> -->
+    <a href="{% url 'accounts:login' %}" class="write-btn">로그인</a>
+    {% endif %}
+  </div>
     </div>
     {% block category_bar %}{% endblock %}
     {% block search_bar %}{% endblock %}
@@ -187,3 +194,4 @@
   </div>
 </body>
 </html>
+

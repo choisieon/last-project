@@ -1,0 +1,189 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>청설모 우체통</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    @font-face {
+      font-family: 'MyCustomFont';
+      src: url("{% static 'fonts/픽셀.woff2' %}") format('woff2');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    body {
+      font-family: 'MyCustomFont', sans-serif;
+      background: url("{% static 'images/Frame 13.png' %}") no-repeat center top fixed;
+      background-size: cover;
+      margin: 0;
+      padding: 0;
+    }
+
+    .wrapper {
+      max-width: 1200px;
+      margin: 80px auto 40px;
+      padding: 0 20px;
+      display: flex;
+      gap: 24px;
+    }
+
+    .left-panel {
+      flex: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      background-color: rgba(250, 235, 180, 0.9);
+      background-image: url("{% static 'images/pixel-paper.png' %}");
+      background-size: 4px 4px;
+      background-repeat: repeat;
+      border: 2.5px solid #5a4a2f;
+      box-shadow: 3px 3px 0 #b9a782;
+      padding: 20px;
+      height: 600px;
+      overflow-y: auto;
+    }
+
+    .right-panel {
+      flex: 1;
+      background-color: rgba(250, 235, 180, 0.9);
+      background-image: url("{% static 'images/pixel-paper.png' %}");
+      background-size: 4px 4px;
+      background-repeat: repeat;
+      border: 2.5px solid #5a4a2f;
+      box-shadow: 3px 3px 0 #b9a782;
+      padding: 20px;
+      height: 600px;
+      overflow-y: auto;
+    }
+
+    .section {
+      flex: 1;
+      border-top: 2px dashed #9a7c4f;
+      padding-top: 10px;
+    }
+
+    .section h3 {
+      margin-bottom: 10px;
+      font-size: 16px;
+      color: #3c2e1e;
+    }
+
+    .chat-room, .request-item {
+      margin-bottom: 12px;
+      padding: 8px;
+      background-color: #fffbe0;
+      border: 1px solid #bca76b;
+    }
+
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .top-nav {
+      display: flex;
+      justify-content: flex-start;
+      gap: 12px;
+      background-color: rgba(250, 235, 180, 0.9);
+      background-image: url("{% static 'images/pixel-paper.png' %}");
+      background-size: 4px 4px;
+      border: 2.5px solid #5a4a2f;
+      box-shadow: 3px 3px 0 #b9a782;
+      padding: 8px 16px;
+      position: fixed;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+    }
+
+    .top-nav a {
+      text-decoration: none;
+      color: #3c2e1e;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .delete-btn {
+      color: red;
+      text-decoration: none;
+      font-weight: bold;
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-nav">
+    <a href="{% url 'post_list' %}">커뮤니티</a>
+    <a href="{% url 'mentor:mentor_home' %}">선배찾기</a>
+    <a href="{% url 'accounts:my_page' %}">마이페이지</a>
+    <a href="{% url 'youth_policy:basic_page' %}">청년정책</a>
+  </div>
+
+  <form method="post" action="{% url 'mentor:delete_chatrooms' %}">
+    {% csrf_token %}
+    <div class="wrapper">
+      <div class="left-panel">
+        <div class="section">
+          <h3>📤 내가 신청한 조언</h3>
+          {% for req in sent_requests %}
+            {% if not req.is_accepted %}
+              <div class="request-item">
+                {{ req.mentor.nickname }} 선배님께 보낸 신청 ({{ req.created_at|date:"Y-m-d H:i" }})<br>
+                <strong>내용:</strong> {{ req.message }}<br>
+                <span>🕒 대기중</span>
+                <a href="{% url 'mentor:delete_mentor_request' req.id %}" class="delete-btn">❌ 삭제</a>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <div class="section">
+          <h3>📥 나에게 온 조언 요청</h3>
+          {% for req in received_requests %}
+            {% if not req.is_accepted %}
+              <div class="request-item">
+                {{ req.mentee.nickname }}님이 보낸 신청 ({{ req.created_at|date:"Y-m-d H:i" }})<br>
+                <strong>내용:</strong> {{ req.message }}<br>
+                <a href="{% url 'mentor:accept_mentor_request' req.id %}">✅ 수락</a>
+                <a href="{% url 'mentor:delete_mentor_request' req.id %}" class="delete-btn">❌ 삭제</a>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="right-panel">
+        <h3>💬 채팅방 목록 <input type="checkbox" id="select-all-chat"> 전체 선택</h3>
+        {% for room in chat_rooms %}
+          {% if room.id %}
+            <div class="chat-room">
+              <div class="checkbox-container">
+                <input type="checkbox" name="delete_rooms" value="{{ room.id }}">
+                <div>
+                  {{ room.mentor_request.mentee.nickname }} ↔ {{ room.mentor_request.mentor.nickname }}<br>
+                  생성일: {{ room.created_at|date:"Y-m-d H:i" }}<br>
+                  <a href="{% url 'mentor:chat_room' room.id %}">채팅방 입장</a>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        {% empty %}
+          <div>열린 채팅방이 없습니다.</div>
+        {% endfor %}
+        <button type="submit">선택 삭제</button>
+      </div>
+    </div>
+  </form>
+
+  <script>
+    document.getElementById('select-all-chat').addEventListener('change', function() {
+      const checkboxes = document.querySelectorAll('input[name="delete_rooms"]');
+      checkboxes.forEach(cb => cb.checked = this.checked);
+    });
+  </script>
+</body>
+</html>

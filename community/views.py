@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from .models import Post
+from mentor.models import MentorRequest, ChatRoom
+from accounts.models import UserProfile
 
 # Create your views here.
 

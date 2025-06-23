@@ -1,44 +1,20 @@
 from django.contrib import admin
-from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import UserProfile, Question, Answer, MentorRequest, Message, Concern
+from django.contrib.auth import get_user_model
+
+# Concern은 accounts에서 import!
+from accounts.models import UserProfile, Concern
+
+from mentor.models import Question, Answer, MentorRequest, Message, ChatRoom, ChatMessage
+
+User = get_user_model()  # accounts.User 커스텀 유저 모델
 
 # Concern 관리
 @admin.register(Concern)
 class ConcernAdmin(admin.ModelAdmin):
     list_display = ('name',)
 
-# UserProfile을 User에 붙이기
-class UserProfileInline(admin.StackedInline):
-    model = UserProfile
-    can_delete = False
-
-class CustomUserAdmin(BaseUserAdmin):
-    inlines = (UserProfileInline,)
-
-# ✅ 오류 방지: 먼저 등록됐는지 모르니 try-except로 감싸기
-try:
-    admin.site.unregister(User)
-except admin.sites.NotRegistered:
-    pass
-
-# User + UserProfile 같이 등록
-admin.site.register(User, CustomUserAdmin)
-
-# 나머지 모델 등록
-admin.site.register(UserProfile)
-admin.site.register(Question)
-admin.site.register(Answer)
-admin.site.register(MentorRequest)
-admin.site.register(Message)
-
-from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from django.contrib.auth import get_user_model
-from mentor.models import UserProfile  # UserProfile은 mentor.models에 있음
-
-User = get_user_model()  # 👉 이게 accounts.User를 가져옴!
-
+# UserProfile을 User에 붙이기 위한 Inline
 class UserProfileInline(admin.StackedInline):
     model = UserProfile
     can_delete = False
@@ -47,10 +23,19 @@ class UserProfileInline(admin.StackedInline):
 class CustomUserAdmin(BaseUserAdmin):
     inlines = [UserProfileInline]
 
-# 이미 등록돼 있을 수 있으니 안전하게 try-except
+# 이미 등록된 User 모델이면 해제 후 다시 등록
 try:
     admin.site.unregister(User)
 except admin.sites.NotRegistered:
     pass
 
 admin.site.register(User, CustomUserAdmin)
+
+# 나머지 모델 등록
+# admin.site.register(UserProfile)
+admin.site.register(Question)
+admin.site.register(Answer)
+admin.site.register(MentorRequest)
+admin.site.register(Message)
+admin.site.register(ChatRoom)
+admin.site.register(ChatMessage)

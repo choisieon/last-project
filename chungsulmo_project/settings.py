@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+load_dotenv()
+
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -52,6 +56,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.naver',  # 네이버 로그인
     'allauth.socialaccount.providers.google', # 구글 로그인
     'mentor.apps.MentorConfig',
+    'advice',
 ]
 
 MIDDLEWARE = [
@@ -77,6 +82,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'mentor.context_processors.mentor_notifications',
             ],
         },
     },
@@ -146,10 +152,6 @@ AUTH_USER_MODEL = 'accounts.User'
 
 
 
-
-
-
-
 SITE_ID = 2
 
 AUTHENTICATION_BACKENDS = (
@@ -165,7 +167,7 @@ SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_LOGIN_ON_GET = True
 ACCOUNT_ADAPTER = 'allauth.account.adapter.DefaultAccountAdapter'
 
-
+LOGIN_URL = '/accounts/login/'
 
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -177,7 +179,7 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     },
     'kakao': {
-        'SCOPE': ['account_email', 'profile_nickname'],
+        'SCOPE': ['profile_nickname'],
         'AUTH_PARAMS': {
             "response_type": "code",
             'prompt': 'login'
@@ -191,3 +193,4 @@ SOCIALACCOUNT_PROVIDERS = {
         },
     }
 }
+

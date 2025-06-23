@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+  <h2>프로필 수정</h2>
+
+  <form method="POST">
+    {% csrf_token %}
+
+    <!-- 아바타 생성용 프롬프트 입력 -->
+<p>
+  <label for="avatar_prompt">아바타 생성 프롬프트</label><br>
+  <input type="text" name="avatar_prompt" id="avatar_prompt"
+         placeholder="예: 큰 눈, 단정한 머리, 교복 스타일"
+         style="width: 80%;"
+         {% if user.userprofile.avatar_edit_count >= 1 %}disabled value="아바타는 한 번만 생성 가능합니다."{% endif %}>
+</p>
+    
+    <p>
+      <label for="nickname">닉네임</label><br>
+      <input type="text" name="nickname" id="nickname" value="{{ form.nickname.value|default_if_none:'' }}" required>
+    </p>
+
+    <p>
+      <label for="age">나이</label><br>
+      <input type="text" name="age" id="age" value="{{ form.age.value|default_if_none:'' }}">
+    </p>
+
+    <p>
+      <label for="job">직업</label><br>
+      <input type="text" name="job" id="job" value="{{ form.job.value|default_if_none:'' }}">
+    </p>
+
+    <p>
+      <label for="points">내공</label><br>
+      <input type="number" name="points" id="points" value="{{ form.points.value|default_if_none:'' }}">
+    </p>
+
+    <p>
+      <label for="interests">관심 키워드</label><br>
+      <input type="text" name="interests" id="interests" placeholder="예: 자취, 운동, 취업" value="{{ form.interests.value|default_if_none:'' }}">
+    </p>
+
+    <p>
+      <label for="tagline">한줄 소개</label><br>
+      <input type="text" name="tagline" id="tagline" placeholder="예: 나만의 인생설계를 찾아서" value="{{ form.tagline.value|default_if_none:'' }}">
+    </p>
+
+    <button type="submit">저장 / 아바타 생성하기</button>
+  </form>
+
+  {% if user.userprofile.avatar_image %}
+    <h3>내 아바타 미리보기</h3>
+    <img src="{{ user.userprofile.avatar_image.url }}" alt="내 아바타" width="256" height="256" style="border: 2px solid #888; border-radius: 8px;">
+  {% endif %}
+{% endblock %}

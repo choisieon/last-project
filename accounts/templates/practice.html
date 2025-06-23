@@ -1,0 +1,278 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>마이페이지 - 인생 보드게임</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: 'Noto Sans KR', sans-serif;
+      background: url("{% static 'images/Frame 13.png' %}") no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    h1, h2, h3 {
+      text-align: center;
+      color: #4e3b2b;
+    }
+
+    .top-section {
+      display: flex;
+      width: 100%;
+      max-width: 1200px;
+      justify-content: space-between;
+      margin-bottom: 30px;
+    }
+
+    .profile-box {
+      display: flex;
+      background-color: #f3f3f3;
+      border-radius: 10px;
+      box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.15);
+      padding: 10px;
+      width: 420px;
+    }
+
+    .avatar-nickname-box {
+      width: 140px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-right: 10px;
+    }
+
+    .avatar-nickname-box img {
+      width: 120px;
+      height: 120px;
+      border-radius: 8px;
+      background-color: white;
+    }
+
+    .nickname {
+      font-weight: bold;
+      background: #bde0fe;
+      padding: 4px 8px;
+      border: 2px solid #444;
+      border-radius: 6px;
+      font-size: 14px;
+      margin-top: 6px;
+    }
+
+    .info-section-container {
+      width: 100%;
+    }
+
+    .info-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .info-label {
+      width: 60px;
+      background-color: #444;
+      color: white;
+      font-weight: bold;
+      padding: 4px 6px;
+      border-radius: 4px 0 0 4px;
+      text-align: center;
+      font-size: 11px;
+      border: 1px solid #444;
+      border-right: none;
+    }
+
+    .info-value {
+      background-color: white;
+      padding: 4px 6px;
+      border: 1px solid #444;
+      border-left: none;
+      border-radius: 0 4px 4px 0;
+      flex: 1;
+      font-size: 11px;
+    }
+
+    .policy-banner {
+      background-color: #fffef9;
+      border: 2px dashed #c2a178;
+      border-radius: 16px;
+      padding: 20px;
+      width: 320px;
+      height: fit-content;
+    }
+
+    .middle-section {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    .board-map {
+      flex: 2;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 1rem;
+      border: 4px dashed #c2a178;
+      border-radius: 32px;
+      padding: 1rem;
+      background-color: #fffef9;
+      margin-right: 20px;
+    }
+
+    .tile {
+      width: 120px;
+      height: 120px;
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 0.5rem;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s ease;
+    }
+
+    .tile:hover {
+      transform: translateY(-4px);
+      z-index: 10;
+    }
+
+    .year {
+      font-size: 1.1rem;
+      font-weight: bold;
+      margin-bottom: 0.3rem;
+    }
+
+    .event {
+      font-size: 0.95rem;
+      color: #333;
+      margin-bottom: 0.2rem;
+    }
+
+    .note {
+      font-size: 0.8rem;
+      color: #777;
+    }
+
+    .metrics {
+      font-size: 0.8rem;
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.3rem;
+    }
+
+    .detail {
+      display: none;
+      position: absolute;
+      bottom: -80px;
+      left: 0;
+      width: 100%;
+      background: #fff8e1;
+      padding: 0.5rem;
+      font-size: 0.75rem;
+      color: #444;
+      border-radius: 0 0 16px 16px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .tile:hover .detail {
+      display: block;
+    }
+
+    .others-activity {
+      background-color: #fffef9;
+      border: 2px dashed #c2a178;
+      border-radius: 16px;
+      padding: 20px;
+      width: 280px;
+      height: fit-content;
+    }
+
+    .activity-box p {
+      margin: 6px 0;
+      font-size: 14px;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    ul li {
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+  </style>
+</head>
+<body>
+  <h1>나의 인생 마이페이지</h1>
+
+  <!-- 상단: 프로필 + 정책 -->
+  <div class="top-section">
+    <div class="profile-box">
+   <div class="avatar-section">
+  {% if profile.avatar_image %}
+  <img src="{{ profile.avatar_image.url }}" alt="아바타" width="100" height="100">
+{% elif profile.avatar_url %}
+  <img src="{{ profile.avatar_url }}" alt="아바타" width="100" height="100">
+{% else %}
+  <p>아바타가 아직 없습니다.</p>
+{% endif %}
+    
+        {% csrf_token %}
+        <input type="file" name="avatar" id="avatarInput" accept="image/*">
+        <button type="submit">업로드</button>
+    </form>
+        <div class="nickname">{{ profile.nickname }}</div>
+      </div>
+      <div class="info-section-container">
+        <div class="info-row"><div class="info-label">레벨</div><div class="info-value">20대 청년</div></div>
+        <div class="info-row"><div class="info-label">직업</div><div class="info-value">대학생</div></div>
+        <div class="info-row"><div class="info-label">내공</div><div class="info-value">29점</div></div>
+        <div class="info-row"><div class="info-label">관심</div><div class="info-value">자취, 운동, 취업</div></div>
+        <div class="info-row"><div class="info-label">한줄</div><div class="info-value">나만의 인생설계를 찾아서</div></div>
+      </div>
+    </div>
+    <div class="policy-banner">
+      <h3>📌 청년 정책 추천</h3>
+      <ul>
+        <li><strong>청년내일채움공제:</strong> 중소기업 재직 청년에게 목돈 마련 지원</li>
+        <li><strong>전세보증금 대출 이자 지원:</strong> 자취/독립 청년 대상</li>
+        <li><strong>청년 월세 지원:</strong> 만 19~34세 대상, 최대 월 20만원 지원</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 중단: 인생 그래프 + 다른사람 -->
+  <h2>🎲 나의 인생 여정</h2>
+  <div class="middle-section">
+    <div class="board-map">
+      <div class="tile"><div class="year">2021년 3월</div><div class="event">졸업 🎓</div><div class="note">설렘</div><div class="metrics"><span>😊 90</span><span>🏆 80</span></div><div class="detail">새로운 환경 기대</div></div>
+      <div class="tile"><div class="year">2022년 2월</div><div class="event">입사 💼</div><div class="note">적응 중</div><div class="metrics"><span>😐 60</span><span>🏆 70</span></div><div class="detail">성장 과정</div></div>
+      <div class="tile"><div class="year">2023년 1월</div><div class="event">자취 🏠</div><div class="note">독립</div><div class="metrics"><span>🙂 75</span><span>🏆 85</span></div><div class="detail">자유와 책임</div></div>
+      <div class="tile"><div class="year">2024년 6월</div><div class="event">자기계발 🔧</div><div class="note">탐색</div><div class="metrics"><span>😌 70</span><span>🏆 90</span></div><div class="detail">운동, 코딩 도전</div></div>
+      <div class="tile"><div class="year">2025년 4월</div><div class="event">창업 도전 🚀</div><div class="note">위기와 가능성</div><div class="metrics"><span>😮 65</span><span>🏆 95</span></div><div class="detail">첫 도전</div></div>
+      <div class="tile"><div class="year">2026년 7월</div><div class="event">쉼 🧘‍♂️</div><div class="note">자기돌봄</div><div class="metrics"><span>😊 88</span><span>🏆 70</span></div><div class="detail">진정한 여유</div></div>
+      <div class="tile"><div class="year">2027년 10월</div><div class="event">여행 🌍</div><div class="note">시야 확장</div><div class="metrics"><span>😎 95</span><span>🏆 85</span></div><div class="detail">다양한 문화 경험</div></div>
+      <div class="tile"><div class="year">2028년 5월</div><div class="event">멘토됨 🤝</div><div class="note">나눔</div><div class="metrics"><span>🥹 92</span><span>🏆 98</span></div><div class="detail">후배와 공유</div></div>
+      <div class="tile"><div class="year">2029년 상반기</div><div class="event">연수 ✈️</div><div class="note">성장</div><div class="metrics"><span>😮 85</span><span>🏆 92</span></div><div class="detail">해외에서 시야 확장</div></div>
+      <div class="tile"><div class="year">2030년 하반기</div><div class="event">팀 창업 🎉</div><div class="note">협업</div><div class="metrics"><span>😄 93</span><span>🏆 97</span></div><div class="detail">첫 투자 유치</div></div>
+    </div>
+
+    <div class="others-activity">
+      <h3>👥 같은 시기 다른 사람들은...</h3>
+      <div class="activity-box">
+        <p>🔹 <strong>은지(26)</strong> - 비영리 단체 활동 시작</p>
+        <p>🔹 <strong>민수(29)</strong> - 창업교육 수료 + 카페 창업 준비</p>
+        <p>🔹 <strong>유나(25)</strong> - 지방 공무원 시험 도전</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
