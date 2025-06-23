@@ -3,7 +3,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import YouthPolicy, PolicyComment, Region, Sigungu, Sido, PolicyViewLog
 from .forms import CommentForm
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Q, Count
 from collections import Counter
 
 # Create your views here.
@@ -12,6 +12,7 @@ def basic_page(request):
     selected_sido = request.GET.get('sido')
     selected_sigungu = request.GET.get('sigungu')
     selected_category = request.GET.get('category', 'all')
+    top_viewed_policies = YouthPolicy.objects.order_by('-view_count')[:3]
 
     policies = YouthPolicy.objects.all()
 
@@ -60,7 +61,7 @@ def basic_page(request):
         'selected_sido': selected_sido,
         'selected_sigungu': selected_sigungu,
         'selected_category': selected_category, 
-        'top_viewed_policies': YouthPolicy.objects.order_by('-view_count')[:3],
+        'top_viewed_policies': top_viewed_policies,
         'paginator': paginator, 
         'is_paginated': True, 
     }
