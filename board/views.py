@@ -75,7 +75,9 @@ def post_list(request):
     ).order_by('-like_count')[:10]
 
     # 인기 태그
-    popular_mentor_tags = Tag.objects.filter(name__in=['대학', '연애', '운동', '인생', '자취', '지갑', '취업'])
+    popular_mentor_tags = Tag.objects.filter(name__in=['대학', '연애', '운동', '인생', '자취', '지갑', '취업', '정책'])
+
+    fixed_posts = Post.objects.filter(is_notice=True).order_by('-created_at')[:5]
     
     return render(request, 'board/post_list.html', {
         'page_obj': page_obj,
@@ -86,6 +88,7 @@ def post_list(request):
         'popular_mentor_tags': popular_mentor_tags,
         'tag_filter': tag_filter,
         'weekly_top_posts': weekly_top_posts,
+        'fixed_posts': fixed_posts,
     })
 
 
@@ -107,6 +110,7 @@ def post_new(request):
             post.author = request.user
             post.category = category  # 카테고리 설정
             post.save()
+            form.save_m2m()
             
             # 4. 태그 처리
             tags_str = request.POST.get('tags', '')
@@ -128,6 +132,7 @@ def post_new(request):
     # 7. GET 요청 처리 (기존 로직 유지)
     else:
         form = PostForm(initial={'category': category})
+        form.instance = None
     
     # 8. 렌더링 (기존 로직 유지)
     return render(request, 'board/post_new.html', {

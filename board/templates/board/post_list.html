@@ -37,42 +37,34 @@
     {% else %}{{ category|title }} 게시판
     {% endif %}
   </h1>
-  <a href="{% url 'board:post_new' %}" class="review-write-btn">✏️ 새 글 작성</a>
 
-  <!-- 공지/고정글 (상단 고정) -->
-  <div class="fixed-posts" style="background:#f7f7f7; border:1.5px solid #d0d0d0; border-radius:8px; margin:28px 0; padding:18px 18px 12px 18px;">
-    <h3 style="font-size:1.08rem; margin-bottom:7px; color:#1976d2; display:flex; align-items:center; gap:6px;">
-      <span>📢</span> 공지/고정글
-    </h3>
-    <ul style="margin:0; padding:0; list-style:none;">
-      {% for post in fixed_posts %}
-        <li style="margin-bottom:7px;">
-          <a href="{% url 'board:post_detail' post.pk %}" style="font-weight:bold; color:#d2691e;">
+  <!-- 인기글 리스트 (최대 5개, 한 줄에 간결하게) -->
+  <div class="top-list-box">
+    <div class="top-list-label"><span>🔥</span> 이번 주 인기글</div>
+    <ul class="top-list-ul">
+      {% for post in weekly_top_posts|slice:":5" %}
+        <li class="top-list-li">
+          <a href="{% url 'board:post_detail' post.pk %}" class="top-list-title">
             {{ post.title }}
           </a>
-          <span style="color:#888; font-size:0.97em;">({{ post.created_at|date:"Y.m.d" }})</span>
+          <span class="top-list-meta">
+            <span class="top-list-author">{{ post.author.username }}</span>
+            <span class="top-list-date">| {{ post.created_at|date:"Y.m.d" }}</span>
+            <span class="top-list-views">| 조회수: {{ post.views }}</span>
+            <span class="top-list-likes">| ♥ {{ post.likes.count }}</span>
+          </span>
+          <span class="top-list-thumb">
+            {% if post.category == 'review' and post.thumbnail %}
+              <img src="{{ post.thumbnail.url }}" alt="썸네일">
+            {% elif post.category == 'share' %}
+              <span class="top-list-icon share-default">📄</span>
+            {% elif post.category == 'free' %}
+              <span class="top-list-icon chat-default">💬</span>
+            {% endif %}
+          </span>
         </li>
       {% empty %}
-        <li style="color:#aaa;">공지/고정글이 없습니다.</li>
-      {% endfor %}
-    </ul>
-  </div>
-
-  <!-- 주간 인기글 배너 -->
-  <div class="weekly-top" style="margin-bottom:28px;">
-    <h3 style="font-size:1.12rem; margin-bottom:8px; color:#d2691e; display:flex; align-items:center; gap:6px;">
-      <span>🔥</span> 이번 주 인기글
-    </h3>
-    <ul style="display:flex; flex-wrap:wrap; gap:18px; margin:0; padding:0;">
-      {% for post in weekly_top_posts %}
-        <li style="list-style:none; min-width:180px;">
-          <a href="{% url 'board:post_detail' post.pk %}" style="font-weight:bold; color:#1976d2;">
-            {{ post.title|truncatechars:28 }}
-          </a>
-          <span style="color:#888; font-size:0.97em;">({{ post.views }}회)</span>
-        </li>
-      {% empty %}
-        <li style="color:#aaa;">이번 주 인기글이 없습니다.</li>
+        <li class="top-list-empty">이번 주 인기글이 없습니다.</li>
       {% endfor %}
     </ul>
   </div>
@@ -112,41 +104,21 @@
     <a href="?{% if category %}category={{ category }}&{% endif %}{% if keyword %}keyword={{ keyword }}&{% endif %}{% if search_type %}search_type={{ search_type }}&{% endif %}{% for tag in tag_filter %}tag={{ tag }}&{% endfor %}sort=views" {% if sort == 'views' %}class="active"{% endif %}>조회수순</a>
   </div>
 
-  <!-- 카드형(썸네일 있는 글)만 먼저 모아서 출력 -->
-  <div class="review-grid">
-    {% for post in page_obj %}
-      {% if post.thumbnail %}
-        <a href="{% url 'board:post_detail' post.pk %}" class="review-card">
-          <img src="{{ post.thumbnail.url }}" alt="{{ post.title }}">
-          <div class="review-card-body">
-            <h3>{{ post.title }}</h3>
-            <p>👤 {{ post.author.username }}</p>
-            <p>📅 {{ post.created_at|date:"Y.m.d" }}</p>
-          </div>
-        </a>
-      {% endif %}
-    {% endfor %}
-    {% if not page_obj|dictsort:"thumbnail" %}
-      <div style="margin:40px 0; text-align:center; color:#888;">
-        썸네일이 있는 게시글이 없습니다.
-      </div>
-    {% endif %}
-  </div>
-
-  <!-- 리스트형(썸네일 없는 글)만 아래에 모아서 출력 -->
-  <div class="post-list">
-    {% for post in page_obj %}
-      {% if not post.thumbnail %}
-        <div class="post-item post-item-row" style="border:1px solid #fbc02d; border-radius:8px; margin-bottom:16px; background:#fff;">
+  <!-- 이하 게시글 리스트/공지글 등 기존 코드 그대로 유지 -->
+  {% if category == 'review' %}
+    {% if fixed_posts %}
+      {% for post in fixed_posts %}
+        <div class="post-item post-item-row notice-row">
           <div class="post-item-text">
             <h4>
-              <a href="{% url 'board:post_detail' post.pk %}?category={{ category }}{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}">{{ post.title }}</a>
+              <span class="notice-badge">공지</span>
+              <a href="{% url 'board:post_detail' post.pk %}?category={{ category }}">{{ post.title }}</a>
             </h4>
             <div class="post-meta">
               <span>작성자: {{ post.author }}</span>
               <span> | {{ post.created_at|date:"Y-m-d H:i" }}</span>
               <span> | 조회수: {{ post.views }}</span>
-              <span> | 🤍 {{ post.likes.count }}</span>
+              <span> | ♥ {{ post.likes.count }}</span>
               <span> | 댓글: {{ post.comments.count }}</span>
             </div>
             <div class="post-snippet">
@@ -163,22 +135,139 @@
             </div>
           </div>
         </div>
-      {% endif %}
-    {% endfor %}
-    {% if page_obj|length == 0 or not page_obj|dictsortreversed:"thumbnail" %}
-      <div style="margin:40px 0; text-align:center; color:#888;">
-        썸네일 없는 게시글이 없습니다.
-      </div>
+      {% endfor %}
     {% endif %}
-  </div>
+    
+    <div class="review-grid">
+      {% for post in page_obj %}
+        {% if post.thumbnail %}
+          <a href="{% url 'board:post_detail' post.pk %}" class="review-card">
+            <img src="{{ post.thumbnail.url }}" alt="{{ post.title }}">
+            <div class="review-card-body">
+              <h3>{{ post.title }}</h3>
+              <p>👤 {{ post.author.username }}</p>
+              <p>📅 {{ post.created_at|date:"Y.m.d" }}</p>
+            </div>
+          </a>
+        {% endif %}
+      {% endfor %}
+    </div>
+    
+    <div class="post-list">
+      {% for post in page_obj %}
+        {% if not post.thumbnail %}
+          <div class="post-item post-item-row">
+            <div class="post-item-text">
+              <h4>
+                <a href="{% url 'board:post_detail' post.pk %}?category={{ category }}{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}">{{ post.title }}</a>
+              </h4>
+              <div class="post-meta">
+                <span>작성자: {{ post.author }}</span>
+                <span> | {{ post.created_at|date:"Y-m-d H:i" }}</span>
+                <span> | 조회수: {{ post.views }}</span>
+                <span> | ♥ {{ post.likes.count }}</span>
+                <span> | 댓글: {{ post.comments.count }}</span>
+              </div>
+              <div class="post-snippet">
+                {{ post.content|truncatechars_html:10|safe }}
+              </div>
+              <div class="post-tags" style="margin: 6px 0 0 0;">
+                {% for tag in post.tags.all %}
+                <a href="{% url 'board:tagged' tag.slug %}" style="display:inline-block; margin-right:8px; color:#1976d2; background:#f0f4fa; padding:3px 10px; border-radius:12px; font-size:0.98em; text-decoration:none;">
+                  #{{ tag.name }}
+                </a>
+                {% empty %}
+                <span style="color:#aaa;">태그 없음</span>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="post-list">
+      {% for post in fixed_posts %}
+        <div class="post-item post-item-row notice-row">
+          <div class="post-item-text">
+            <h4>
+              <span class="notice-badge">공지</span>
+              <a href="{% url 'board:post_detail' post.pk %}?category={{ category }}">{{ post.title }}</a>
+            </h4>
+            <div class="post-meta">
+              <span>작성자: {{ post.author }}</span>
+              <span> | {{ post.created_at|date:"Y-m-d H:i" }}</span>
+              <span> | 조회수: {{ post.views }}</span>
+              <span> | ♥ {{ post.likes.count }}</span>
+              <span> | 댓글: {{ post.comments.count }}</span>
+            </div>
+            <div class="post-snippet">
+              {{ post.content|truncatechars_html:30|safe }}
+            </div>
+            <div class="post-tags" style="margin: 8px 0 0 0;">
+              {% for tag in post.tags.all %}
+              <a href="{% url 'board:tagged' tag.slug %}" style="display:inline-block; margin-right:8px; color:#1976d2; background:#f0f4fa; padding:3px 10px; border-radius:12px; font-size:0.98em; text-decoration:none;">
+                #{{ tag.name }}
+              </a>
+              {% empty %}
+              <span style="color:#aaa;">태그 없음</span>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="post-item-image">
+            <div class="default-image notice-default">📢</div>
+          </div>
+        </div>
+      {% endfor %}
+      {% for post in page_obj %}
+        <div class="post-item post-item-row">
+          <div class="post-item-text">
+            <h4>
+              <a href="{% url 'board:post_detail' post.pk %}?category={{ category }}{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}">{{ post.title }}</a>
+            </h4>
+            <div class="post-meta">
+              <span>작성자: {{ post.author }}</span>
+              <span> | {{ post.created_at|date:"Y-m-d H:i" }}</span>
+              <span> | 조회수: {{ post.views }}</span>
+              <span> | ♥ {{ post.likes.count }}</span>
+              <span> | 댓글: {{ post.comments.count }}</span>
+            </div>
+            <div class="post-snippet">
+              {{ post.content|truncatechars_html:30|safe }}
+            </div>
+            <div class="post-tags" style="margin: 8px 0 0 0;">
+              {% for tag in post.tags.all %}
+              <a href="{% url 'board:tagged' tag.slug %}" style="display:inline-block; margin-right:8px; color:#1976d2; background:#f0f4fa; padding:3px 10px; border-radius:12px; font-size:0.98em; text-decoration:none;">
+                #{{ tag.name }}
+              </a>
+              {% empty %}
+              <span style="color:#aaa;">태그 없음</span>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="post-item-image{% if post.category == 'review' and post.thumbnail %} review-thumbnail{% endif %}">
+            {% if post.category == 'review' and post.thumbnail %}
+              <img src="{{ post.thumbnail.url }}" alt="{{ post.title }}">
+            {% elif post.category == 'share' %}
+              <div class="default-image share-default">📄</div>
+            {% elif post.category == 'free' %}
+              <div class="default-image chat-default">💬</div>
+            {% endif %}
+          </div>
+        </div>
+      {% empty %}
+        <div style="margin:40px 0; text-align:center; color:#888;">
+          게시글이 없습니다.
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
 
-  <!-- 페이지네이션 UI -->
   <div class="pagination" style="margin-top:30px; text-align:center;">
     {% if page_obj.has_previous %}
     <a href="?page=1{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if search_type %}&search_type={{ search_type }}{% endif %}{% for tag in tag_filter %}&tag={{ tag }}{% endfor %}">« 처음</a>
     <a href="?page={{ page_obj.previous_page_number }}{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if search_type %}&search_type={{ search_type }}{% endif %}{% for tag in tag_filter %}&tag={{ tag }}{% endfor %}">‹ 이전</a>
     {% endif %}
-
     {% for num in page_obj.paginator.page_range %}
     {% if page_obj.number == num %}
     <strong>{{ num }}</strong>
@@ -186,7 +275,6 @@
     <a href="?page={{ num }}{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if search_type %}&search_type={{ search_type }}{% endif %}{% for tag in tag_filter %}&tag={{ tag }}{% endfor %}">{{ num }}</a>
     {% endif %}
     {% endfor %}
-
     {% if page_obj.has_next %}
     <a href="?page={{ page_obj.next_page_number }}{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if search_type %}&search_type={{ search_type }}{% endif %}{% for tag in tag_filter %}&tag={{ tag }}{% endfor %}">다음 ›</a>
     <a href="?page={{ page_obj.paginator.num_pages }}{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if search_type %}&search_type={{ search_type }}{% endif %}{% for tag in tag_filter %}&tag={{ tag }}{% endfor %}">마지막 »</a>
@@ -236,6 +324,111 @@ document.addEventListener('DOMContentLoaded', function() {
   background-color: #007aff;
   color: white;
 }
+/* 인기글 리스트 스타일 (박스 없이 깔끔하게) */
+.top-list-label {
+  margin: 18px 0 8px 0;
+  font-weight: bold;
+  color: #e65100;
+  font-size: 1.08rem;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.top-list-ul {
+  list-style: none;
+  margin: 0 0 20px 0;
+  padding: 0;
+}
+.top-list-li {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #f0e6d2;
+  background: none;
+  border-radius: 0;
+  padding: 6px 0;
+  margin-bottom: 0;
+  gap: 10px;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+}
+.top-list-li:hover {
+  background-color: #fafafa;
+}
+.top-list-li:last-child {
+  border-bottom: none;
+}
+.top-list-title {
+  flex: 1;
+  font-weight: bold;
+  color: #1976d2;
+  text-decoration: none;
+  font-size: 1.03rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.top-list-meta {
+  color: #666;
+  font-size: 0.93rem;
+  margin-left: 10px;
+  white-space: nowrap;
+}
+.top-list-thumb {
+  margin-left: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.top-list-thumb img {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid #e0e0e0;
+  background: #eee;
+}
+.top-list-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  color: #fff;
+  font-weight: bold;
+}
+.share-default {
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+}
+.chat-default {
+  background: linear-gradient(135deg, #FF9800, #F57C00);
+}
+.top-list-empty {
+  color: #aaa;
+  text-align: center;
+  padding: 12px 0;
+  font-style: italic;
+}
+/* 공지글 스타일 */
+.notice-row {
+  background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%) !important;
+  border-left: 4px solid #ff0000 !important;
+}
+.notice-badge {
+  display: inline-block;
+  background: #ff9800;
+  color: #fff;
+  font-weight: bold;
+  font-size: 0.85rem;
+  padding: 3px 8px;
+  border-radius: 12px;
+  margin-right: 8px;
+}
+.notice-default {
+  background: linear-gradient(135deg, #1976d2, #42a5f5) !important; /* 파란색 계열 */
+  color: #fff;
+}
 .sort-bar {
   margin-bottom: 18px;
   display: flex;
@@ -270,13 +463,36 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 .post-item-text {
   flex: 1;
+  min-width: 0;
+}
+.post-item-image {
+  flex-shrink: 0;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .post-item-image img {
-  max-width: 90px;
-  max-height: 70px;
+  width: 80px;
+  height: 80px;
   border-radius: 8px;
   object-fit: cover;
-  box-shadow: 1px 1px 5px #b9a78233;
+  box-shadow: 1px 1px 5px rgba(185, 167, 130, 0.3);
+  border: 1px solid #e0e0e0;
+}
+.default-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: #fff;
+  font-weight: bold;
+  box-shadow: 1px 1px 5px rgba(185, 167, 130, 0.3);
+  border: 1px solid #e0e0e0;
 }
 .pagination {
   margin-top: 20px;
@@ -304,7 +520,7 @@ document.addEventListener('DOMContentLoaded', function() {
   font-weight: bold;
 }
 .search-result-label {
-  color: #fff;
+  color: #333;
   font-weight: bold;
 }
 .review-grid {
@@ -347,17 +563,59 @@ document.addEventListener('DOMContentLoaded', function() {
   color: #555;
   font-size: 0.98em;
 }
+.post-item-image.review-thumbnail {
+  align-self: center !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100px;
+  width: 100px;
+}
+.post-item-image.review-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.top-list-box {
+  background: #fff;
+  border: 2px solid #ffd600;
+  border-radius: 12px;
+  padding: 14px 18px 10px 18px;
+  margin: 24px 0 18px 0;
+  box-shadow: 0 4px 16px rgba(255, 193, 7, 0.10);
+}
 @media (max-width: 600px) {
   .post-item-row {
     flex-direction: column;
     gap: 0.7rem;
   }
-  .post-item-image img {
-    max-width: 100%;
-    max-height: 120px;
+  .post-item-image {
+    width: 100%;
+    height: 60px;
+    margin-top: 10px;
+  }
+  .post-item-image img,
+  .default-image {
+    width: 60px;
+    height: 60px;
   }
   .review-card img {
     height: 120px;
+  }
+  .top-list-li {
+    flex-direction: column;
+    text-align: left;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  .top-list-thumb, .top-list-thumb img, .top-list-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 1.1rem;
+  }
+  .top-list-meta {
+    margin-left: 0;
   }
 }
 </style>
