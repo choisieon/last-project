@@ -28,11 +28,16 @@
       padding: 30px 20px;
     }
 
+    .carousel-wrapper {
+      margin-bottom: 25px;
+    }
+
     .top-nav {
       padding: 6px 12px;
       margin-bottom: 10px;
       gap: 6px;
-      margin-top: -35px;   /* 위로 올림 */
+      margin-top: -35px;
+      margin-left: -13px;
     }
 
     .menu-left {
@@ -195,12 +200,11 @@
     }
 
     .card-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 32px;
-  margin-top: 30px;
-}
-
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      margin-top: 30px;
+    }
 
     .policy-card-link {
       text-decoration: none;
@@ -220,6 +224,13 @@
   background-color: rgba(255, 248, 230, 0.95);
   box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.2);
   border: 2px solid #b49e74; 
+}
+
+.card-grid .policy-card {
+  width: 95%;
+  margin: 0 auto;
+  padding: 16px;
+  max-height: 340px !important;  
 }
 
 
@@ -309,17 +320,6 @@
       height: 300px;
       justify-content: space-between;
     }
-
-    .policy-group-box {
-      background-color: rgba(255, 255, 240, 0.7);
-      border: 2px solid #bfa46e;
-      border-radius: 16px;
-      padding: 36px;
-      margin: 40px auto;
-      box-shadow: 4px 4px 0 #a3885c;
-      max-width: 1100px;
-    }
-
 
     .sidebar {
       width: 300px;
@@ -646,9 +646,8 @@
 
 <div class="container-flex d-flex justify-content-between">
   <div class="main-content flex-fill">
-    <div class="policy-group-box">
     {% if policies %}
-    <div class="card-grid">
+    <div class="card-grid" id="policy-cards">
       {% for policy in policies %}
       <a href="{% url 'youth_policy:policy_detail' policy.id %}" class="policy-card-link">
 
@@ -699,7 +698,6 @@
 </div>
 </a>
         {% endfor %}
-      </div>
       </div>
 
       {% if is_paginated %}
@@ -898,6 +896,17 @@
   document.addEventListener('DOMContentLoaded', function () {
     showSlide(currentIndex);
   });
+
+  window.addEventListener('DOMContentLoaded', function () {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.has('page')) {
+    const target = document.getElementById('policy-cards');
+    if (target) {
+      const y = target.getBoundingClientRect().top + window.pageYOffset;
+      window.scrollTo(0, y); // 즉시 이동
+    }
+  }
+});
 </script>
 </body>
 </html>
