@@ -66,19 +66,40 @@ def post_list(request):
     paginator = Paginator(posts, 10)
     page_obj = paginator.get_page(page)
 
-    # 주간 인기글: 지난 7일 동안의 글 중 좋아요 순으로 상위 10개
+    # 주간 인기글: 카테고리별/전체 인기글 (5개)
     one_week_ago = timezone.now() - timedelta(days=7)
-    weekly_top_posts = Post.objects.filter(
-        created_at__gte=one_week_ago
-    ).annotate(
-        like_count=Count('likes')
-    ).order_by('-like_count')[:10]
+
+    if category:  # 특정 카테고리가 선택된 경우
+        weekly_top_posts = Post.objects.filter(
+            category=category,
+            created_at__gte=one_week_ago
+        ).annotate(
+            like_count=Count('likes')
+        ).order_by('-like_count')[:5]  # 5개만
+    else:  # 전체 카테고리
+        weekly_top_posts = Post.objects.filter(
+            created_at__gte=one_week_ago
+        ).annotate(
+            like_count=Count('likes')
+        ).order_by('-like_count')[:5]  # 5개만
 
     # 인기 태그
     popular_mentor_tags = Tag.objects.filter(name__in=['대학', '연애', '운동', '인생', '자취', '지갑', '취업', '정책'])
 
-    fixed_posts = Post.objects.filter(is_notice=True).order_by('-created_at')[:5]
-    
+    # 전체 공지 2개
+    global_notices = Post.objects.filter(is_notice=True, category='all').order_by('-created_at')[:2]
+
+    # 카테고리별 공지 2개 (category는 'review', 'share', 'free' 등)
+    if category and category != 'all':
+        category_notices = Post.objects.filter(is_notice=True, category=category).order_by('-created_at')[:2]
+        # 전체 공지 + 카테고리별 공지 합치기 (중복 제거)
+        fixed_posts = list(global_notices)
+        for post in category_notices:
+            if post.id not in [g.id for g in global_notices]:
+                fixed_posts.append(post)
+    else:
+        fixed_posts = list(global_notices)
+
     return render(request, 'board/post_list.html', {
         'page_obj': page_obj,
         'sort': sort,
