@@ -23,7 +23,7 @@
     }
 
     .wrapper {
-      max-width: 1000px;
+      max-width: 1100px;
       margin: 0 auto;
       padding: 30px 20px;
     }
@@ -197,7 +197,7 @@
     .card-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 32px; /* 기존 24px → 더 여유 있게 */
+  gap: 32px;
   margin-top: 30px;
 }
 
@@ -208,18 +208,18 @@
     }
 
   .policy-card {
-  border-radius: 12px;
+  border-radius: 14px;
   overflow: visible;
   padding: 24px;
-  height: 400px;
+  height: 280px;
   display: flex;
   flex-direction: column;
   transition: all 0.3s ease;
   justify-content: space-between;
 
-  background-color: #fcf5e5;
-  box-shadow: 6px 6px 0 #a28a64;
-  border: 2px solid #c9b482; 
+  background-color: rgba(255, 248, 230, 0.95);
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.2);
+  border: 2px solid #b49e74; 
 }
 
 
@@ -310,6 +310,16 @@
       justify-content: space-between;
     }
 
+    .policy-group-box {
+      background-color: rgba(255, 255, 240, 0.7);
+      border: 2px solid #bfa46e;
+      border-radius: 16px;
+      padding: 36px;
+      margin: 40px auto;
+      box-shadow: 4px 4px 0 #a3885c;
+      max-width: 1100px;
+    }
+
 
     .sidebar {
       width: 300px;
@@ -358,47 +368,109 @@
     }
 
     .wrapper.position-relative {
-  position: relative;
-}
+      position: relative;
+    }
 
-.top-widgets-fixed {
-  position: absolute;
-  top: 0;
-  right: 0;
-  display: flex;
-  gap: 12px;
-  z-index: 100;
-}
+    .top-widgets-fixed {
+      position: absolute;
+      top: 0;
+      right: 0;
+      display: flex;
+      gap: 12px;
+      z-index: 100;
+    }
 
-.top-widget {
-  background-image: url("{% static 'images/pixel-paper.png' %}");
-  background-size: 4px 4px;
-  background-repeat: repeat;
-  border: 2.5px solid #5a4a2f;
-  box-shadow: 3px 3px 0 #b9a782;
-  background-color: rgba(250, 235, 180, 0.95);
-  border-radius: 8px;
-  padding: 12px 16px;
-  font-size: 13px;
-  white-space: nowrap;
-}
+    .top-widget {
+      background-image: url("{% static 'images/pixel-paper.png' %}");
+      background-size: 4px 4px;
+      background-repeat: repeat;
+      border: 2.5px solid #5a4a2f;
+      box-shadow: 3px 3px 0 #b9a782;
+      background-color: rgba(250, 235, 180, 0.95);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 13px;
+      white-space: nowrap;
+    }
 
-.top-widget h5 {
-  margin: 0 0 8px 0;
-  font-size: 14px;
-  font-weight: bold;
-}
+    .top-widget h5 {
+      margin: 0 0 8px 0;
+      font-size: 14px;
+      font-weight: bold;
+    }
 
-.top-widget a {
-  color: #3c2e1e;
-  text-decoration: none;
-  font-weight: 600;
-}
+    .top-widget a {
+      color: #3c2e1e;
+      text-decoration: none;
+      font-weight: 600;
+    }
 
-.top-widget a:hover {
-  color: #007aff;
-}
+    .top-widget a:hover {
+      color: #007aff;
+    }
 
+    .carousel-item .policy-card {
+          height: 280px;
+        }
+
+    .carousel-item .policy-card {
+      height: 260px;  /* 원하는 값으로 조정 가능 */
+      background-color: rgba(245, 230, 200, 0.9);
+      border: 2px solid #a6895d;
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .carousel-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      background-color: rgba(255, 255, 255, 0.85);
+      border: 2px solid #aaa06d;
+      box-shadow: 3px 3px 0 #b9a782;
+      font-size: 24px;
+      font-weight: bold;
+      padding: 10px 14px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .carousel-arrow:hover {
+      background-color: #fff3cd;
+    }
+
+    .left-arrow {
+      left: -30px; /* wrapper 기준 */
+    }
+
+    .right-arrow {
+      right: -30px;
+    }
+
+    @media (max-width: 768px) {
+      .carousel-arrow {
+        font-size: 18px;
+        padding: 8px 10px;
+      }
+
+      .left-arrow {
+        left: -20px;
+      }
+
+      .right-arrow {
+        right: -20px;
+      }
+    }
+
+    /* 그리드 카드 높이 확장 */
+    .card-grid .policy-card {
+      height: 360px;
+    }
 
     @media (max-width: 768px) {
       .container-flex {
@@ -539,12 +611,46 @@
     </div>
   </div>
 
-  <div class="container-flex d-flex justify-content-between">
-    <div class="main-content flex-fill">
-      {% if policies %}
-      <div class="card-grid">
-        {% for policy in policies %}
-        <a href="{% url 'youth_policy:policy_detail' policy.id %}" class="policy-card-link">
+  <div class="carousel-wrapper position-relative">
+  <div id="policyCarousel" class="carousel-inner">
+    {% for policy in top_viewed_policies %}
+      {% if forloop.counter0|divisibleby:4 %}
+        <div class="carousel-item {% if forloop.counter0 == 0 %}active{% endif %}">
+          <div class="row gx-3">
+      {% endif %}
+
+      <div class="col-md-3">
+        <div class="card shadow-sm policy-card">
+          <h5 class="card-title mt-2">{{ policy.정책명 }}</h5>
+          <div class="policy-description mt-3 mb-2">
+            {{ policy.정책설명요약 }}
+          </div>
+          <div class="policy-meta mt-2">
+            {{ policy.view_count }}회 조회
+            {% if policy.comment_count %}&nbsp;&nbsp;💬 {{ policy.comment_count }}{% endif %}
+          </div>
+          <a href="{% url 'youth_policy:policy_detail' policy.id %}" class="btn btn-sm btn-outline-light btn-detail">상세 보기</a>
+        </div>
+      </div>
+
+      {% if forloop.counter|divisibleby:4 or forloop.last %}
+          </div> <!-- row -->
+        </div> <!-- carousel-item -->
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  <button class="carousel-arrow left-arrow" onclick="prevSlide()" id="prevArrow">←</button>
+  <button class="carousel-arrow right-arrow" onclick="nextSlide()" id="nextArrow">→</button>
+</div>
+
+<div class="container-flex d-flex justify-content-between">
+  <div class="main-content flex-fill">
+    <div class="policy-group-box">
+    {% if policies %}
+    <div class="card-grid">
+      {% for policy in policies %}
+      <a href="{% url 'youth_policy:policy_detail' policy.id %}" class="policy-card-link">
 
   <div class="policy-card">
   <div class="d-flex align-items-center badge-group mb-2">
@@ -593,6 +699,7 @@
 </div>
 </a>
         {% endfor %}
+      </div>
       </div>
 
       {% if is_paginated %}
@@ -749,7 +856,48 @@
       document.getElementById('stageText').textContent = stageValue;
     }
   });
-</script>
 
+  let currentIndex = 0;
+  const items = document.querySelectorAll('.carousel-item');
+  const prevBtn = document.querySelector('.carousel-controls button:nth-child(1)');
+  const nextBtn = document.querySelector('.carousel-controls button:nth-child(2)');
+
+  function updateButtons() {
+  const prevArrow = document.getElementById('prevArrow');
+  const nextArrow = document.getElementById('nextArrow');
+
+  if (prevArrow && nextArrow) {
+    prevArrow.style.display = (currentIndex === 0) ? 'none' : 'block';
+    nextArrow.style.display = (currentIndex === items.length - 1) ? 'none' : 'block';
+  }
+}
+
+  function showSlide(index) {
+    items.forEach((item, i) => {
+      item.classList.remove('active');
+      if (i === index) item.classList.add('active');
+    });
+    updateButtons();
+  }
+
+  function prevSlide() {
+    if (currentIndex > 0) {
+      currentIndex -= 1;
+      showSlide(currentIndex);
+    }
+  }
+
+  function nextSlide() {
+    if (currentIndex < items.length - 1) {
+      currentIndex += 1;
+      showSlide(currentIndex);
+    }
+  }
+
+  // 초기 실행
+  document.addEventListener('DOMContentLoaded', function () {
+    showSlide(currentIndex);
+  });
+</script>
 </body>
 </html>

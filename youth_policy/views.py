@@ -9,6 +9,10 @@ from datetime import date, datetime
 from calendar import monthrange
 import calendar
 from datetime import timedelta
+from collections import defaultdict
+import json
+from django.utils.dateformat import format as django_date_format
+from django.core.serializers.json import DjangoJSONEncoder
 
 # Create your views here.
 def basic_page(request):
@@ -16,6 +20,7 @@ def basic_page(request):
     selected_sido = request.GET.get('sido')
     selected_sigungu = request.GET.get('sigungu')
     selected_category = request.GET.get('category', 'all')
+    top_viewed_policies = YouthPolicy.objects.order_by('-view_count')[:10]
 
     policies = YouthPolicy.objects.all()
 
@@ -65,7 +70,8 @@ def basic_page(request):
         'selected_sigungu': selected_sigungu,
         'selected_category': selected_category, 
         'paginator': paginator, 
-        'is_paginated': True, 
+        'is_paginated': True,
+        'top_viewed_policies': top_viewed_policies,
     }
     
     return render(request, 'basic_page.html', context)
@@ -177,7 +183,7 @@ def toggle_policy_like(request, policy_id):
     return redirect('youth_policy:policy_detail', policy_id=policy.id)
 
 def popular_policies(request):
-    top_viewed_policies = YouthPolicy.objects.order_by('-view_count')[:5]
+    top_viewed_policies = YouthPolicy.objects.order_by('-view_count')[:10]
 
     return render(request, 'popular_policies.html', {
         'top_viewed_policies': top_viewed_policies,
@@ -216,6 +222,17 @@ def calendar_view(request):
 
     calendar_data = get_calendar(year, month)
 
+    calendar_json_dict = defaultdict(list)
+    for date_obj, policies_list in start_dict.items():
+        date_str = django_date_format(date_obj, 'Y-m-d')
+        for p in policies_list:
+            calendar_json_dict[date_str].append({'정책명': p.정책명})
+
+    for date_obj, policies_list in end_dict.items():
+        date_str = django_date_format(date_obj, 'Y-m-d')
+        for p in policies_list:
+            calendar_json_dict[date_str].append({'정책명': p.정책명})
+
     context = {
         'year': year,
         'month': month,
@@ -224,6 +241,7 @@ def calendar_view(request):
         'policies': policies,
         'start_dict': start_dict,
         'end_dict': end_dict,
+        'calendar_data_json': json.dumps(calendar_json_dict, cls=DjangoJSONEncoder),
     }
 
     return render(request, 'calendar.html', context)
