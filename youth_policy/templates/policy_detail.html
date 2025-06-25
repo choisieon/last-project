@@ -60,14 +60,20 @@ h1 {
   color: #2d3436;
 }
 
-.description-box {
-  background-color: #fffef2;
-  border: 2px dashed #5a4a2f;
+.description-box .section {
+  background-color: #fffefc;
+  border: 1.5px solid #e0d9c3;
+  border-radius: 8px;
   padding: 1rem;
-  border-radius: 6px;
-  line-height: 1.6;
-  margin-bottom: 1.5rem;
-  color: #2d3436;
+  margin-bottom: 1rem;
+  box-shadow: 2px 2px 0 #e0d9c3;
+}
+
+.description-box .section h2 {
+  font-size: 1.1rem;
+  color: #5a4a2f;
+  border-bottom: 1px dashed #ccc;
+  margin-bottom: 0.5rem;
 }
 
 .keyword-buttons {
@@ -201,17 +207,31 @@ h1 {
     <div class="main-keyword">📌 {{ policy.정책키워드|default:"없음" }}</div>
 
     <div class="description-box">
-      <p><strong>정책명</strong><br>{{ policy.정책명|linebreaksbr }}</p>
-      <p><strong>설명</strong><br>{{ policy.정책설명|linebreaksbr }}</p>
-      <!-- <p><strong>추가 자격</strong><br>{{ policy.추가신청자격조건내용|linebreaksbr }}</p> -->
-      <p><strong>신청 기간</strong><br>{{ policy.application_period }}</p>
-      <p><strong>신청URL</strong><br>
+      <div class="section">
+        <h2>📌 정책명</h2>
+        <p>{{ policy.정책명 }}</p>
+      </div>
+
+      <div class="section">
+        <h2>📝 설명</h2>
+        <div class="plain-description">
+          {{ policy.정책설명|linebreaksbr }}
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>⏰ 신청 기간</h2>
+        <p>{{ policy.application_period }}</p>
+      </div>
+
+      <div class="section">
+        <h2>🔗 신청 URL</h2>
         {% if policy.신청URL and policy.신청URL != "nan" %}
           <a href="{{ policy.신청URL }}" target="_blank">{{ policy.신청URL }}</a>
         {% else %}
           <span>없음</span>
         {% endif %}
-      </p>
+      </div>
     </div>
 
     <div class="keyword-buttons">
@@ -227,7 +247,7 @@ h1 {
     </div>
 
     {% if user.is_authenticated %}
-  <div id="commentForm" class="comment-form">
+  <div id="commentForm" class="comment-form" style="display: none;">
     <form action="{% url 'youth_policy:add_policy_comment' policy.id %}" method="post">
       {% csrf_token %}
       <textarea name="content" rows="4" placeholder="댓글을 입력하세요."></textarea>

@@ -121,8 +121,8 @@
     .start-badge.more,
     .end-badge.more {
       display: block;
-      background-color: #eeeeee;
-      color: #333;
+      background-color: #ffe082; 
+      color: #5d4037;
       font-weight: normal;
       font-size: 11px;
       padding: 2px 4px;
@@ -176,13 +176,14 @@
     }
 
     .modal-content {
-      background-color: #fffef6;
+      background-color: #fffdf4;
       margin: 10% auto;
       padding: 20px;
-      border: 3px solid #e0d5b6;
+      border: 3px solid #d4b886;
       width: 300px;
       border-radius: 10px;
       font-family: 'MyCustomFont', sans-serif;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
     }
 
     .close-btn {
@@ -192,24 +193,95 @@
       cursor: pointer;
     }
 
+    .calendar-legend {
+      position: absolute;
+      top: 125px;
+      right: 60px;
+      padding: 6px 8px;
+      font-size: 13px;
+      font-weight: bold;
+      color: #ffffff;
+    }
+
+    .calendar-legend div {
+      display: flex;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .legend-box {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      margin-right: 6px;
+      border-radius: 3px;
+      border: 1px solid #555;
+    }
+
+    .legend-box.start {
+      background-color: #d3f9d8; /* 신청 시작 */
+      border-color: #388e3c;
+    }
+
+    .legend-box.end {
+      background-color: #ffcdd2; /* 신청 마감 */
+      border-color: #c62828;
+    }
+
     #policyList {
       padding-left: 0;
       list-style-type: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .policy-card {
+      background-color: #fdf5e6;
+      border: 1px solid #c3a76f;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 14px;
+      color: #3c2e1e;
+      box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+    }
+
+    .policy-card:hover {
+      background-color: #fff7d6;
+      font-weight: bold;
     }
 
     #policyList li {
-      padding: 6px 0;
-      border-bottom: 1px dashed #ccc;
-      font-size: 14px;
+      padding: 10px 0;
+      border-bottom: 1px solid #b7a278; /* 점선 → 실선, 색상 강화 */
+      font-size: 15px;
+      color: #2f1b0c;
+    }
+
+    #policyList li:hover {
+      background-color: #fff7d6;
+      border-radius: 6px;
+      padding-left: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #modalDateTitle {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 12px;
+      border-bottom: 2px solid #b7a278;
+      padding-bottom: 6px;
+      color: #3b2a1e;
     }
   </style>
 </head>
 <body>
 <div class="calendar-container">
   <h2>{{ year }}년 {{ month }}월 정책 달력</h2>
-
   <div class="calendar-nav">
     <a href="{% url 'youth_policy:calendar_view' %}?year={% if month == 1 %}{{ year|add:'-1' }}{% else %}{{ year }}{% endif %}&month={% if month == 1 %}12{% else %}{{ month|add:'-1' }}{% endif %}">← prev</a>
+    <a href="{% url 'youth_policy:basic_page' %}">🏠 Home</a>
     <a href="{% url 'youth_policy:calendar_view' %}?year={% if month == 12 %}{{ year|add:'1' }}{% else %}{{ year }}{% endif %}&month={% if month == 12 %}1{% else %}{{ month|add:'1' }}{% endif %}">next →</a>
   </div>
 
@@ -267,6 +339,12 @@
     </tbody>
   </table>
 </div>
+
+<div class="calendar-legend">
+  <div><span class="legend-box start"></span> 신청 시작</div>
+  <div><span class="legend-box end"></span> 신청 마감</div>
+</div>
+
 <div id="policyModal" class="modal" style="display:none;">
   <div class="modal-content">
     <span class="close-btn" onclick="closeModal()">&times;</span>
@@ -276,27 +354,28 @@
 </div>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-  const allPolicyData = {{ calendar_data_json|safe }};
+const allPolicyData = {{ calendar_data_json|safe }};
 
-  window.openModal = function(dateStr) {
-    const policies = allPolicyData[dateStr] || [];
+window.openModal = function(dateStr) {
+const policies = allPolicyData[dateStr] || [];
 
-    document.getElementById('modalDateTitle').innerText = `${dateStr} 정책 목록`;
-    const list = document.getElementById('policyList');
-    list.innerHTML = '';
+document.getElementById('modalDateTitle').innerText = `${dateStr}`;
+const list = document.getElementById('policyList');
+list.innerHTML = '';
 
-    if (policies.length === 0) {
-      list.innerHTML = '<li>해당 날짜에 등록된 정책이 없습니다.</li>';
-    } else {
-      policies.forEach(p => {
-        const li = document.createElement('li');
-        li.textContent = p.정책명;
-        list.appendChild(li);
-      });
-    }
+if (policies.length === 0) {
+  list.innerHTML = '<li>해당 날짜에 등록된 정책이 없습니다.</li>';
+} else {
+  policies.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'policy-card';
+    div.textContent = p.정책명;
+    list.appendChild(div);
+  });
+}
 
-    document.getElementById('policyModal').style.display = 'block';
-  };
+document.getElementById('policyModal').style.display = 'block';
+};
 
   window.closeModal = function () {
     document.getElementById('policyModal').style.display = 'none';

@@ -5,7 +5,6 @@ app_name = 'youth_policy'
 
 urlpatterns = [
     path('policy_list/', views.basic_page, name='basic_page'),
-    path('popular_policies/', views.popular_policies, name='popular_policies'),
     path('<int:policy_id>/', views.policy_detail, name='policy_detail'),
     path('<int:policy_id>/comment/', views.add_policy_comment, name='add_policy_comment'),
     path('comment/<int:comment_id>/edit/', views.edit_policy_comment, name='edit_policy_comment'),

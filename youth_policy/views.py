@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import YouthPolicy, PolicyComment, Region, Sigungu, Sido, PolicyViewLog
+from .models import YouthPolicy, PolicyComment, Region, Sigungu, Sido
 from .forms import CommentForm
 from django.core.paginator import Paginator
 from django.db.models import Q, Count
@@ -79,24 +79,6 @@ def basic_page(request):
 def youth_policy_detail(request, policy_id):
     policy = get_object_or_404(YouthPolicy, id=policy_id)
     return render(request, 'youth_policies.html', {'policy': policy})
-
-def get_next_most_viewed(policy_id):
-    logs = PolicyViewLog.objects.order_by('viewed_at')
-    user_sequences = {}
-
-    for log in logs:
-        user_sequences.setdefault(log.user_id, []).append(log.policy_id)
-
-    next_policies = []
-    for sequence in user_sequences.values():
-        if policy_id in sequence:
-            idx = sequence.index(policy_id)
-            if idx + 1 < len(sequence):
-                next_policies.append(sequence[idx + 1])
-
-    counter = Counter(next_policies)
-    most_common_ids = [pk for pk, _ in counter.most_common(5)]
-    return YouthPolicy.objects.filter(id__in=most_common_ids)
 
 # youth_policy/views.py
 
@@ -182,13 +164,6 @@ def toggle_policy_like(request, policy_id):
 
     return redirect('youth_policy:policy_detail', policy_id=policy.id)
 
-def popular_policies(request):
-    top_viewed_policies = YouthPolicy.objects.order_by('-view_count')[:10]
-
-    return render(request, 'popular_policies.html', {
-        'top_viewed_policies': top_viewed_policies,
-    })
-
 def get_calendar(year, month):
     cal = calendar.Calendar(firstweekday=6)
     return cal.monthdatescalendar(year, month)
@@ -226,7 +201,9 @@ def calendar_view(request):
     for date_obj, policies_list in start_dict.items():
         date_str = django_date_format(date_obj, 'Y-m-d')
         for p in policies_list:
-            calendar_json_dict[date_str].append({'정책명': p.정책명})
+            calendar_json_dict[date_str].append({
+                'id': p.id,
+                '정책명': p.정책명})
 
     for date_obj, policies_list in end_dict.items():
         date_str = django_date_format(date_obj, 'Y-m-d')

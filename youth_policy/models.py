@@ -69,9 +69,3 @@ class PolicyComment(models.Model):
 
     def __str__(self):
         return f"{self.author.username}: {self.content[:20]}"
-
-
-class PolicyViewLog(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    policy = models.ForeignKey(YouthPolicy, on_delete=models.CASCADE)
-    viewed_at = models.DateTimeField(auto_now_add=True)
