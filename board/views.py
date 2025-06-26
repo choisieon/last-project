@@ -227,6 +227,28 @@ def post_detail(request, pk):
     # 게시글 신고 횟수
     report_count = Report.objects.filter(post=post).count()
 
+    # ★★★ 태그 전처리 추가 ★★★
+    processed_tags = []
+    for tag in post.tags.all():
+        if hasattr(tag, 'name'):  # name 속성이 있는 경우
+            processed_tags.append(tag.name)
+        elif isinstance(tag, str):  # 문자열인 경우 (JSON 등)
+            # JSON 파싱 시도: [{"value":"태그명"}] → "태그명"
+            if tag.startswith('['):
+                try:
+                    import json
+                    tag_data = json.loads(tag)
+                    if isinstance(tag_data, list) and tag_data:
+                        processed_tags.append(tag_data[0].get('value', tag))
+                    else:
+                        processed_tags.append(tag)
+                except json.JSONDecodeError:
+                    processed_tags.append(tag)
+            else:
+                processed_tags.append(tag)
+        else:  # 기타 경우
+            processed_tags.append(str(tag))
+
     return render(request, 'board/post_detail.html', {
         'post': post,
         'comments': comments,
@@ -235,6 +257,7 @@ def post_detail(request, pk):
         'is_following': is_following,
         'is_bookmarked': is_bookmarked,
         'report_count': report_count,
+        'processed_tags': processed_tags,
     })
 
 # 좋아요 (페이지 리로드)
