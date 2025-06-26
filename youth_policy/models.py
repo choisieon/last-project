@@ -5,7 +5,7 @@ from django.conf import settings
 class Sigungu(models.Model):
     code = models.CharField(max_length=5, primary_key=True)
     name = models.CharField(max_length=50)
-    sido_name = models.CharField(max_length=20)  # 예: '경기도'
+    sido_name = models.CharField(max_length=20)
 
     def __str__(self):
         return self.name
@@ -41,8 +41,8 @@ class YouthPolicy(models.Model):
     
 
 class Sido(models.Model):
-    code = models.CharField(max_length=2, primary_key=True)  # 예: '11'
-    name = models.CharField(max_length=50)  # 예: '서울특별시'
+    code = models.CharField(max_length=2, primary_key=True)
+    name = models.CharField(max_length=50)
 
     def __str__(self):
         return self.name
