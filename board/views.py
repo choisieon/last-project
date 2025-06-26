@@ -62,8 +62,13 @@ def post_list(request):
     else:
         posts = posts.order_by('-created_at')
 
+    if category == 'review':
+        page_size = 9  # 후기는 9개 (3x3 그리드)
+    else:
+        page_size = 18
+
     # 페이지네이션
-    paginator = Paginator(posts, 10)
+    paginator = Paginator(posts, page_size)
     page_obj = paginator.get_page(page)
 
     # 주간 인기글: 카테고리별/전체 인기글 (5개)
@@ -139,11 +144,11 @@ def post_new(request):
                 tag_list = [tag.strip() for tag in tags_str.split(',') if tag.strip()]
                 post.tags.set(tag_list)
                 
-            # 5. 이미지 저장
+            # 이미지 저장 (images 필드)
             for f in request.FILES.getlist('images'):
-                PostImage.objects.create(post=post, image=f)
+                PostFile.objects.create(post=post, image=f)
 
-            # 파일 저장 (여기 추가!)
+            # 파일 저장 (files 필드)
             for f in request.FILES.getlist('files'):
                 PostFile.objects.create(post=post, file=f)
                 

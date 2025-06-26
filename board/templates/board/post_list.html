@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
+{% load board_extras %}
+
 
 {% block title %}
 {% if category == 'review' %}후기 게시판 | 청설모{% else %}커뮤니티 | 청설모{% endif %}
@@ -12,6 +14,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
 {% endblock %}
 
+<!-- ✅ 수정: category-bar와 tag-cloud를 category_bar 블록으로 이동 -->
 {% block category_bar %}
 <div class="category-bar">
   <a href="{% url 'board:post_list' %}" class="{% if not category %}active{% endif %}"><button>전체</button></a>
@@ -19,6 +22,7 @@
   <a href="{% url 'board:post_list' %}?category=share" class="{% if category == 'share' %}active{% endif %}"><button>자료공유</button></a>
   <a href="{% url 'board:post_list' %}?category=free" class="{% if category == 'free' %}active{% endif %}"><button>잡담</button></a>
 </div>
+
 <div class="tag-cloud">
   {% for tag in popular_mentor_tags %}
   <a href="?{% if category %}category={{ category }}&{% endif %}tag={{ tag.name }}"
@@ -31,80 +35,99 @@
 
 {% block content %}
 <div class="wrapper">
-  <h1>
-    {% if category == 'review' %}📸 후기 게시판
-    {% elif not category %}전체 게시글
-    {% else %}{{ category|title }} 게시판
-    {% endif %}
-  </h1>
-
-  <!-- 인기글 리스트 (최대 5개, 한 줄에 간결하게) -->
-  <div class="top-list-box">
-    <div class="top-list-label"><span>🔥</span> 이번 주 인기글</div>
-    <ul class="top-list-ul">
-      {% for post in weekly_top_posts|slice:":5" %}
-        <li class="top-list-li">
-          <a href="{% url 'board:post_detail' post.pk %}" class="top-list-title">
-            {{ post.title }}
-          </a>
-          <span class="top-list-meta">
-            <span class="top-list-author">{{ post.author.username }}</span>
-            <span class="top-list-date">| {{ post.created_at|date:"Y.m.d" }}</span>
-            <span class="top-list-views">| 조회수: {{ post.views }}</span>
-            <span class="top-list-likes">| ♥ {{ post.likes.count }}</span>
-          </span>
-          <span class="top-list-thumb">
-            {% if post.category == 'review' and post.thumbnail %}
-              <img src="{{ post.thumbnail.url }}" alt="썸네일">
-            {% elif post.category == 'share' %}
-              <span class="top-list-icon share-default">📄</span>
-            {% elif post.category == 'free' %}
-              <span class="top-list-icon chat-default">💬</span>
-            {% endif %}
-          </span>
-        </li>
-      {% empty %}
-        <li class="top-list-empty">이번 주 인기글이 없습니다.</li>
+  <!-- 픽셀아트 스타일 검색창과 정렬 -->
+  <div class="search-sort-bar">
+    <form method="get" class="pixel-search-form">
+      <input type="text" name="keyword" value="{{ keyword|default_if_none:'' }}" placeholder="검색어를 입력하세요" class="pixel-search-input">
+      <select name="search_type" class="pixel-search-select">
+        <option value="">전체</option>
+        <option value="author" {% if search_type == 'author' %}selected{% endif %}>아이디</option>
+        <option value="tag" {% if search_type == 'tag' %}selected{% endif %}>태그</option>
+        <option value="content" {% if search_type == 'content' %}selected{% endif %}>내용</option>
+      </select>
+      <button type="submit" class="pixel-search-btn">검색</button>
+      {% if category %}
+        <input type="hidden" name="category" value="{{ category }}">
+      {% endif %}
+      {% for tag in tag_filter %}
+        <input type="hidden" name="tag" value="{{ tag }}">
       {% endfor %}
-    </ul>
+      <input type="hidden" name="sort" value="{{ sort }}">
+    </form>
+    
+    <!-- 픽셀아트 스타일 정렬 드롭다운 -->
+    <div class="pixel-sort-dropdown">
+      <button type="button" class="pixel-sort-btn" onclick="toggleSortDropdown()">
+        {% if sort == 'likes' %}♥ 좋아요순
+        {% elif sort == 'comments' %}💬 댓글순
+        {% elif sort == 'views' %}👁 조회수순
+        {% else %}📅 최신순
+        {% endif %}
+        <span class="pixel-arrow">▼</span>
+      </button>
+      <div id="sortDropdownMenu" class="pixel-sort-menu">
+        <a href="?{% if category %}category={{ category }}&{% endif %}{% if keyword %}keyword={{ keyword }}&{% endif %}{% if search_type %}search_type={{ search_type }}&{% endif %}{% for tag in tag_filter %}tag={{ tag }}&{% endfor %}sort=" class="pixel-sort-item {% if not sort %}active{% endif %}">📅 최신순</a>
+        <a href="?{% if category %}category={{ category }}&{% endif %}{% if keyword %}keyword={{ keyword }}&{% endif %}{% if search_type %}search_type={{ search_type }}&{% endif %}{% for tag in tag_filter %}tag={{ tag }}&{% endfor %}sort=likes" class="pixel-sort-item {% if sort == 'likes' %}active{% endif %}">♥ 좋아요순</a>
+        <a href="?{% if category %}category={{ category }}&{% endif %}{% if keyword %}keyword={{ keyword }}&{% endif %}{% if search_type %}search_type={{ search_type }}&{% endif %}{% for tag in tag_filter %}tag={{ tag }}&{% endfor %}sort=comments" class="pixel-sort-item {% if sort == 'comments' %}active{% endif %}">💬 댓글순</a>
+        <a href="?{% if category %}category={{ category }}&{% endif %}{% if keyword %}keyword={{ keyword }}&{% endif %}{% if search_type %}search_type={{ search_type }}&{% endif %}{% for tag in tag_filter %}tag={{ tag }}&{% endfor %}sort=views" class="pixel-sort-item {% if sort == 'views' %}active{% endif %}">👁 조회수순</a>
+      </div>
+    </div>
   </div>
 
-  <!-- 검색창 -->
-  <form method="get" class="search-bar" style="margin-bottom: 16px; display:flex; gap:8px; align-items:center;">
-    <input type="text" name="keyword" value="{{ keyword|default_if_none:'' }}" placeholder="검색어(내용, 태그, 작성자)" style="flex:1; padding:7px 12px; border:1.5px solid #bbb; border-radius:4px;">
-    <select name="search_type" style="padding:7px 8px; border-radius:4px; border:1.5px solid #bbb;">
-      <option value="">전체</option>
-      <option value="author" {% if search_type == 'author' %}selected{% endif %}>아이디</option>
-      <option value="tag" {% if search_type == 'tag' %}selected{% endif %}>태그</option>
-      <option value="content" {% if search_type == 'content' %}selected{% endif %}>내용</option>
-    </select>
-    <button type="submit" style="padding:7px 18px; border-radius:4px; background:#1976d2; color:#fff; font-weight:bold;">검색</button>
-    {% if sort %}
-      <input type="hidden" name="sort" value="{{ sort }}">
-    {% endif %}
-    {% if category %}
-      <input type="hidden" name="category" value="{{ category }}">
-    {% endif %}
-    {% for tag in tag_filter %}
-      <input type="hidden" name="tag" value="{{ tag }}">
-    {% endfor %}
-  </form>
-
   {% if keyword %}
-    <div class="search-result-label" style="margin-bottom:10px; color:#333; font-weight:bold;">
+    <div class="search-result-label">
       <strong>"{{ keyword }}"</strong>에 대한 검색 결과
     </div>
   {% endif %}
 
-  <!-- 정렬 바 -->
-  <div class="sort-bar">
-    <a href="?{% if category %}category={{ category }}&{% endif %}{% if keyword %}keyword={{ keyword }}&{% endif %}{% if search_type %}search_type={{ search_type }}&{% endif %}{% for tag in tag_filter %}tag={{ tag }}&{% endfor %}sort=" {% if not sort %}class="active"{% endif %}>최신순</a>
-    <a href="?{% if category %}category={{ category }}&{% endif %}{% if keyword %}keyword={{ keyword }}&{% endif %}{% if search_type %}search_type={{ search_type }}&{% endif %}{% for tag in tag_filter %}tag={{ tag }}&{% endfor %}sort=likes" {% if sort == 'likes' %}class="active"{% endif %}>좋아요순</a>
-    <a href="?{% if category %}category={{ category }}&{% endif %}{% if keyword %}keyword={{ keyword }}&{% endif %}{% if search_type %}search_type={{ search_type }}&{% endif %}{% for tag in tag_filter %}tag={{ tag }}&{% endfor %}sort=comments" {% if sort == 'comments' %}class="active"{% endif %}>댓글순</a>
-    <a href="?{% if category %}category={{ category }}&{% endif %}{% if keyword %}keyword={{ keyword }}&{% endif %}{% if search_type %}search_type={{ search_type }}&{% endif %}{% for tag in tag_filter %}tag={{ tag }}&{% endfor %}sort=views" {% if sort == 'views' %}class="active"{% endif %}>조회수순</a>
-  </div>
+  <!-- 인기글 리스트 (탭 색상 구분 적용) -->
+  {% if weekly_top_posts %}
+    <div class="popular-posts-section">
+      <div class="popular-posts-header">
+        <span>🔥 이번 주 인기글</span>
+      </div>
+      <div class="popular-posts-table">
+        {% for post in weekly_top_posts|slice:":5" %}
+          <div class="popular-post-row">
+            <div class="popular-post-category">
+              {% if post.category == 'share' %}
+                <span class="category-tab tab-share">자료</span>
+              {% elif post.category == 'free' %}
+                <span class="category-tab tab-free">잡담</span>
+              {% elif post.category == 'review' %}
+                <span class="category-tab tab-review">후기</span>
+              {% else %}
+                <span class="category-tab">전체</span>
+              {% endif %}
+            </div>
+            <div class="popular-post-title">
+              <a href="{% url 'board:post_detail' post.pk %}">{{ post.title }}</a>
+              <!-- 2. 제목 바로 옆에 댓글 수 표시 -->
+              {% if post.comments.count > 0 %}
+                <span class="comment-count">[{{ post.comments.count }}]</span>
+              {% endif %}
+              {# 이미지 여부 체크 (썸네일 또는 첨부 이미지) #}
+              {% if post.thumbnail or post.files.all|any_has_image %}
+                <span class="attachment-icon">🖼️</span>
+              {% endif %}
 
-  <!-- 이하 게시글 리스트/공지글 등 기존 코드 그대로 유지 -->
+              {# 파일 여부 체크 #}
+              {% if post.files.all|any_has_file %}
+                <span class="attachment-icon">💾</span>
+              {% endif %}
+
+            </div>
+            <div class="popular-post-author">{{ post.author.username }}</div>
+            <div class="popular-post-date">{{ post.created_at|date:"m.d" }}</div>
+            <div class="popular-post-views">{{ post.views }}</div>
+            <div class="popular-post-likes">{{ post.likes.count }}</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- 후기 게시판은 기존 그리드 뷰 유지 -->
   {% if category == 'review' %}
     {% if fixed_posts %}
       {% for post in fixed_posts %}
@@ -124,9 +147,9 @@
             <div class="post-snippet">
               {{ post.content|truncatechars_html:10|safe }}
             </div>
-            <div class="post-tags" style="margin: 6px 0 0 0;">
+            <div class="post-tags">
               {% for tag in post.tags.all %}
-              <a href="{% url 'board:tagged' tag.slug %}" style="display:inline-block; margin-right:8px; color:#1976d2; background:#f0f4fa; padding:3px 10px; border-radius:12px; font-size:0.98em; text-decoration:none;">
+              <a href="{% url 'board:tagged' tag.slug %}" class="post-tag-link">
                 #{{ tag.name }}
               </a>
               {% empty %}
@@ -171,9 +194,9 @@
               <div class="post-snippet">
                 {{ post.content|truncatechars_html:10|safe }}
               </div>
-              <div class="post-tags" style="margin: 6px 0 0 0;">
+              <div class="post-tags">
                 {% for tag in post.tags.all %}
-                <a href="{% url 'board:tagged' tag.slug %}" style="display:inline-block; margin-right:8px; color:#1976d2; background:#f0f4fa; padding:3px 10px; border-radius:12px; font-size:0.98em; text-decoration:none;">
+                <a href="{% url 'board:tagged' tag.slug %}" class="post-tag-link">
                   #{{ tag.name }}
                 </a>
                 {% empty %}
@@ -185,85 +208,97 @@
         {% endif %}
       {% endfor %}
     </div>
+
   {% else %}
-    <div class="post-list">
+    <!-- 전체/자료공유/잡담 게시판: 테이블 형태 리스트 -->
+    
+    <!-- 컬럼 헤더 -->
+    <div class="post-table-header">
+      <div class="header-category">탭</div>
+      <div class="header-title">제목</div>
+      <div class="header-author">작성자</div>
+      <div class="header-date">작성일</div>
+      <div class="header-views">조회</div>
+      <div class="header-likes">좋아요</div>
+    </div>
+
+    <!-- 공지글 -->
+    <div class="post-table">
       {% for post in fixed_posts %}
-        <div class="post-item post-item-row notice-row">
-          <div class="post-item-text">
-            <h4>
-              <span class="notice-badge">공지</span>
-              <a href="{% url 'board:post_detail' post.pk %}?category={{ category }}">{{ post.title }}</a>
-            </h4>
-            <div class="post-meta">
-              <span>작성자: {{ post.author }}</span>
-              <span> | {{ post.created_at|date:"Y-m-d H:i" }}</span>
-              <span> | 조회수: {{ post.views }}</span>
-              <span> | ♥ {{ post.likes.count }}</span>
-              <span> | 댓글: {{ post.comments.count }}</span>
-            </div>
-            <div class="post-snippet">
-              {{ post.content|truncatechars_html:30|safe }}
-            </div>
-            <div class="post-tags" style="margin: 8px 0 0 0;">
-              {% for tag in post.tags.all %}
-              <a href="{% url 'board:tagged' tag.slug %}" style="display:inline-block; margin-right:8px; color:#1976d2; background:#f0f4fa; padding:3px 10px; border-radius:12px; font-size:0.98em; text-decoration:none;">
-                #{{ tag.name }}
-              </a>
-              {% empty %}
-              <span style="color:#aaa;">태그 없음</span>
-              {% endfor %}
-            </div>
+        <div class="post-table-row notice-table-row">
+          <div class="post-category">
+            <span class="notice-badge-small tab-notice">공지</span>
           </div>
-          <div class="post-item-image">
-            <div class="default-image notice-default">📢</div>
+          <div class="post-title">
+            <a href="{% url 'board:post_detail' post.pk %}?category={{ category }}">{{ post.title }}</a>
+            <!-- 2,3. 제목 바로 옆에 댓글 수와 첨부파일 표시 -->
+            {% if post.comments.count > 0 %}
+              <span class="comment-count">[{{ post.comments.count }}]</span>
+            {% endif %}
+            {# 이미지 여부 체크 (썸네일 또는 첨부 이미지) #}
+            {% if post.thumbnail or post.files.all|any_has_image %}
+              <span class="attachment-icon">🖼️</span>
+            {% endif %}
+
+            {# 파일 여부 체크 #}
+            {% if post.files.all|any_has_file %}
+              <span class="attachment-icon">💾</span>
+            {% endif %}
+
           </div>
+          <div class="post-author">{{ post.author.username }}</div>
+          <div class="post-date">{{ post.created_at|date:"m.d" }}</div>
+          <div class="post-views">{{ post.views }}</div>
+          <div class="post-likes">{{ post.likes.count }}</div>
         </div>
       {% endfor %}
+      
+      <!-- 일반 게시글 (깔끔한 탭 색상 구분) -->
       {% for post in page_obj %}
-        <div class="post-item post-item-row">
-          <div class="post-item-text">
-            <h4>
-              <a href="{% url 'board:post_detail' post.pk %}?category={{ category }}{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}">{{ post.title }}</a>
-            </h4>
-            <div class="post-meta">
-              <span>작성자: {{ post.author }}</span>
-              <span> | {{ post.created_at|date:"Y-m-d H:i" }}</span>
-              <span> | 조회수: {{ post.views }}</span>
-              <span> | ♥ {{ post.likes.count }}</span>
-              <span> | 댓글: {{ post.comments.count }}</span>
-            </div>
-            <div class="post-snippet">
-              {{ post.content|truncatechars_html:30|safe }}
-            </div>
-            <div class="post-tags" style="margin: 8px 0 0 0;">
-              {% for tag in post.tags.all %}
-              <a href="{% url 'board:tagged' tag.slug %}" style="display:inline-block; margin-right:8px; color:#1976d2; background:#f0f4fa; padding:3px 10px; border-radius:12px; font-size:0.98em; text-decoration:none;">
-                #{{ tag.name }}
-              </a>
-              {% empty %}
-              <span style="color:#aaa;">태그 없음</span>
-              {% endfor %}
-            </div>
-          </div>
-          <div class="post-item-image{% if post.category == 'review' and post.thumbnail %} review-thumbnail{% endif %}">
-            {% if post.category == 'review' and post.thumbnail %}
-              <img src="{{ post.thumbnail.url }}" alt="{{ post.title }}">
-            {% elif post.category == 'share' %}
-              <div class="default-image share-default">📄</div>
+        <div class="post-table-row">
+          <div class="post-category">
+            {% if post.category == 'share' %}
+              <span class="category-tab tab-share">자료</span>
             {% elif post.category == 'free' %}
-              <div class="default-image chat-default">💬</div>
+              <span class="category-tab tab-free">잡담</span>
+            {% elif post.category == 'review' %}
+              <span class="category-tab tab-review">후기</span>
+            {% else %}
+              <span class="category-tab">전체</span>
             {% endif %}
           </div>
+          <div class="post-title">
+            <a href="{% url 'board:post_detail' post.pk %}?category={{ category }}{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}">{{ post.title }}</a>
+            <!-- 2,3. 제목 바로 옆에 댓글 수와 첨부파일 표시 -->
+            {% if post.comments.count > 0 %}
+              <span class="comment-count">[{{ post.comments.count }}]</span>
+            {% endif %}
+            {# 이미지 여부 체크 (썸네일 또는 첨부 이미지) #}
+            {% if post.thumbnail or post.files.all|any_has_image %}
+              <span class="attachment-icon">🖼️</span>
+            {% endif %}
+
+            {# 파일 여부 체크 #}
+            {% if post.files.all|any_has_file %}
+              <span class="attachment-icon">💾</span>
+            {% endif %}
+
+          </div>
+          <div class="post-author">{{ post.author.username }}</div>
+          <div class="post-date">{{ post.created_at|date:"m.d" }}</div>
+          <div class="post-views">{{ post.views }}</div>
+          <div class="post-likes">{{ post.likes.count }}</div>
         </div>
       {% empty %}
-        <div style="margin:40px 0; text-align:center; color:#888;">
+        <div class="post-table-empty">
           게시글이 없습니다.
         </div>
       {% endfor %}
     </div>
   {% endif %}
 
-  <div class="pagination" style="margin-top:30px; text-align:center;">
+  <!-- 페이지네이션 -->
+  <div class="pagination">
     {% if page_obj.has_previous %}
     <a href="?page=1{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if search_type %}&search_type={{ search_type }}{% endif %}{% for tag in tag_filter %}&tag={{ tag }}{% endfor %}">« 처음</a>
     <a href="?page={{ page_obj.previous_page_number }}{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if search_type %}&search_type={{ search_type }}{% endif %}{% for tag in tag_filter %}&tag={{ tag }}{% endfor %}">‹ 이전</a>
@@ -294,18 +329,51 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+
+// 정렬 드롭다운 토글 함수
+function toggleSortDropdown() {
+  const menu = document.getElementById('sortDropdownMenu');
+  menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+
+// 드롭다운 외부 클릭 시 닫기
+document.addEventListener('click', function(event) {
+  const dropdown = document.querySelector('.pixel-sort-dropdown');
+  const menu = document.getElementById('sortDropdownMenu');
+  if (dropdown && !dropdown.contains(event.target)) {
+    menu.style.display = 'none';
+  }
+});
 </script>
 {% endblock %}
 
 {% block extra_style %}
 <style>
+.top-nav,
+.category-bar,
+.tag-cloud {
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* ✅ 수정: 상위 네비게이션과 정렬 맞춤 및 간격 최소화 */
+.top-nav {
+  margin-bottom: 6px;   /* 20px → 6px (위 간격 최소화) */
+}
 .category-bar {
-  margin-top: 20px;
-  margin-bottom: 15px;
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
+  justify-content: flex-start;
+  padding: 0;
+  margin-top: 0;
+  margin-bottom: 8px;   /* 태그와의 간격 */
 }
+
 .category-bar button {
   background-color: rgba(250, 235, 180, 0.9);
   background-image: url("{% static 'images/pixel-paper.png' %}");
@@ -315,227 +383,586 @@ document.addEventListener('DOMContentLoaded', function() {
   box-shadow: 2px 2px 0 #b9a782;
   font-size: 13px;
   font-weight: bold;
-  padding: 6px 10px;
+  padding: 6px 16px;
   cursor: pointer;
   color: #4a3b28;
+  transition: all 0.1s ease;
+  min-width: 75px;
 }
-.category-bar a.active button,
-.category-bar button.active {
+
+.category-bar button:hover {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 #b9a782;
+}
+
+.category-bar a.active button {
   background-color: #007aff;
   color: white;
+  border-color: #005cbf;
+  box-shadow: 2px 2px 0 #0066cc;
 }
-/* 인기글 리스트 스타일 (박스 없이 깔끔하게) */
-.top-list-label {
-  margin: 18px 0 8px 0;
+
+/* ✅ 수정: 태그 클라우드도 중앙 정렬 및 간격 최소화 */
+.tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-start;
+  padding: 0;
+  margin-top: 0;
+  margin-bottom: 6px;   /* 본문과의 간격 */
+}
+
+.tag-cloud .tag {
+  background-color: rgba(240, 248, 255, 0.95);
+  background-image: url("{% static 'images/pixel-paper.png' %}");
+  background-size: 3px 3px;
+  background-repeat: repeat;
+  color: #0066cc;
+  text-decoration: none;
+  padding: 4px 10px;
+  border: 2px solid #4682b4;
+  box-shadow: 2px 2px 0 #87ceeb;
+  font-size: 11px;
   font-weight: bold;
-  color: #e65100;
-  font-size: 1.08rem;
+  transition: all 0.1s ease;
+}
+
+.tag-cloud .tag:hover {
+  background-color: #4682b4;
+  color: #ffffff;
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 #87ceeb;
+}
+
+.tag-cloud .tag.active {
+  background-color: #0066cc;
+  color: #ffffff;
+  box-shadow: 2px 2px 0 #87ceeb;
+}
+
+/* 픽셀아트 스타일 검색창 */
+.search-sort-bar {
+  margin-bottom: 25px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.pixel-search-form {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.pixel-search-input {
+  padding: 7px 11px;
+  border: 2px solid #8b4513;
+  background-color: rgba(255, 248, 220, 0.95);
+  background-image: url("{% static 'images/pixel-paper.png' %}");
+  background-size: 3px 3px;
+  background-repeat: repeat;
+  box-shadow: 2px 2px 0 #cd853f;
+  font-size: 13px;
+  font-weight: bold;
+  color: #4a3b28;
+  outline: none;
+  min-width: 180px;
+}
+
+.pixel-search-input:focus {
+  background-color: #ffffff;
+  border-color: #ff6347;
+  box-shadow: 2px 2px 0 #ffa07a;
+}
+
+.pixel-search-select {
+  padding: 7px 9px;
+  border: 2px solid #8b4513;
+  background-color: rgba(245, 222, 179, 0.95);
+  background-image: url("{% static 'images/pixel-paper.png' %}");
+  background-size: 3px 3px;
+  background-repeat: repeat;
+  box-shadow: 2px 2px 0 #cd853f;
+  font-size: 12px;
+  font-weight: bold;
+  color: #4a3b28;
+  cursor: pointer;
+}
+
+.pixel-search-btn {
+  padding: 7px 14px;
+  border: 2px solid #228b22;
+  background-color: rgba(144, 238, 144, 0.95);
+  background-image: url("{% static 'images/pixel-paper.png' %}");
+  background-size: 3px 3px;
+  background-repeat: repeat;
+  box-shadow: 2px 2px 0 #32cd32;
+  color: #006400;
+  font-weight: bold;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.pixel-search-btn:hover {
+  background-color: #32cd32;
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 #32cd32;
+}
+
+/* 픽셀아트 스타일 정렬 드롭다운 */
+.pixel-sort-dropdown {
+  position: relative;
+}
+
+.pixel-sort-btn {
+  padding: 7px 14px;
+  border: 2px solid #ff4500;
+  background-color: rgba(255, 165, 0, 0.95);
+  background-image: url("{% static 'images/pixel-paper.png' %}");
+  background-size: 3px 3px;
+  background-repeat: repeat;
+  box-shadow: 2px 2px 0 #ff6347;
+  color: #8b0000;
+  font-weight: bold;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.1s ease;
+}
+
+.pixel-sort-btn:hover {
+  background-color: #ff6347;
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 #ff6347;
+}
+
+.pixel-sort-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: rgba(255, 248, 220, 0.98);
+  background-image: url("{% static 'images/pixel-paper.png' %}");
+  background-size: 3px 3px;
+  background-repeat: repeat;
+  border: 2px solid #8b4513;
+  box-shadow: 3px 3px 0 #cd853f;
+  z-index: 1000;
+  min-width: 130px;
+  margin-top: 3px;
+}
+
+.pixel-sort-item {
+  display: block;
+  padding: 7px 11px;
+  color: #4a3b28;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 12px;
+  border-bottom: 1px solid #deb887;
+  transition: all 0.1s ease;
+}
+
+.pixel-sort-item:last-child {
+  border-bottom: none;
+}
+
+.pixel-sort-item:hover {
+  background-color: rgba(245, 222, 179, 0.8);
+  color: #8b4513;
+}
+
+.pixel-sort-item.active {
+  background-color: #007aff;
+  color: #ffffff;
+}
+
+/* 깔끔한 탭 색상 구분 (공지/후기/자료공유/잡담만) */
+.category-tab {
+  display: inline-block;
+  padding: 3px 7px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: bold;
+  color: #ffffff;
+  text-align: center;
+  min-width: 30px;
+}
+
+.tab-share {
+  background-color: #4CAF50;
+}
+
+.tab-free {
+  background-color: #2196F3;
+}
+
+.tab-review {
+  background-color: #E91E63;
+}
+
+.tab-notice {
+  background-color: #FF9800;
+  color: #ffffff;
+}
+
+/* 인기글 섹션 */
+.popular-posts-section {
+  margin-bottom: 25px;
+}
+
+.popular-posts-header {
+  padding: 11px 15px;
+  background: linear-gradient(135deg, #ff6f00 0%, #ff8f00 100%);
+  color: #fff;
+  font-weight: bold;
+  font-size: 1.02rem;
+  border-radius: 7px 7px 0 0;
   display: flex;
   align-items: center;
   gap: 7px;
 }
-.top-list-ul {
-  list-style: none;
-  margin: 0 0 20px 0;
-  padding: 0;
+
+.popular-posts-table {
+  border: 2px solid #ff8f00;
+  border-top: none;
+  border-radius: 0 0 7px 7px;
+  background: #fff;
+  overflow: hidden;
 }
-.top-list-li {
-  display: flex;
+
+.popular-post-row {
+  display: grid;
+  grid-template-columns: 60px 1fr 100px 80px 60px 60px;
+  gap: 9px;
+  padding: 9px 15px;
+  border-bottom: 1px solid #f0f0f0;
   align-items: center;
-  border-bottom: 1px solid #f0e6d2;
-  background: none;
-  border-radius: 0;
-  padding: 6px 0;
-  margin-bottom: 0;
-  gap: 10px;
-  font-size: 1rem;
   transition: background-color 0.2s;
+  background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+  border-left: 3px solid #ff9800;
 }
-.top-list-li:hover {
-  background-color: #fafafa;
+
+.popular-post-row:hover {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
 }
-.top-list-li:last-child {
+
+.popular-post-row:last-child {
   border-bottom: none;
 }
-.top-list-title {
-  flex: 1;
-  font-weight: bold;
-  color: #1976d2;
+
+.popular-post-category {
+  text-align: center;
+  font-size: 1rem;
+}
+
+.popular-post-title {
+  font-size: 0.93rem;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-wrap: wrap;
+}
+
+.popular-post-title a {
+  color: #e65100;
   text-decoration: none;
-  font-size: 1.03rem;
-  white-space: nowrap;
+  font-weight: bold;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: none;
+  flex-shrink: 1;
 }
-.top-list-meta {
+
+.popular-post-title a:hover {
+  color: #bf360c;
+  text-decoration: underline;
+}
+
+.popular-post-author, .popular-post-date, .popular-post-views, .popular-post-likes {
   color: #666;
+  font-size: 0.88rem;
+  text-align: center;
+}
+
+/* 테이블 형태 게시판 스타일 */
+.post-table-header {
+  display: grid;
+  grid-template-columns: 60px 1fr 100px 80px 60px 60px;
+  gap: 9px;
+  padding: 11px 15px;
+  background: #f8f9fa;
+  border: 2px solid #dee2e6;
+  border-bottom: 1px solid #dee2e6;
+  border-radius: 7px 7px 0 0;
+  font-weight: bold;
+  color: #495057;
   font-size: 0.93rem;
-  margin-left: 10px;
+}
+
+.post-table {
+  border: 2px solid #dee2e6;
+  border-top: none;
+  border-radius: 0 0 7px 7px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.post-table-row {
+  display: grid;
+  grid-template-columns: 60px 1fr 100px 80px 60px 60px;
+  gap: 9px;
+  padding: 11px 15px;
+  border-bottom: 1px solid #f0f0f0;
+  align-items: center;
+  transition: background-color 0.2s;
+}
+
+.post-table-row:hover {
+  background-color: #f8f9fa;
+}
+
+.post-table-row:last-child {
+  border-bottom: none;
+}
+
+.notice-table-row {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%) !important;
+  border-left: 4px solid #ff9800 !important;
+}
+
+.notice-table-row:hover {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%) !important;
+}
+
+.post-category {
+  text-align: center;
+  font-size: 0.98rem;
+}
+
+.category-icon {
+  font-size: 1.05rem;
+  color: #666;
+}
+
+.notice-badge-small {
+  font-size: 10px;
+  font-weight: bold;
+  background-color: #FF9800;
+  color: #ffffff;
+  padding: 3px 7px;
+  border-radius: 3px;
+}
+
+.post-title {
+  font-size: 0.93rem;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-wrap: wrap;
+}
+
+.post-title a {
+  color: #333;
+  text-decoration: none;
+  font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: none;
+  flex-shrink: 1;
+}
+
+.post-title a:hover {
+  color: #1976d2;
+  text-decoration: underline;
+}
+
+/* 2. 댓글 수를 제목 바로 옆에 붙이기 */
+.comment-count {
+  color: #e65100;
+  font-weight: bold;
+  font-size: 0.85rem;
+  margin-left: 3px;
+  flex-shrink: 0;
   white-space: nowrap;
 }
-.top-list-thumb {
-  margin-left: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+
+/* 3. 첨부파일 이모티콘 표시 */
+.attachment-icon {
+  color: #666;
+  font-size: 0.9rem;
+  margin-left: 4px;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
-.top-list-thumb img {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  object-fit: cover;
-  border: 1px solid #e0e0e0;
-  background: #eee;
-}
-.top-list-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.3rem;
-  color: #fff;
-  font-weight: bold;
-}
-.share-default {
-  background: linear-gradient(135deg, #4CAF50, #45a049);
-}
-.chat-default {
-  background: linear-gradient(135deg, #FF9800, #F57C00);
-}
-.top-list-empty {
-  color: #aaa;
+
+.post-author {
+  color: #666;
+  font-size: 0.88rem;
   text-align: center;
-  padding: 12px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.post-date {
+  color: #666;
+  font-size: 0.88rem;
+  text-align: center;
+}
+
+.post-views, .post-likes {
+  color: #666;
+  font-size: 0.88rem;
+  text-align: center;
+}
+
+.post-table-empty {
+  padding: 35px;
+  text-align: center;
+  color: #aaa;
   font-style: italic;
 }
+
 /* 공지글 스타일 */
 .notice-row {
   background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%) !important;
-  border-left: 4px solid #ff0000 !important;
+  border-left: 4px solid #ff9800 !important;
 }
 .notice-badge {
   display: inline-block;
   background: #ff9800;
   color: #fff;
   font-weight: bold;
-  font-size: 0.85rem;
-  padding: 3px 8px;
-  border-radius: 12px;
-  margin-right: 8px;
+  font-size: 0.83rem;
+  padding: 3px 7px;
+  border-radius: 11px;
+  margin-right: 7px;
 }
-.notice-default {
-  background: linear-gradient(135deg, #1976d2, #42a5f5) !important; /* 파란색 계열 */
-  color: #fff;
-}
-.sort-bar {
-  margin-bottom: 18px;
+
+/* 픽셀아트 스타일 태그 링크 */
+.post-tags {
+  margin: 5px 0 0 0;
   display: flex;
-  gap: 10px;
+  flex-wrap: wrap;
+  gap: 5px;
 }
-.sort-bar a {
-  padding: 6px 14px;
-  border: 1.5px solid #007aff;
-  border-radius: 4px;
-  color: #007aff;
-  background: #fff;
+
+.post-tag-link {
+  display: inline-block;
+  background-color: rgba(230, 243, 255, 0.9);
+  background-image: url("{% static 'images/pixel-paper.png' %}");
+  background-size: 2px 2px;
+  background-repeat: repeat;
+  color: #0066cc;
   text-decoration: none;
+  padding: 2px 7px;
+  border: 1px solid #4682b4;
+  box-shadow: 1px 1px 0 #87ceeb;
+  font-size: 10px;
   font-weight: bold;
-  transition: background 0.2s, color 0.2s;
+  transition: all 0.1s ease;
 }
-.sort-bar a.active,
-.sort-bar a:hover {
-  background: #007aff;
-  color: #090000;
+
+.post-tag-link:hover {
+  background-color: #4682b4;
+  color: #ffffff;
+  transform: translate(1px, 1px);
+  box-shadow: 0px 0px 0 #87ceeb;
 }
+
+/* 검색 결과 라벨 */
+.search-result-label {
+  margin-bottom: 18px;
+  color: #333;
+  font-weight: bold;
+  background-color: rgba(255, 250, 205, 0.9);
+  background-image: url("{% static 'images/pixel-paper.png' %}");
+  background-size: 3px 3px;
+  background-repeat: repeat;
+  border: 2px solid #daa520;
+  box-shadow: 2px 2px 0 #b8860b;
+  padding: 7px 11px;
+  font-size: 13px;
+  text-align: center;
+}
+
+/* 기존 스타일 유지 */
 .post-list {
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 .post-item-row {
   display: flex;
   align-items: flex-start;
-  gap: 1.2rem;
-  margin-bottom: 24px;
+  gap: 1.1rem;
+  margin-bottom: 22px;
   border: 1px solid #fbc02d;
-  border-radius: 8px;
+  border-radius: 7px;
   background: #fff;
+  padding: 15px;
 }
 .post-item-text {
   flex: 1;
   min-width: 0;
 }
-.post-item-image {
-  flex-shrink: 0;
-  width: 80px;
-  height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.post-item-image img {
-  width: 80px;
-  height: 80px;
-  border-radius: 8px;
-  object-fit: cover;
-  box-shadow: 1px 1px 5px rgba(185, 167, 130, 0.3);
-  border: 1px solid #e0e0e0;
-}
-.default-image {
-  width: 80px;
-  height: 80px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2rem;
-  color: #fff;
-  font-weight: bold;
-  box-shadow: 1px 1px 5px rgba(185, 167, 130, 0.3);
-  border: 1px solid #e0e0e0;
-}
+
+/* 픽셀아트 스타일 페이지네이션 */
 .pagination {
-  margin-top: 20px;
+  margin-top: 30px;
   text-align: center;
 }
 .pagination a, .pagination strong {
   display: inline-block;
   margin: 0 3px;
-  padding: 4px 10px;
-  border-radius: 4px;
+  padding: 5px 9px;
+  border: 2px solid #4682b4;
+  background-color: rgba(240, 248, 255, 0.9);
+  background-image: url("{% static 'images/pixel-paper.png' %}");
+  background-size: 2px 2px;
+  background-repeat: repeat;
+  box-shadow: 2px 2px 0 #87ceeb;
+  color: #0066cc;
   text-decoration: none;
-  color: #007aff;
   font-weight: bold;
-  border: 1px solid #e0e0e0;
-  background: #fff;
+  font-size: 12px;
+  transition: all 0.1s ease;
 }
 .pagination a:hover {
-  background: #007aff;
-  color: #fff;
+  background-color: #4682b4;
+  color: #ffffff;
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 #87ceeb;
 }
 .pagination strong {
-  background: #007aff;
-  color: #090000;
-  border: 1.5px solid #007aff;
-  font-weight: bold;
+  background-color: #0066cc;
+  color: #ffffff;
+  border-color: #003d7a;
+  box-shadow: 2px 2px 0 #4682b4;
 }
-.search-result-label {
-  color: #333;
-  font-weight: bold;
-}
+
+/* 후기 그리드 스타일 */
 .review-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 24px;
-  margin-top: 30px;
-  margin-bottom: 30px;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 22px;
+  margin-top: 28px;
+  margin-bottom: 28px;
 }
 .review-card {
   display: block;
   background: #fff;
   border: 2px solid #fbc02d;
-  border-radius: 12px;
-  box-shadow: 2px 2px 8px #b9a78233;
+  border-radius: 11px;
+  box-shadow: 2px 2px 7px #b9a78233;
   overflow: hidden;
   text-decoration: none;
   color: #222;
@@ -543,79 +970,104 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 .review-card:hover {
   border: 2px solid #007aff;
-  box-shadow: 4px 4px 12px #1976d233;
+  box-shadow: 4px 4px 11px #1976d233;
 }
 .review-card img {
   width: 100%;
-  height: 180px;
+  height: 170px;
   object-fit: cover;
   background: #eee;
 }
 .review-card-body {
-  padding: 16px 14px 10px 14px;
+  padding: 15px 13px 9px 13px;
 }
 .review-card-body h3 {
-  font-size: 1.13rem;
-  margin-bottom: 7px;
+  font-size: 1.1rem;
+  margin-bottom: 6px;
 }
 .review-card-body p {
-  margin: 0 0 4px 0;
+  margin: 0 0 3px 0;
   color: #555;
-  font-size: 0.98em;
+  font-size: 0.96em;
 }
-.post-item-image.review-thumbnail {
-  align-self: center !important;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100px;
-  width: 100px;
+
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+  .search-sort-bar {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .pixel-search-form {
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    max-width: 380px;
+  }
+  
+  .pixel-search-input {
+    min-width: auto;
+    width: 100%;
+  }
+  
+  .post-table-header, .post-table-row, .popular-post-row {
+    grid-template-columns: 45px 1fr 65px 55px 40px 40px;
+    gap: 5px;
+    padding: 7px 11px;
+    font-size: 0.82rem;
+  }
+  
+  .category-bar {
+    gap: 6px;
+    padding: 1px 0;
+  }
+  
+  .category-bar button {
+    padding: 4px 10px;
+    font-size: 12px;
+    min-width: 65px;
+  }
+  
+  .tag-cloud {
+    gap: 4px;
+    padding: 1px 0;
+  }
+  
+  .tag-cloud .tag {
+    font-size: 10px;
+    padding: 3px 7px;
+  }
+  
+  /* 모바일에서 제목, 댓글, 첨부파일 간격 조정 */
+  .comment-count {
+    font-size: 0.8rem;
+    margin-left: 2px;
+  }
+  
+  .attachment-icon {
+    font-size: 0.85rem;
+    margin-left: 3px;
+  }
 }
-.post-item-image.review-thumbnail img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 8px;
-}
-.top-list-box {
-  background: #fff;
-  border: 2px solid #ffd600;
-  border-radius: 12px;
-  padding: 14px 18px 10px 18px;
-  margin: 24px 0 18px 0;
-  box-shadow: 0 4px 16px rgba(255, 193, 7, 0.10);
-}
+
 @media (max-width: 600px) {
   .post-item-row {
     flex-direction: column;
-    gap: 0.7rem;
-  }
-  .post-item-image {
-    width: 100%;
-    height: 60px;
-    margin-top: 10px;
-  }
-  .post-item-image img,
-  .default-image {
-    width: 60px;
-    height: 60px;
+    gap: 0.6rem;
   }
   .review-card img {
-    height: 120px;
+    height: 110px;
   }
-  .top-list-li {
-    flex-direction: column;
-    text-align: left;
-    align-items: flex-start;
-    gap: 4px;
+  
+  .pixel-search-input, .pixel-search-select, .pixel-search-btn {
+    width: 100%;
   }
-  .top-list-thumb, .top-list-thumb img, .top-list-icon {
-    width: 28px;
-    height: 28px;
-    font-size: 1.1rem;
-  }
-  .top-list-meta {
-    margin-left: 0;
+  
+  .category-bar button {
+    padding: 3px 8px;
+    font-size: 11px;
+    min-width: 60px;
   }
 }
 </style>
