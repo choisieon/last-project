@@ -78,15 +78,13 @@
 
         <!-- 태그 -->
         <div class="post-tags">
-          {% if post.tags.all %}
-            {% for tag in post.tags.all %}
-              <a href="{% url 'board:tagged' tag.slug %}" class="tag-link">
-                #{{ tag.name }}
-              </a>
-            {% endfor %}
-          {% else %}
+          {% for tag_name in processed_tags %}  <!-- processed_tags 사용 -->
+            <a href="{% url 'board:tagged' tag_name|slugify %}" class="tag-link">
+              #{{ tag_name }}  <!-- 태그 이름 출력 -->
+            </a>
+          {% empty %}  <!-- 태그가 없을 때 -->
             <span class="no-tags">태그 없음</span>
-          {% endif %}
+          {% endfor %}
         </div>
       </div>
     </div>
