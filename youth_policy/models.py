@@ -5,7 +5,7 @@ from django.conf import settings
 class Sigungu(models.Model):
     code = models.CharField(max_length=5, primary_key=True)
     name = models.CharField(max_length=50)
-    sido_name = models.CharField(max_length=20)  # 예: '경기도'
+    sido_name = models.CharField(max_length=20)
 
     def __str__(self):
         return self.name
@@ -16,8 +16,10 @@ class YouthPolicy(models.Model):
     정책설명 = models.TextField(blank=True, null=True)
     대상연령 = models.CharField(max_length=100, blank=True, null=True)
     정책키워드 = models.CharField(max_length=255, blank=True, null=True)
-    시행지역 = models.CharField(max_length=255, blank=True, null=True)
-    신청기간 = models.CharField(max_length=255, blank=True, null=True)
+    시행지역 = models.CharField(max_length=300, blank=True, null=True)
+    application_period = models.CharField("신청기간", max_length=255, blank=True, null=True)
+    application_start = models.DateField("신청 시작일", blank=True, null=True)
+    application_end = models.DateField("신청 마감일", blank=True, null=True)
     신청URL = models.URLField(blank=True, null=True)
     추가신청자격조건내용 = models.TextField(blank=True, null=True)
     제출서류내용 = models.TextField(blank=True, null=True)
@@ -39,8 +41,8 @@ class YouthPolicy(models.Model):
     
 
 class Sido(models.Model):
-    code = models.CharField(max_length=2, primary_key=True)  # 예: '11'
-    name = models.CharField(max_length=50)  # 예: '서울특별시'
+    code = models.CharField(max_length=2, primary_key=True)
+    name = models.CharField(max_length=50)
 
     def __str__(self):
         return self.name
@@ -67,9 +69,3 @@ class PolicyComment(models.Model):
 
     def __str__(self):
         return f"{self.author.username}: {self.content[:20]}"
-
-
-class PolicyViewLog(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    policy = models.ForeignKey(YouthPolicy, on_delete=models.CASCADE)
-    viewed_at = models.DateTimeField(auto_now_add=True)

@@ -10,4 +10,6 @@ urlpatterns = [
     path('comment/<int:comment_id>/edit/', views.edit_policy_comment, name='edit_policy_comment'),
     path('policy/<int:policy_id>/like/', views.toggle_policy_like, name='toggle_policy_like'),
     path('comment/<int:comment_id>/delete/', views.delete_policy_comment, name='delete_policy_comment'),
+
+    path('calendar/', views.calendar_view, name='calendar_view'),
 ]

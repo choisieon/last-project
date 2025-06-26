@@ -1,0 +1,386 @@
+{% load static %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ year }}년 {{ month }}월 정책 달력</title>
+  <style>
+    @font-face {
+      font-family: 'MyCustomFont';
+      src: url("{% static 'fonts/픽셀.woff2' %}") format('woff2');
+    }
+
+    body {
+      font-family: 'MyCustomFont', sans-serif;
+      background: url("{% static 'images/Frame 13.png' %}") no-repeat center center fixed;
+      background-size: cover;
+      margin: 0;
+      padding: 0;
+      color: #2f1b0c;
+    }
+
+    .calendar-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    h2 {
+      text-align: center;
+      font-size: 28px;
+      color: #f4e9db;
+      text-shadow: 2px 2px 0 #000;
+      margin: 20px 0 10px;
+    }
+
+    .calendar-nav {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .calendar-nav a {
+      margin: 0 20px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 16px;
+      background-color: #ffeeba;
+      color: #4e2801;
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 2px solid #c38743;
+      box-shadow: 2px 2px 0 #000;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 8px;
+      table-layout: fixed;
+    }
+
+    thead th {
+      background-color: #fff2b8;
+      border: 2px solid #c3a76f;
+      border-radius: 10px;
+      height: 50px;
+      text-align: center;
+      font-size: 16px;
+      color: #3c2f16;
+      box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+    }
+
+    td {
+      background-color: #fdf5e6;
+      border: 2px solid #c3a76f;
+      border-radius: 12px;
+      height: 80px;
+      vertical-align: top;
+      padding: 4px;
+      position: relative;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+      overflow: hidden;
+    }
+
+    td:hover {
+      background: #fff9e0;
+    }
+
+    .start-badge {
+      background-color: #d3f9d8;
+      color: #1b5e20;
+      font-weight: bold;
+      padding: 3px 5px;
+      border-radius: 4px;
+      margin-top: 4px;
+      display: block;
+      font-size: 11px;
+      border: 1px solid #388e3c;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    .end-badge {
+      background-color: #ffcdd2;
+      color: #b71c1c;
+      font-weight: bold;
+      padding: 3px 5px;
+      border-radius: 4px;
+      margin-top: 4px;
+      display: block;
+      font-size: 11px;
+      border: 1px solid #c62828;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    .start-badge.more,
+    .end-badge.more {
+      display: block;
+      background-color: #ffe082; 
+      color: #5d4037;
+      font-weight: normal;
+      font-size: 11px;
+      padding: 2px 4px;
+      margin-top: 4px;
+      border: 1px dashed #999;
+      text-align: center;
+    }
+
+    .badge-wrapper {
+      display: block;
+    }
+
+    .other-month {
+      color: #bbb;
+    }
+
+    .day-number {
+      display: block;
+      text-align: center;
+      font-weight: bold;
+      margin-bottom: 4px;
+      color: #3c2e1e; /* 평일 기본색 */
+    }
+
+    /* === 당월 === */
+    .day-number.sunday:not(.other-month) {
+      color: #d12c2c; /* 진한 빨강 */
+    }
+    .day-number.saturday:not(.other-month) {
+      color: #2b63d1; /* 진한 파랑 */
+    }
+
+    /* === 당월 아님 (흐린 색) === */
+    .day-number.other-month.sunday {
+      color: #f5bfbf; /* 흐린 빨강 */
+    }
+    .day-number.other-month.saturday {
+      color: #aecbfa; /* 흐린 파랑 */
+    }
+    .day-number.other-month:not(.sunday):not(.saturday) {
+      color: #c2b8a3; /* 흐린 기본색 (평일) */
+    }
+
+    .modal {
+      position: fixed;
+      z-index: 1000;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.6);
+    }
+
+    .modal-content {
+      background-color: #fffdf4;
+      margin: 10% auto;
+      padding: 20px;
+      border: 3px solid #d4b886;
+      width: 300px;
+      border-radius: 10px;
+      font-family: 'MyCustomFont', sans-serif;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+
+    .close-btn {
+      color: #888;
+      float: right;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .calendar-legend {
+      position: absolute;
+      top: 125px;
+      right: 60px;
+      padding: 6px 8px;
+      font-size: 13px;
+      font-weight: bold;
+      color: #ffffff;
+    }
+
+    .calendar-legend div {
+      display: flex;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .legend-box {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      margin-right: 6px;
+      border-radius: 3px;
+      border: 1px solid #555;
+    }
+
+    .legend-box.start {
+      background-color: #d3f9d8; /* 신청 시작 */
+      border-color: #388e3c;
+    }
+
+    .legend-box.end {
+      background-color: #ffcdd2; /* 신청 마감 */
+      border-color: #c62828;
+    }
+
+    #policyList {
+      padding-left: 0;
+      list-style-type: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .policy-card {
+      background-color: #fdf5e6;
+      border: 1px solid #c3a76f;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 14px;
+      color: #3c2e1e;
+      box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+    }
+
+    .policy-card:hover {
+      background-color: #fff7d6;
+      font-weight: bold;
+    }
+
+    #policyList li {
+      padding: 10px 0;
+      border-bottom: 1px solid #b7a278; /* 점선 → 실선, 색상 강화 */
+      font-size: 15px;
+      color: #2f1b0c;
+    }
+
+    #policyList li:hover {
+      background-color: #fff7d6;
+      border-radius: 6px;
+      padding-left: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #modalDateTitle {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 12px;
+      border-bottom: 2px solid #b7a278;
+      padding-bottom: 6px;
+      color: #3b2a1e;
+    }
+  </style>
+</head>
+<body>
+<div class="calendar-container">
+  <h2>{{ year }}년 {{ month }}월 정책 달력</h2>
+  <div class="calendar-nav">
+    <a href="{% url 'youth_policy:calendar_view' %}?year={% if month == 1 %}{{ year|add:'-1' }}{% else %}{{ year }}{% endif %}&month={% if month == 1 %}12{% else %}{{ month|add:'-1' }}{% endif %}">← prev</a>
+    <a href="{% url 'youth_policy:basic_page' %}">🏠 Home</a>
+    <a href="{% url 'youth_policy:calendar_view' %}?year={% if month == 12 %}{{ year|add:'1' }}{% else %}{{ year }}{% endif %}&month={% if month == 12 %}1{% else %}{{ month|add:'1' }}{% endif %}">next →</a>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for week in calendar %}
+        <tr>
+          {% for day in week %}
+            <td onclick="openModal('{{ day|date:'Y-m-d' }}')" class="
+              {% if forloop.counter0 == 0 %}sunday
+              {% elif forloop.counter0 == 6 %}saturday
+              {% endif %}
+            ">
+              <strong class="day-number
+                {% if forloop.counter0 == 0 %}sunday{% elif forloop.counter0 == 6 %}saturday{% endif %}
+                {% if day.month != month %} other-month{% endif %}
+              ">
+                {{ day.day }}
+              </strong>
+
+              {% with start_dict|get_item:day as starts %}
+                {% if starts %}
+                  <div class="badge-wrapper">
+                    {% for policy in starts|slice:":2" %}
+                      <div class="start-badge">📜 {{ policy.정책명 }}</div>
+                    {% endfor %}
+                    {% if starts|length > 2 %}
+                      <div class="start-badge more">+{{ starts|length|add:"-2" }}</div>
+                    {% endif %}
+                  </div>
+                {% endif %}
+              {% endwith %}
+
+              {% with end_dict|get_item:day as ends %}
+                {% if ends %}
+                  <div class="badge-wrapper">
+                    {% for policy in ends|slice:":2" %}
+                      <div class="end-badge">🔥 {{ policy.정책명 }}</div>
+                    {% endfor %}
+                    {% if ends|length > 2 %}
+                      <div class="end-badge more">+{{ ends|length|add:"-2" }}</div>
+                    {% endif %}
+                  </div>
+                {% endif %}
+              {% endwith %}
+            </td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="calendar-legend">
+  <div><span class="legend-box start"></span> 신청 시작</div>
+  <div><span class="legend-box end"></span> 신청 마감</div>
+</div>
+
+<div id="policyModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal()">&times;</span>
+    <h3 id="modalDateTitle"></h3>
+    <ul id="policyList"></ul>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+const allPolicyData = {{ calendar_data_json|safe }};
+
+window.openModal = function(dateStr) {
+const policies = allPolicyData[dateStr] || [];
+
+document.getElementById('modalDateTitle').innerText = `${dateStr}`;
+const list = document.getElementById('policyList');
+list.innerHTML = '';
+
+if (policies.length === 0) {
+  list.innerHTML = '<li>해당 날짜에 등록된 정책이 없습니다.</li>';
+} else {
+  policies.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'policy-card';
+    div.textContent = p.정책명;
+    list.appendChild(div);
+  });
+}
+
+document.getElementById('policyModal').style.display = 'block';
+};
+
+  window.closeModal = function () {
+    document.getElementById('policyModal').style.display = 'none';
+  };
+});
+</script>
+</body>
+</html>

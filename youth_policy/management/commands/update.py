@@ -1,25 +1,28 @@
-# 경로: yourapp/management/commands/update_summary.py
-
+import pandas as pd
 from django.core.management.base import BaseCommand
-from youth_policy.models import YouthPolicy  # 앱 이름에 맞게 수정
-from django.db.models import Q
-
+from youth_policy.models import YouthPolicy
 
 class Command(BaseCommand):
-    help = "'정책설명' 필드 내용을 요약하여 '정책설명요약' 필드에 저장합니다. 단, '정책설명요약'이 비어 있는 경우에만 수행됩니다."
+    help = '엑셀에서 신청기간 데이터를 읽어 application_period에 채워 넣습니다 (기존 값이 없는 경우만)'
 
-    def handle(self, *args, **options):
-        updated = 0
+    def handle(self, *args, **kwargs):
+        excel_path = r"C:\Users\1-05\OneDrive\Desktop\병합결과_최종.xlsx"
 
-        policies = YouthPolicy.objects.filter(
-            Q(정책설명__isnull=False) & ~Q(정책설명="") & (Q(정책설명요약__isnull=True) | Q(정책설명요약=""))
-        )
+        try:
+            df = pd.read_excel(excel_path)
+        except Exception as e:
+            self.stderr.write(self.style.ERROR(f'엑셀 파일을 불러오는 데 실패했습니다: {e}'))
+            return
 
-        for policy in policies:
-            description = policy.정책설명.strip().replace('\n', ' ')
-            summary = description[:80] + "..." if len(description) > 80 else description
-            policy.정책설명요약 = summary
-            policy.save()
-            updated += 1
+        update_count = 0
+        for _, row in df.iterrows():
+            try:
+                policy = YouthPolicy.objects.get(id=row['id'])
+                if not policy.application_period and pd.notna(row['신청기간']):
+                    policy.application_period = str(row['신청기간'])
+                    policy.save()
+                    update_count += 1
+            except YouthPolicy.DoesNotExist:
+                continue  # 해당 ID가 없는 경우 무시
 
-        self.stdout.write(self.style.SUCCESS(f"✅ 총 {updated}개의 정책에 요약을 저장했습니다."))
+        self.stdout.write(self.style.SUCCESS(f'{update_count}개의 정책이 업데이트되었습니다.'))

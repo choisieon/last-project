@@ -1,8 +1,9 @@
 from django.contrib import admin
-from .models import YouthPolicy, Region, Sido
+from .models import YouthPolicy, Region, Sido, PolicyComment
 
 admin.site.register(Region)
 admin.site.register(Sido)
+admin.site.register(PolicyComment)
 
 @admin.register(YouthPolicy)
 class YouthPolicyAdmin(admin.ModelAdmin):
