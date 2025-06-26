@@ -52,6 +52,23 @@ class PostForm(forms.ModelForm):
             raise forms.ValidationError("최대 2개까지 업로드 가능합니다.")
         return images
 
+    def clean_tags(self):
+        tags = self.cleaned_data['tags']
+        if isinstance(tags, str) and tags.strip().startswith('['):
+            try:
+                tag_list = [item['value'] for item in json.loads(tags)]
+                return ','.join(tag_list)  # 쉼표로 구분된 문자열로 변환
+            except Exception:
+                return tags  # 파싱 실패 시 원본 반환
+        return tags
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if commit:
+            instance.save()
+            self.save_m2m()  # ManyToMany 필드 저장
+        return instance
+
 
 # 기타 폼 (CommentForm, ImageForm 등은 그대로 유지)
 class ImageForm(forms.ModelForm):

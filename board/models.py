@@ -23,6 +23,7 @@ class Post(models.Model):
     tags = TaggableManager(blank=True)
     thumbnail = models.ImageField(upload_to='reviews/', null=True, blank=True)  # 후기 전용 썸네일(선택)
     is_blinded = models.BooleanField(default=False)  # 블라인드 여부
+    is_notice = models.BooleanField("공지글", default=False)
 
     def __str__(self):
         return self.title

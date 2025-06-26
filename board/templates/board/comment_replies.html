@@ -27,7 +27,7 @@
         </form>
       {% endif %}
 
-      {# 댓글/대댓글 신고 버튼 (작성자 본인 제외, 비동기) #}
+      <!-- {# 댓글/대댓글 신고 버튼 (작성자 본인 제외, 비동기) #}
       {% if user.is_authenticated and user != reply.author %}
         <button type="button"
                 class="comment-report-btn"
@@ -38,7 +38,7 @@
         <span id="comment-report-count-{{ reply.id }}" style="color:#e53935; font-size:0.95em; margin-left:4px;">
           {% if reply.report_count %}신고 {{ reply.report_count }}회{% endif %}
         </span>
-      {% endif %}
+      {% endif %} -->
 
       {# 답글 버튼 & 대댓글 폼 #}
       <a href="#" class="reply-toggle" data-comment-id="{{ reply.id }}">답글</a>

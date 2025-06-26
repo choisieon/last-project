@@ -98,7 +98,7 @@ function getCookie(name) {
       <!-- 태그 입력란 -->
       <div class="form-group">
         <label for="id_tags">태그 (쉼표로 구분):</label>
-        <input name="tags" id="id_tags" value="">
+        <input name="tags" id="id_tags" value="{% for tag in form.instance.tags.all %}{% if not forloop.first %}, {% endif %}{{ tag.name }}{% endfor %}">
         {% for error in form.tags.errors %}
         <div class="error">{{ error }}</div>
         {% endfor %}
