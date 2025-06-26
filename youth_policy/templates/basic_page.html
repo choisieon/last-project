@@ -210,11 +210,25 @@
   .card-grid .policy-card {
     height: 360px;
     padding: 16px;
-    max-height: 340px !important;  
   }
   
   .main-content {
     margin-top: -55px;
+  }
+
+  .policy-card {
+    border-radius: 14px;
+    overflow: visible;
+    padding: 24px;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+    justify-content: space-between;
+    
+    background-color: rgba(255, 248, 230, 0.95);
+    box-shadow: 4px 4px 0px #7e6a3e;
+    border: 2px solid #b49e74; 
   }
   
   .policy-card:hover {
@@ -226,22 +240,6 @@
     text-decoration: none;
     color: inherit;
   }
-  
-  .policy-card {
-    border-radius: 14px;
-    overflow: visible;
-    padding: 24px;
-    height: 280px;
-    display: flex;
-    flex-direction: column;
-    transition: all 0.3s ease;
-    justify-content: space-between;
-    
-    background-color: rgba(255, 248, 230, 0.95);
-    box-shadow: 4px 4px 0px #7e6a3e;
-    border: 2px solid #b49e74; 
-  }
-  
   
   .badge,
   .badge.date {
