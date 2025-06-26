@@ -22,14 +22,18 @@ class MultipleFileField(forms.FileField):
 
 
 class PostForm(forms.ModelForm):
-    images = MultipleFileField(
+    images = MultipleFileField(  # 이미지 전용 (최대 2개)
         required=False,
         label="이미지 업로드 (최대 2개)"
+    )
+    files = MultipleFileField(  # 파일 전용 (갯수 제한 없음)
+        required=False,
+        label="파일 첨부 (갯수 제한 없음)"
     )
 
     class Meta:
         model = Post
-        fields = ['category', 'title', 'content', 'thumbnail', 'images', 'tags']
+        fields = ['category', 'title', 'content', 'thumbnail', 'images', 'files', 'tags']
         widgets = {
             'category': forms.Select(attrs={'class': 'form-control', 'rows': 10, 'required': False}),
             'title': forms.TextInput(attrs={'class': 'form-control'}),
