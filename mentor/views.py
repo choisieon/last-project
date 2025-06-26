@@ -516,3 +516,27 @@ def answer_adopt(request, answer_id):
         answer.save()
 
     return redirect('mentor:question_detail', pk=answer.question.pk)
+
+@login_required
+def answer_evaluate(request, answer_id):
+    answer = get_object_or_404(Answer, pk=answer_id)
+    user = request.user
+    eval_type = request.POST.get("evaluation")
+
+    # 기존 평가 제거
+    answer.good_users.remove(user)
+    answer.soso_users.remove(user)
+    answer.bad_users.remove(user)
+
+    # 평가 적용/취소
+    if eval_type == "good":
+        if user not in answer.good_users.all():
+            answer.good_users.add(user)
+    elif eval_type == "soso":
+        if user not in answer.soso_users.all():
+            answer.soso_users.add(user)
+    elif eval_type == "bad":
+        if user not in answer.bad_users.all():
+            answer.bad_users.add(user)
+
+    return redirect('mentor:question_detail', pk=answer.question.id)

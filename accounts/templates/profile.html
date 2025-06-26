@@ -499,6 +499,10 @@
   padding: 10px 16px;
   margin-bottom: 20px;
 }
+.menu-box.active {
+  color: #007aff;
+  font-weight: bold;
+}
   </style>
 </head>
 <body>
@@ -509,15 +513,21 @@
 
         <a href="{% url 'community:index' %}" class="menu-box home-link">
           <i class="fas fa-home"></i>
-        </a>
-        <a href="{% url 'board:post_list' %}" class="menu-box {% block nav_community_active %}{% endblock %}">커뮤니티</a>
-        <a href="{% url 'mentor:mentor_home' %}" class="menu-box {% block nav_mentor_active %}{% endblock %}">멘토멘티</a>
-        <a href="#" class="menu-box {% block nav_mypage_active %}{% endblock %}">마이페이지</a>
-        <a href="#" class="menu-box {% block nav_policy_active %}{% endblock %}">청년정책</a>
+        <a href="{% url 'board:post_list' %}" 
+   class="menu-box {% if request.resolver_match.url_name == 'post_list' %}active{% endif %}">커뮤니티</a>
+
+<a href="{% url 'mentor:mentor_home' %}" 
+   class="menu-box {% if request.resolver_match.url_name == 'mentor_home' %}active{% endif %}">멘토멘티</a>
+
+<a href="{% url 'accounts:my_page' %}" 
+   class="menu-box {% if request.resolver_match.url_name == 'my_page' %}active{% endif %}">마이페이지</a>
+
+<a href="{% url 'youth_policy:basic_page' %}" 
+   class="menu-box {% if request.resolver_match.url_name == 'basic_page' %}active{% endif %}">청년정책</a>
+
       </div>
 
-    <div class="menu-right">
- 
+    <div class="menu-right">      
     {% if user.is_authenticated %}
         <div class="login-info">{{user.username}}님 환영합니다</div>
     {% else %}

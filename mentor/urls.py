@@ -40,4 +40,6 @@ urlpatterns = [
       path('chatroom/delete_selected/', views.delete_selected_chatrooms, name='delete_chatrooms'),
      path('chatrooms/delete/', views.delete_chatrooms, name='delete_chatrooms'),
     path('answer/<int:answer_id>/adopt/', views.answer_adopt, name='answer_adopt'),
+    path('answer/<int:answer_id>/evaluate/', views.answer_evaluate, name='answer_evaluate'),
+
     ]
