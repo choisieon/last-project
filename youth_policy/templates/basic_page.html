@@ -619,8 +619,8 @@
           <div class="dropdown-item" onclick="selectFilter('sigungu', '', '시군구')">전체</div>
           {% for sigungu in sigungu_list %}
             <div class="dropdown-item"
-                data-value="{{ sigungu.code }}"
-                onclick="selectFilter('sigungu', '{{ sigungu.code }}', '{{ sigungu.name }}')">
+                data-value="{{ sigungu.id }}"
+                onclick="selectFilter('sigungu', '{{ sigungu.id }}', '{{ sigungu.name }}')">
               {{ sigungu.name }}
             </div>
           {% endfor %}

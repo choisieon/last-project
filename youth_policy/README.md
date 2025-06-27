@@ -5,8 +5,9 @@
 - pip install -r requirements.txt
 - python manage.py makemigrations/migrate
 - python manage.py init_policy
-- python manage.py init_sigungu
 - python manage.py init_sido
+- python manage.py init_sigungu
+- python manage.py init_sigungu_links.py
 
-# init_policy.py/init_sigungu.py는 엑셀 파일 바탕화면에 저장한 후 실행
+# init_policy.py/init_sigungu.py/init_sigungu_links.py는 엑셀 파일 바탕화면에 저장한 후 실행
 # 커맨드 파일 내 엑셀 경로명은 로컬에 맞게 수정

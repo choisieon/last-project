@@ -14,7 +14,6 @@ import json
 from django.utils.dateformat import format as django_date_format
 from django.core.serializers.json import DjangoJSONEncoder
 
-# Create your views here.
 def basic_page(request):
     stage = request.GET.get('stage')
     selected_sido = request.GET.get('sido')
@@ -31,18 +30,21 @@ def basic_page(request):
     
     sigungu_list = []
     if selected_sido:
-        # 시도 코드로 시군구 필터링 (앞 2자리 매칭)
         sigungu_list = Sigungu.objects.filter(
             code__startswith=selected_sido
         ).order_by('code')
     
-    
     if selected_sido:
         policies = policies.filter(sido_id=selected_sido)
+    
     if selected_sigungu:
-        policies = policies.filter(sigungu_id=selected_sigungu)
+        try:
+            sigungu_id = int(selected_sigungu)
+            policies = policies.filter(sigungu__id=sigungu_id)
+        except ValueError:
+            pass  # 잘못된 ID 입력 방지
+
     if selected_category != 'all':
-        
         if selected_category == 'job':
             policies = policies.filter(Q(정책키워드__icontains='일자리'))
         elif selected_category == 'education':
@@ -51,10 +53,6 @@ def basic_page(request):
             policies = policies.filter(Q(정책키워드__icontains='금융복지') | Q(정책키워드__icontains='참여권리'))
         elif selected_category == 'housing':
             policies = policies.filter(Q(정책키워드__icontains='주거'))
-
-    if 'sido' in request.GET and not selected_sigungu:
-        # 시도만 선택되고 시군구가 없으면, 해당 시도의 시군구 목록만 보여줌
-        pass
 
     paginator = Paginator(policies, 9)
     page_number = request.GET.get('page', 1)

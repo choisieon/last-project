@@ -39,7 +39,6 @@ class YouthPolicy(models.Model):
     def comment_count(self):
         return self.comments.count()
     
-
 class Sido(models.Model):
     code = models.CharField(max_length=2, primary_key=True)
     name = models.CharField(max_length=50)
