@@ -200,6 +200,7 @@
           <div class="post-footer">
             <div class="mentor-info">
               👤 <strong>{{ question.author.nickname }}</strong> |
+              💼 {{ question.author.profile.job|default:"직업 미입력" }} |
               {{ question.author.bio|default:"소개 없음" }}
               <button class="mentor-profile-btn" onclick="location.href='/mentor/profile/{{ question.author.id }}'">프리포일</button>
             

@@ -128,7 +128,7 @@
       margin-bottom: 8px;
       font-size: 11px;
     }
-    .post-title { font-size: 12px; font-weight: bold; color: #222; margin: 2px 0; }
+    .post-title { font-size: 16px; font-weight: bold; color: #222; margin: 2px 0; }
     .post-preview { font-size: 11px; color: #555; margin: 2px 0; }
     .post-footer { font-size: 10px; display: flex; justify-content: space-between; flex-wrap: wrap; }
     .mentor-profile-btn {
@@ -179,7 +179,7 @@
       {{ label }}
     </button>
   {% endfor %}
-  <button onclick="location.href='/mentor/list/'">👤 선배 구경하기</button>
+  <button onclick="location.href='{% url 'mentor:mentor_list' %}'">👤 선배 구경하기</button>
 </div>
 
 
@@ -206,23 +206,19 @@
           <h4 class="post-title">
             <a href="{% url 'mentor:question_detail' question.id %}">{{ question.title }}</a>
           </h4>
-          <p class="post-preview">{{ question.content|truncatechars:60 }}</p>
-<div class="metrics" style="display: flex; align-items: center; gap: 6px;">
-  <img src="{% static 'images/12.png' %}" alt="like" style="width: 13px; height: 12px;" />
-  <span style="font-size: 11px;">{{ question.likes.count }}</span>
-  <span>| 💬 {{ question.answers.count }}</span>
-  <span>| 👀 {{ question.views }}</span>
-</div>
-          <div class="post-footer">
+
+          <div class="post-footer" style="display: flex; justify-content: space-between; align-items: center;">
             <div>
               👤 <strong>{{ question.author.nickname }}</strong> |
-              {{ question.author.bio|default:"소개 없음" }}
+              {{ question.author.job|default:"직장 정보 없음" }}
             </div>
-            <div>
+            <div class="metrics" style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 11px;">좋아요 {{ question.likes.count }}</span>
+              <span>| 댓글 {{ question.answers.count }}</span>
+              <span>| 조회수 {{ question.views }}</span>
               {% if question.is_promoted_to_mentoring %}
-                <span class="apply-mentoring-btn">멘토링 진행중..</span>
+                <span class="apply-mentoring-btn" style="margin-left: 8px;">멘토링 진행중..</span>
               {% endif %}
-              <button class="mentor-profile-btn" onclick="location.href='/mentor/profile/{{ question.author.id }}'">프로필</button>
             </div>
           </div>
         </div>

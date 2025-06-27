@@ -227,9 +227,16 @@ def onboarding(request):
 
     return render(request, 'mentor/onboarding.html', {'form': form})
 
-@login_required
 def mentor_list(request):
-    mentors = UserProfile.objects.filter(is_mentor=True)
+    mentors = UserProfile.objects.all().select_related('user').prefetch_related('concerns')
+    mentor_count = mentors.count()
+    print(f"총 {mentor_count}명의 프로필을 찾았습니다.")
+    
+    # 디버그: 첫 번째 프로필 정보 출력
+    if mentor_count > 0:
+        first_mentor = mentors.first()
+        print(f"첫 번째 프로필: {first_mentor.nickname}, 직업: {first_mentor.job}, 나이: {first_mentor.age}")
+    
     return render(request, 'mentor/mentor_list.html', {'mentors': mentors})
 
 

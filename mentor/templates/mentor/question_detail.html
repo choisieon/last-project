@@ -14,7 +14,7 @@
     body {
       font-family: 'MyCustomFont', sans-serif;
       background: url("{% static 'images/Frame 13.png' %}") no-repeat center center fixed;
-      background-size: cover;
+      background-size: 105% ;
       background-color: #cde4c7;
       margin: 0;
       padding: 0;
@@ -150,7 +150,7 @@
   margin-bottom: 16px;
   box-shadow: 2px 2px 0 #ccc;
   font-family: 'MyCustomFont';
-  margin-right: 48px; /* 아바타 여백 확보 */
+  margin-right: 50px; /* 오른쪽 여백을 줄여서 박스를 더 넓게 만들기 */
   border-radius: 8px;
 }
 
@@ -282,7 +282,7 @@
 .avatar-box-question {
   position: absolute;
   top: 100px;
-  left: 200px;
+  left: 320px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -292,7 +292,7 @@
 .avatar-box-answer {
   position: relative;
   float: right;
-  margin-right: -300px;
+  margin-right: -130px;
   margin-top: 10px;
   display: flex;
   flex-direction: column;
@@ -303,8 +303,8 @@
 
 .nickname-box-question {
   position: absolute;
-  top: 250px;
-  left: 170px;
+  top: 255px;
+  left: 230px;
   font-size: 13px;
   font-weight: bold;
   background: rgba(255, 255, 255, 0.9);
@@ -317,7 +317,9 @@
 }
 
 .nickname-box-answer {
-  margin-top: 6px;
+  position: absolute;
+  top: 150px;
+  left: 150px;
   font-size: 13px;
   font-weight: bold;
   background: rgba(255, 255, 255, 0.9);
@@ -342,7 +344,7 @@
   height: 150px;
   object-fit: cover;
   border-radius: 8px;
-  box-shadow: 3px 3px 0 #5a4a2f;
+  box-shadow: 3px 3px 0 #5a4a2f;  
 }
 
 /* 질문자 아바타 없음 시 */
@@ -380,17 +382,22 @@
       </div>
     </div>
 <div class="avatar-box-question">
+<a href="{% url 'accounts:view_profile' question.author.user.id %}" style="text-decoration: none;">
 {% if question.author.avatar_image %}
-  <img src="{{ question.author.avatar_image.url }}" class="avatar-question" />
+  <img src="{{ question.author.avatar_image.url }}" class="avatar-question" style="cursor: pointer;" />
 {% elif question.author.avatar_url %}
-  <img src="{{ question.author.avatar_url }}" class="avatar-question" />
+  <img src="{{ question.author.avatar_url }}" class="avatar-question" style="cursor: pointer;" />
 {% else %}
-  <div class="avatar-question no-avatar">아바타 없음</div>
+  <div class="avatar-question no-avatar" style="cursor: pointer;">아바타 없음</div>
 {% endif %}
+  </a>
 </div>
 
+
 <div class="nickname-box-question">
-  {{ question.author.nickname }}
+  <a href="{% url 'accounts:view_profile' question.author.user.id %}" style="text-decoration: none; color: inherit; cursor: pointer;">
+    {{ question.author.nickname }}
+  </a>
 </div>
 
 
@@ -410,7 +417,7 @@
     </span>
   </div>
   <div class="question-meta">
-      {{ question.author.job_title|default:"없음" }} | {{ question.author.age }}세 | {{ question.author.points }}점 | {{ question.created_at|date:"Y-m-d H:i" }}
+      {{ question.author.profile.job|default:"없음" }} | {{ question.author.profile.age }}세 | {{ question.author.profile.points }}점 | {{ question.created_at|date:"Y-m-d H:i" }}
   </div>
   <p>{{ question.content }}</p>
 {% load static %}
@@ -496,23 +503,33 @@
 
     <h3>💬 답변</h3>
     {% for answer in answers %}
-<div class="avatar-box-answer" style="top: 0; right: 190px;">
-{% if answer.author.avatar_image %}
-  <img src="{{ answer.author.avatar_image.url }}" class="avatar-answer" />
-{% elif answer.author.avatar_url %}
-  <img src="{{ answer.author.avatar_url }}" class="avatar-answer" />
-{% else %}
-  <div class="avatar-answer no-avatar">아바타 없음</div>
-{% endif %}
-  <div class="nickname-box-answer" style="top: 150px; right: 190px;">
-    {{ answer.author.nickname }}
+<!-- 답변 박스 옆에 아바타와 닉네임 배치 -->
+<div style="position: absolute; right: 220px; width: 120px; text-align: center;">
+  <!-- 아바타 박스 -->
+  <div style="margin-bottom: 10px;">
+    <a href="{% url 'accounts:view_profile' answer.author.user.id %}" style="text-decoration: none;">
+    {% if answer.author.avatar_image %}
+      <img src="{{ answer.author.avatar_image.url }}" style="width: 120px; height: 140px; border-radius: 8px; box-shadow: 3px 3px 0 #5a4a2f; object-fit: cover; cursor: pointer;" />
+    {% elif answer.author.avatar_url %}
+      <img src="{{ answer.author.avatar_url }}" style="width: 120px; height: 140px; border-radius: 8px; box-shadow: 3px 3px 0 #5a4a2f; object-fit: cover; cursor: pointer;" />
+    {% else %}
+      <div style="width: 120px; height: 140px; border-radius: 8px; box-shadow: 3px 3px 0 #5a4a2f; background-color: #ddd; display: flex; justify-content: center; align-items: center; color: #555; font-size: 12px; cursor: pointer;">아바타 없음</div>
+    {% endif %}
+    </a>
+  </div>
+  
+  <!-- 닉네임 박스 -->
+  <div style="position: relative; left: -7px; width: 120px; font-size: 13px; font-weight: bold; background: rgba(255, 255, 255, 0.9); border: 2px solid #5a4a2f; padding: 4px 6px; text-align: center; box-shadow: 2px 2px 0 #b9a782; font-family: 'MyCustomFont'; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+    <a href="{% url 'accounts:view_profile' answer.author.user.id %}" style="text-decoration: none; color: inherit; cursor: pointer;">
+      {{ answer.author.nickname }}
+    </a>
   </div>
 </div>
 
       <div class="answer-box">
         <div class="answer-meta">
  <div class="answer-meta">
-   {{ answer.author.job_title|default:"없음" }} | {{ answer.author.age }}세 | {{ answer.author.points }}점 | {{ answer.created_at|date:"Y-m-d H:i" }}
+   {{ answer.author.profile.job|default:"없음" }} | {{ answer.author.profile.age }}세 | {{ answer.author.profile.points }}점 | {{ answer.created_at|date:"Y-m-d H:i" }}
   {% if answer.is_adopted %}
     <span class="adopted-label">채택됨</span>
   {% endif %}

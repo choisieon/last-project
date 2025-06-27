@@ -31,11 +31,10 @@
 
     .background-wrapper {
       width: 100%;
-      background: url('{% static "images/Frame 13.png" %}') no-repeat top center;
+      background: url('{% static "images/Frame 13.png" %}') repeat-y top center;
       background-size: 105% auto;
-      background-repeat: no-repeat;
       background-color: #cde4c7;
-      min-height: 1000px;
+      min-height: 1500px;
       position: relative;
       padding-top: 680px;
     }
@@ -235,24 +234,35 @@
     }
     .mailbox-wrapper {
   position: absolute;
-  top: 70px;  /* 글쓰기 아래 여백 조정 */
+  top: 50px;
   right: 20px;
   z-index: 99;
 }
     
 .mailbox-btn {
-  width: 44px;
-  height: 44px;
-  border: 2px solid #5a4a2f;
-  box-shadow: 2px 2px 0 #b9a782;
-  background-color: rgba(250, 235, 180, 0.9);
-  background-image: url("{% static 'images/pixel-paper.png' %}"), url("{% static 'images/우체통.png' %}");
-  background-size: 4px 4px, cover;
-  background-repeat: repeat, no-repeat;
-  background-position: top left, center center;
+  width: 80px;
+  height: 80px;
+  border: none;
+  box-shadow: none;
+  background-color: transparent;
+  background-image: url("{% static 'images/메시지.png' %}");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center center;
   border-radius: 0;
-  text-indent: -9999px;
+  text-indent: 0;
   cursor: pointer;
+  transform: scaleX(-1);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'MyCustomFont', sans-serif;
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  text-shadow: 1px 1px 0 #fff;
+  text-decoration: none;
 }
 
 
@@ -306,8 +316,8 @@
       {% endif %}
         </div>
         <div class="mailbox-wrapper">
-  <a href="{% url 'advice:advice_center' %}">
-    <img src="{% static 'images/우체통.png' %}" alt="우체통" class="mailbox-btn">
+  <a href="{% url 'advice:advice_center' %}" class="mailbox-btn">
+    . . .
   </a>
 </div>
     <div class="intro-box">
