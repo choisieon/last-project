@@ -15,8 +15,8 @@ class YouthPolicy(models.Model):
     정책명 = models.CharField(max_length=255, default="데이터 변경")
     정책설명 = models.TextField(blank=True, null=True)
     대상연령 = models.CharField(max_length=100, blank=True, null=True)
-    정책키워드 = models.CharField(max_length=255, blank=True, null=True)
-    시행지역 = models.CharField(max_length=300, blank=True, null=True)
+    정책키워드 = models.CharField(max_length=600, blank=True, null=True)
+    시행지역 = models.CharField(max_length=600, blank=True, null=True)
     application_period = models.CharField("신청기간", max_length=255, blank=True, null=True)
     application_start = models.DateField("신청 시작일", blank=True, null=True)
     application_end = models.DateField("신청 마감일", blank=True, null=True)
@@ -31,7 +31,7 @@ class YouthPolicy(models.Model):
     likes = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='liked_policies', blank=True)
 
     sido = models.ForeignKey('Sido', on_delete=models.CASCADE, null=True, blank=True)
-    sigungu = models.ForeignKey('Sigungu', on_delete=models.CASCADE, null=True, blank=True)
+    sigungu = models.ManyToManyField('Sigungu', blank=True)
 
     def __str__(self):
         return self.정책명
