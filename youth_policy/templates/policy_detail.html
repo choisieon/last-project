@@ -157,11 +157,19 @@ h1 {
   border-left: 4px solid #d6c8aa;
   border-radius: 0 8px 8px 8px;
   line-height: 1.4;
+  position: relative;
 }
 
 .reply-box .comment-meta {
   font-size: 12px;
   color: #aaa;
+}
+
+.reply-box .comment-icons {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  font-size: 14px;
 }
 
 .comment-form textarea {
@@ -298,6 +306,12 @@ h1 {
       <div class="reply-box">
         <p class="comment-meta"><strong>{{ reply.author.username }}</strong> | {{ reply.created_at|date:"Y.m.d H:i" }}</p>
         <p>{{ reply.content|linebreaks }}</p>
+        {% if user.is_authenticated and user == reply.author %}
+        <div class="comment-icons">
+          <a href="{% url 'youth_policy:edit_policy_comment' reply.id %}" title="수정">✏️</a>
+          <a href="{% url 'youth_policy:delete_policy_comment' reply.id %}" onclick="return confirm('삭제하시겠습니까?');" title="삭제">🗑️</a>
+        </div>
+{% endif %}
       </div>
     {% endfor %}
   </div>

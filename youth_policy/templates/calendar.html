@@ -21,7 +21,7 @@
     }
 
     .calendar-container {
-      max-width: 1200px;
+      max-width: 1100px;
       margin: 0 auto;
       padding: 20px;
     }
@@ -197,10 +197,14 @@
       position: absolute;
       top: 125px;
       right: 60px;
-      padding: 6px 8px;
-      font-size: 13px;
+      padding: 10px 14px;
+      font-size: 15px;
       font-weight: bold;
       color: #ffffff;
+      background-color: rgba(0, 0, 0, 0.6);  /* 반투명 어두운 배경 */
+      border-radius: 8px;
+      box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
+      line-height: 1.6;
     }
 
     .calendar-legend div {
@@ -209,17 +213,16 @@
       margin-bottom: 6px;
     }
 
-    .legend-box {
-      display: inline-block;
-      width: 14px;
-      height: 14px;
-      margin-right: 6px;
+    .calendar-legend .legend-box {
+      width: 16px;
+      height: 16px;
+      margin-right: 8px;
       border-radius: 3px;
-      border: 1px solid #555;
+      border: 1px solid #fff;
     }
 
     .legend-box.start {
-      background-color: #d3f9d8; /* 신청 시작 */
+      background-color: #d3f9d8;
       border-color: #388e3c;
     }
 
@@ -245,12 +248,7 @@
       color: #3c2e1e;
       box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
     }
-
-    .policy-card:hover {
-      background-color: #fff7d6;
-      font-weight: bold;
-    }
-
+    
     #policyList li {
       padding: 10px 0;
       border-bottom: 1px solid #b7a278; /* 점선 → 실선, 색상 강화 */
