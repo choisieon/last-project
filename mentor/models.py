@@ -40,9 +40,23 @@ class Answer(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     likes = models.PositiveIntegerField(default=0)
     is_adopted = models.BooleanField(default=False)
+    good_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='good_answers', blank=True)
+    soso_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='soso_answers', blank=True)
+    bad_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='bad_answers', blank=True)
+
+
 
     def __str__(self):
         return f"{self.author.nickname} → {self.question.title}"
+    
+    def good_count(self):
+        return self.good_users.count()
+
+    def soso_count(self):
+        return self.soso_users.count()
+
+    def bad_count(self):
+        return self.bad_users.count()
 
 class MentorRequest(models.Model):
     mentee = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='requests_made')

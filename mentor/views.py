@@ -227,9 +227,16 @@ def onboarding(request):
 
     return render(request, 'mentor/onboarding.html', {'form': form})
 
-@login_required
 def mentor_list(request):
-    mentors = UserProfile.objects.filter(is_mentor=True)
+    mentors = UserProfile.objects.all().select_related('user').prefetch_related('concerns')
+    mentor_count = mentors.count()
+    print(f"총 {mentor_count}명의 프로필을 찾았습니다.")
+    
+    # 디버그: 첫 번째 프로필 정보 출력
+    if mentor_count > 0:
+        first_mentor = mentors.first()
+        print(f"첫 번째 프로필: {first_mentor.nickname}, 직업: {first_mentor.job}, 나이: {first_mentor.age}")
+    
     return render(request, 'mentor/mentor_list.html', {'mentors': mentors})
 
 
@@ -516,3 +523,27 @@ def answer_adopt(request, answer_id):
         answer.save()
 
     return redirect('mentor:question_detail', pk=answer.question.pk)
+
+@login_required
+def answer_evaluate(request, answer_id):
+    answer = get_object_or_404(Answer, pk=answer_id)
+    user = request.user
+    eval_type = request.POST.get("evaluation")
+
+    # 기존 평가 제거
+    answer.good_users.remove(user)
+    answer.soso_users.remove(user)
+    answer.bad_users.remove(user)
+
+    # 평가 적용/취소
+    if eval_type == "good":
+        if user not in answer.good_users.all():
+            answer.good_users.add(user)
+    elif eval_type == "soso":
+        if user not in answer.soso_users.all():
+            answer.soso_users.add(user)
+    elif eval_type == "bad":
+        if user not in answer.bad_users.all():
+            answer.bad_users.add(user)
+
+    return redirect('mentor:question_detail', pk=answer.question.id)

@@ -106,13 +106,33 @@ def profile_edit(request):
 
 
 
+from django.contrib.auth import get_user_model
+
 @login_required
-def view_profile(request):
+def view_profile(request, user_id):
+    User = get_user_model()
     try:
-        profile = UserProfile.objects.get(user=request.user)
-    except UserProfile.DoesNotExist:
-        return redirect('accounts:edit_profile')  # 프로필 없으면 입력 페이지로
-    return render(request, 'view_profile.html', {'profile': profile})
+        user = User.objects.get(id=user_id)
+        profile = UserProfile.objects.get(user=user)
+    except (User.DoesNotExist, UserProfile.DoesNotExist):
+        return redirect('accounts:my_page')  # 존재하지 않으면 마이페이지로
+
+    life_events = LifeEvent.objects.filter(user=user).order_by('date')
+    
+    others = [
+        {"name": "은지(26)", "activity": "비영리 단체 활동 시작"},
+        {"name": "민수(29)", "activity": "창업교육 수료 + 카페 창업 준비"},
+        {"name": "유나(25)", "activity": "지방 공무원 시험 도전"}
+    ]
+    paths = []
+
+    return render(request, 'profile.html', {
+        'profile': profile,
+        'life_events': life_events,
+        'paths': paths,
+        'others': others,
+        'user': user,
+    })
 
 @login_required
 def my_page(request):
@@ -132,6 +152,7 @@ def my_page(request):
         'life_events': life_events,
         'paths': paths,
         'others': others,
+        'user': request.user,
     })
 
 @login_required
@@ -256,6 +277,13 @@ def add_life_event(request):
             score=request.POST['score'],
             detail=request.POST['detail'],
         )
+    return redirect('accounts:my_page')
+
+@login_required
+def delete_life_event(request, event_id):
+    if request.method == 'POST':
+        event = LifeEvent.objects.get(id=event_id, user=request.user)
+        event.delete()
     return redirect('accounts:my_page')
 
 @login_required

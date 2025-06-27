@@ -2,6 +2,8 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
   <meta charset="UTF-8" />
   <title>마이페이지 - 인생 보드게임</title>
   <style>
@@ -17,7 +19,29 @@
       padding: 20px;
       font-family: 'MyCustomFont', sans-serif;
       background: url("{% static 'images/Frame 13.png' %}") no-repeat center center fixed;
-      background-size: cover;
+      background-size: 105%;
+    }
+    .write-btn {
+      background-color: #007aff;
+    }
+    .write-btn:hover {
+      background: #005bb5;
+      color: #fff700;
+
+    }
+    .login-info {
+      background-color: rgba(250, 235, 180, 0.9);
+      background-image: url("{% static 'images/pixel-paper.png' %}");
+      background-size: 4px 4px;
+      background-repeat: repeat;
+      padding: 6px 12px;
+      border: 2.5px solid #5a4a2f;
+      box-shadow: 3px 3px 0 #b9a782;
+      font-size: 14px;
+      color: #3c2e1e;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
     }
 
     h1 {
@@ -25,23 +49,28 @@
       color: #4e3b2b;
     }
 
-    .top-container {
-      display: flex;
-      justify-content: space-between;
-      max-width: 1200px;
-      margin: 20px auto;
-    }
-
-    .profile-box {
+    .main-wrapper {
+      max-width: 1320px;
+      margin: 0 auto;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      gap: 20px;
+    }
+
+.top-section {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: flex-start;
+}
+    .profile-box {
       background-color: #f3f3f3;
       border: 4px solid #444;
       border-radius: 8px;
       padding: 16px;
       box-shadow: inset 0 0 0 4px #c2a178;
-      width: 420px;
+      width: 750px;
+      min-height: 150px;
       position: relative;
     }
 
@@ -86,6 +115,15 @@
       border-radius: 4px;
       padding: 6px 0;
     }
+    .custom-menu {
+  position: absolute;
+  background: white;
+  border: 2px solid #444;
+  padding: 8px;
+  border-radius: 6px;
+  box-shadow: 2px 2px 0 #aaa;
+  z-index: 999;
+}
 
     .right-profile {
       flex: 1;
@@ -110,6 +148,8 @@
       font-weight: bold;
       font-size: 13px;
       cursor: pointer;
+      white-space: nowrap;
+      min-width: 80px;
     }
 
     .info-group {
@@ -132,30 +172,37 @@
       border-radius: 4px 0 0 4px;
     }
 
-.info-value {
-  flex: 1;
-  background: white;
-  padding: 6px;
-  font-size: 13px;
-  border: 2px solid #444;
-  border-left: none;
-  border-radius: 0 4px 4px 0;
-
-  /* 👇 아래 두 줄만 추가하면 가운데 딱 맞음 */
-  display: flex;
-  align-items: center;
-}
-
-
-    
-
-    .edit-button-container {
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
+    .info-value {
+      flex: 1;
+      background: white;
+      padding: 6px;
+      font-size: 13px;
+      border: 2px solid #444;
+      border-left: none;
+      border-radius: 0 4px 4px 0;
+      display: flex;
+      align-items: center;
     }
 
-    .edit-button-container a button {
+    .policy-box {
+      background-color: #f3f3f3;
+      border: 4px solid #444;
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: inset 0 0 0 4px #c2a178;
+      width: 700px;
+      font-family: 'MyCustomFont';
+      font-size: 13px;
+    }
+    .profile-box,
+.policy-box,
+.admin-extra-wrapper {
+  flex: 1;
+  max-width: 32%;
+}
+
+    .policy-box select,
+    .policy-box button {
       background-color: #8ecae6;
       border: 2px solid #444;
       border-radius: 6px;
@@ -164,286 +211,950 @@
       font-weight: bold;
       cursor: pointer;
       font-family: 'MyCustomFont';
+      margin-top: 10px;
     }
-
-
-    .middle-section {
-      max-width: 1200px;
-      margin: 40px auto;
-    }
-
-    .board-map {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 10px;
-      background: #fffef9;
-      border: 4px dashed #c2a178;
-      border-radius: 32px;
-      padding: 2rem;
-    }
-
-    .tile {
-      width: 100px;
-      height: 100px;
-      background: #fff;
-      border-radius: 16px;
-      padding: 0.5rem;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      transition: transform 0.2s ease;
-      position: relative;
-      font-family: 'MyCustomFont';
-    }
-
-    .tile:hover {
-      transform: scale(1.05);
-    }
-
-    .tile .year { font-weight: bold; font-size: 0.9rem; }
-    .tile .event { font-size: 0.85rem; }
-    .tile .note { font-size: 0.75rem; color: #555; }
-    .tile .metrics {
-      font-size: 0.7rem;
-      display: flex;
-      justify-content: space-between;
-    }
-  .policy-box {
+.admin-wrapper {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 12px;
+  width: 420px;
+}
+.admin-extra-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 420px;
+}
+
+.admin-box,
+.extra-box {
   background-color: #f3f3f3;
   border: 4px solid #444;
   border-radius: 8px;
   padding: 16px;
   box-shadow: inset 0 0 0 4px #c2a178;
-  width: 420px;
-  height: 100%;
   font-family: 'MyCustomFont';
   font-size: 13px;
-  box-sizing: border-box;
 }
 
-.policy-box h3 {
-  font-size: 16px;
-  margin-bottom: 10px;
-  color: #4e3b2b;
+.profile-section {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  max-width: 32%;
 }
 
-.policy-box ul {
-  margin-bottom: 12px;
-  padding-left: 20px;
+.edit-button-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
 }
 
-.policy-box select,
-.policy-box button {
-  background-color: #8ecae6;
-  border: 2px solid #444;
+.edit-button {
+  background-color: #90e0ef;
+  border: 3px solid #444;
   border-radius: 6px;
-  padding: 5px 12px;
-  font-size: 12px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-family: 'MyCustomFont';
   font-weight: bold;
   cursor: pointer;
+  box-shadow: 2px 2px 0 #444;
+}
+.title-box {
+  background-color: #f3f3f3;
+  border: 4px solid #444;
+  box-shadow: inset 0 0 0 4px #c2a178;
+  border-radius: 12px;
+  padding: 20px 40px;
+  width: fit-content;
+  margin: 0 auto 24px auto; /* 가운데 정렬 + 아래 여백 */
   font-family: 'MyCustomFont';
-  margin-top: 10px;
-}
-.top-container {
-  display: flex;
-  justify-content: flex-start;  /* 왼쪽 정렬 */
-  align-items: flex-start;      /* 위쪽 정렬로 맞추기 */
-  gap: 24px;                    /* 박스 간 여백 */
-  max-width: 1200px;
-  margin: 20px auto;
 }
 
-.policy-box button {
-  background-color: #ccc;
+.title-box h1 {
+  margin: 0;
+  font-size: 28px;
+  text-align: center;
+  color: #2f2f2f;
+}
+.section-title-box {
+  position: absolute;
+  top: -40px;
+  left: 12px;
+  background-color: #fffef9;
+  border: 3px solid #444;
+  box-shadow: inset 0 0 0 3px #c2a178;
+  border-radius: 8px;
+  padding: 10px 20px;
+  width: fit-content;
+  margin: 0 0 10px 24px;  /* 왼쪽 정렬 + 여백 (좌측 24px) */
+  font-family: 'MyCustomFont';
+}
+
+
+.section-title-box h2 {
+  margin: 0;
+  font-size: 18px;
+  text-align: center;
+  color: #333;
+}
+
+.delete-button {
+  background-color: #ff6b6b;
+  color: white;
   border: 2px solid #444;
-  border-radius: 6px;
-  cursor: not-allowed;
+  font-family: 'MyCustomFont';
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
-    .detail {
-      display: none;
-      position: absolute;
-      bottom: -80px;
-      left: 0;
+    .board-section {
+      border: 4px solid #444;
+      padding: 16px;
+      border-radius: 12px;
+      background: url("{% static 'images/journey-bg.png' %}") repeat;
+      background-size: contain;
+      box-shadow: inset 0 0 0 4px #c2a178;
       width: 100%;
-      background: #fff8e1;
-      padding: 0.5rem;
-      font-size: 0.75rem;
-      color: #444;
-      border-radius: 0 0 16px 16px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-      z-index: 10;
+      margin-top: 20px;
+      font-family: 'MyCustomFont';
+      box-sizing: border-box;
+      position: relative;
     }
 
-    .tile:hover .detail {
-      display: block;
-    }
+.tile {
+  width: 160px;
+  background-color: #fff;
+  border: 3px solid #444;
+  border-radius: 10px;
+  padding: 10px;
+  font-family: 'MyCustomFont';
+  font-size: 12px;
+  position: relative;
+  box-shadow: 2px 2px 0 #aaa;
+  transition: transform 0.2s ease;
+}
 
-    .form-section {
-      background-color: #fffef9;
-      border: 4px dotted #c2a178;
-      border-radius: 16px;
-      padding: 20px;
-      max-width: 800px;
-      margin: 20px auto;
-    }
+.tile:hover {
+  transform: scale(1.03);
+}
 
-    .form-section input,
-    .form-section textarea {
-      margin-bottom: 8px;
-      padding: 6px;
-      width: calc(50% - 10px);
-    }
+.tile-header {
+  font-weight: bold;
+  margin-bottom: 6px;
+  background-color: #ffd6a5;
+  padding: 4px;
+  border-radius: 4px;
+  text-align: center;
+}
 
-    .form-section textarea {
-      width: 100%;
-    }
 
-    .form-section button {
-      margin-top: 10px;
-      padding: 6px 12px;
-      background-color: #c2a178;
-      border: none;
-      border-radius: 8px;
-      color: white;
-      font-weight: bold;
-    }
+.tile-content {
+  margin-bottom: 6px;
+}
+
+.tile-detail {
+  font-size: 11px;
+  color: #444;
+  background: #f9f9f9;
+  padding: 4px;
+  border-radius: 4px;
+  margin-top: 6px;
+}
+
+.journey-tile:hover {
+  transform: scale(1.05);
+}
+
+.life-journey {
+  position: relative;
+}
+.life-journey-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.life-event {
+  position: relative;
+  z-index: 1;
+}
+
+
+.metrics {
+  font-size: 11px;
+  color: #555;
+}
+
+/* Base container styling */
+.life-journey-wrapper {
+  overflow-x: auto;           /* Enable horizontal scrolling if needed */
+  overflow-y: hidden;
+  padding: 10px;
+  /* (optional) background-color or other styling */
+}
+
+/* Timeline inner container */
+.life-journey {
+  position: relative;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: flex-start;    /* align items to top by default */
+  width: max-content;        /* Expand width to accommodate all tiles (so scroll works) */
+  min-height: 250px;         /* Enough height to accommodate wave amplitude */
+  padding: 20px 0;
+}
+
+/* Individual event tile container */
+.life-event {
+  position: relative;        /* positioning context for tooltip */
+  flex: 0 0 auto;            /* do not flex-grow, keep natural width */
+  margin-right: 60px;        /* spacing between tiles */
+}
+
+/* Tile styling with pixel-art style border */
+.life-event-tile {
+  background: 
+    radial-gradient(circle at 2px 2px, rgba(255,255,255,0.7) 1px, transparent 0),
+    radial-gradient(circle at 6px 6px, rgba(255,255,255,0.5) 1px, transparent 0),
+    radial-gradient(circle at 10px 10px, rgba(255,255,255,0.3) 1px, transparent 0);
+  background-size: 8px 8px, 12px 12px, 16px 16px;
+  background-color: #fff8dc;
+  color: #2c1810;
+  padding: 12px;
+  width: 160px;
+  min-height: 100px;
+  border: 3px solid #2c1810;
+  box-shadow: 
+    3px 3px 0 #8b7355,
+    inset 2px 2px 0 rgba(255,255,255,0.4),
+    inset -1px -1px 0 rgba(0,0,0,0.2);
+  position: relative;
+  transition: transform 0.1s ease;
+}
+
+.life-event-tile:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 
+    4px 4px 0 #8b7355,
+    inset 2px 2px 0 rgba(255,255,255,0.3),
+    inset -1px -1px 0 rgba(0,0,0,0.1);
+}
+
+.life-event-title {
+  margin: 0 0 6px;
+  font-size: 1.1em;
+  text-align: center;
+  font-weight: bold;
+  color: #2c1810;
+  text-shadow: 1px 1px 0 rgba(255,255,255,0.5);
+}
+
+.life-event-date {
+  font-size: 0.9em;
+  display: block;
+  text-align: center;
+  color: #2c1810;
+  font-weight: bold;
+  background: rgba(255,255,255,0.6);
+  padding: 2px 6px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  border: 1px solid rgba(0,0,0,0.2);
+  box-shadow: inset 1px 1px 0 rgba(255,255,255,0.8);
+}
+
+.event-scores {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.score-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.score-label {
+  font-size: 10px;
+  font-weight: bold;
+  min-width: 32px;
+  font-family: 'MyCustomFont';
+  text-shadow: 1px 1px 0 rgba(255,255,255,0.5);
+}
+
+.score-bar {
+  flex: 1;
+  height: 12px;
+  background: 
+    linear-gradient(90deg, transparent 50%, rgba(0,0,0,0.1) 50%),
+    linear-gradient(0deg, transparent 50%, rgba(0,0,0,0.1) 50%);
+  background-size: 4px 4px;
+  background-color: #e8dcc0;
+  border: 2px solid #2c1810;
+  box-shadow: inset 1px 1px 0 rgba(0,0,0,0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.score-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.score-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    linear-gradient(90deg, transparent 50%, rgba(255,255,255,0.1) 50%),
+    linear-gradient(0deg, transparent 50%, rgba(255,255,255,0.1) 50%);
+  background-size: 2px 2px;
+}
+
+.happiness-bar .score-fill {
+  background: linear-gradient(135deg, #ff6b6b 0%, #e74c3c 50%, #c0392b 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
+}
+
+.achievement-bar .score-fill {
+  background: linear-gradient(135deg, #74b9ff 0%, #0984e3 50%, #2d3436 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
+}
+
+.score-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 8px;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 
+    1px 1px 0 rgba(0,0,0,0.8),
+    -1px -1px 0 rgba(0,0,0,0.8),
+    1px -1px 0 rgba(0,0,0,0.8),
+    -1px 1px 0 rgba(0,0,0,0.8);
+  font-family: 'MyCustomFont';
+}
+
+/* Position the tiles in a repeating wave (top, mid, bottom, mid, ...) */
+.life-event:nth-child(4n+1) { margin-top: 0; }
+.life-event:nth-child(4n+2) { margin-top: 80px; }
+.life-event:nth-child(4n+3) { margin-top: 160px; }
+.life-event:nth-child(4n+4) { margin-top: 80px; }
+
+/* 모달 오버레이 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  z-index: 1000;
+}
+
+/* 이벤트 세부정보 모달 */
+.event-detail-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: 
+    radial-gradient(circle at 2px 2px, rgba(255,255,255,0.8) 1px, transparent 0),
+    radial-gradient(circle at 6px 6px, rgba(255,255,0,0.3) 1px, transparent 0),
+    radial-gradient(circle at 10px 10px, rgba(255,255,255,0.6) 1px, transparent 0);
+  background-size: 8px 8px, 12px 12px, 16px 16px;
+  background-color: rgba(255, 255, 200, 0.95);
+  border: 4px solid #5a4a2f;
+  box-shadow: 6px 6px 0 #b9a782;
+  border-radius: 0;
+  padding: 20px;
+  min-width: 300px;
+  max-width: 500px;
+  font-family: 'MyCustomFont';
+  display: none;
+  z-index: 1001;
+}
+
+.event-detail-modal h3 {
+  margin: 0 0 10px 0;
+  color: #3c2e1e;
+  font-size: 18px;
+  border-bottom: 2px solid #5a4a2f;
+  padding-bottom: 8px;
+}
+
+.event-detail-modal p {
+  margin: 8px 0;
+  color: #4a3b28;
+  line-height: 1.4;
+}
+
+.event-detail-modal .close-btn {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  background: #ff6b6b;
+  color: white;
+  border: 2px solid #5a4a2f;
+  box-shadow: 2px 2px 0 #b9a782;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-family: 'MyCustomFont';
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.life-event-tile {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.life-event-tile:hover {
+  transform: scale(1.05);
+}
+.life-journey {
+  position: relative;  /* SVG가 겹치게 만들기 위해 필요 */
+}
+.life-event {
+  z-index: 1;  /* SVG보다 위에 나오도록 */
+}
+.menu-left, .menu-right {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.menu-box {
+  background-color: rgba(250, 235, 180, 0.9);
+  background-image: url("{% static 'images/pixel-paper.png' %}");
+  background-size: 4px 4px;
+  background-repeat: repeat;
+  border: 2.5px solid #5a4a2f;
+  box-shadow: 3px 3px 0 #b9a782;
+  padding: 6px 12px;
+  font-weight: bold;
+  color: #3c2e1e;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.menu-box.active {
+  color: #007aff;
+  font-weight: bold;
+}
+
+.top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  margin-bottom: 20px;
+}
+.menu-box.active {
+  color: #007aff;
+  font-weight: bold;
+}
+
+.add-event-box {
+  background-color: rgba(250, 235, 180, 0.95);
+  background-image: url("{% static 'images/pixel-paper.png' %}");
+  background-size: 8px 8px;
+  background-repeat: repeat;
+  border: 4px solid #2c1810;
+  box-shadow: 6px 6px 0 #8b7355;
+  border-radius: 0;
+  padding: 20px;
+  width: 400px;
+  margin: 30px 0;
+  font-family: 'MyCustomFont';
+}
+
+.add-event-title {
+  margin: 0 auto 15px auto;
+  color: #2c1810;
+  font-size: 16px;
+  font-family: 'MyCustomFont';
+  text-align: center;
+  background: #ffd700;
+  border: 3px solid #2c1810;
+  box-shadow: 3px 3px 0 #8b7355;
+  padding: 8px 40px;
+  width: 80%;
+  cursor: pointer;
+  border-radius: 0;
+}
+
+.error-message {
+  background: #ffebee;
+  border: 2px solid #f44336;
+  color: #c62828;
+  padding: 8px;
+  font-size: 12px;
+  font-family: 'MyCustomFont';
+  border-radius: 4px;
+  margin-top: 5px;
+}
+
+.add-event-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.event-input, .event-textarea {
+  background: #ffffff;
+  border: 3px solid #2c1810;
+  box-shadow: inset 2px 2px 0 #e0e0e0;
+  padding: 8px;
+  font-family: 'MyCustomFont';
+  font-size: 13px;
+  color: #2c1810;
+  border-radius: 0;
+}
+
+.event-submit-btn {
+  background: linear-gradient(135deg, #ffd700 0%, #ffb300 100%);
+  border: 4px solid #2c1810;
+  box-shadow: 4px 4px 0 #8b7355, inset 1px 1px 0 #fff176;
+  color: #2c1810;
+  font-family: 'MyCustomFont';
+  font-size: 16px;
+  font-weight: bold;
+  padding: 15px 30px;
+  cursor: pointer;
+  border-radius: 0;
+  text-shadow: 1px 1px 0 #fff9c4;
+  transition: all 0.1s ease;
+}
+
+.event-submit-btn:hover {
+  background: linear-gradient(135deg, #ffb300 0%, #ff8f00 100%);
+  transform: translate(1px, 1px);
+  box-shadow: 3px 3px 0 #8b7355, inset 1px 1px 0 #fff176;
+}
+
+.error-message {
+  background: #ffebee;
+  border: 2px solid #f44336;
+  color: #c62828;
+  padding: 8px;
+  font-size: 12px;
+  font-family: 'MyCustomFont';
+  border-radius: 4px;
+  margin-top: 5px;
+}
+
+#reviewList {
+  margin-top: 15px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+#reviewList h4 {
+  margin: 0 0 10px 0;
+  color: #3c2e1e;
+  border-bottom: 1px solid #5a4a2f;
+  padding-bottom: 5px;
+}
   </style>
 </head>
 <body>
-  <h1>나의 인생 마이페이지</h1>
+ <div class="wrapper">
+    <!-- 상단 네비게이션 -->
+    <div class="top-nav">
+      <div class="menu-left">
 
-  <div class="top-container" style="position: relative;">
-    <div class="profile-box">
-      <div class="profile-upper">
-        <div class="left-profile">
-          <div class="avatar-wrapper">
-            {% if profile.avatar_image %}
-            <img src="{{ profile.avatar_image.url }}" alt="아바타">
-            {% elif profile.avatar_url %}
-            <img src="{{ profile.avatar_url }}" alt="아바타">
-            {% else %}
-            <span>아바타 없음</span>
-            {% endif %}
-          </div>
-          <div class="nickname-box">{{ profile.nickname|default:"닉네임 없음" }}</div>
-        </div>
+        <a href="{% url 'community:index' %}" class="menu-box home-link">
+          <i class="fas fa-home"></i>
+        <a href="{% url 'board:post_list' %}" 
+   class="menu-box {% if request.resolver_match.url_name == 'post_list' %}active{% endif %}">커뮤니티</a>
 
-        <div class="right-profile">
-          <div class="action-buttons">
-            <button class="mentor-button">멘토 신청</button>
-            <button class="review-button">후기</button>
-            <button class="recommend-button">추천</button>
-          </div>
-          <div class="info-group">
-<div class="info-row">
-  <div class="info-label">나이</div>
-  <div class="info-value">{{ profile.age }}</div>
-</div>
-<div class="info-row">
-  <div class="info-label">직업</div>
-  <div class="info-value">{{ profile.job }}</div>
-</div>
-<div class="info-row">
-  <div class="info-label">내공</div>
-  <div class="info-value">{{ profile.points|default:"00점" }}</div>
-</div>
-<div class="info-row">
-  <div class="info-label">관심</div>
-  <div class="info-value">{{ profile.interests }}</div>
-</div>
-<div class="info-row">
-  <div class="info-label">한줄 소개</div>
-  <div class="info-value">{{ profile.tagline }}</div>
-</div>
-        </div>
+<a href="{% url 'mentor:mentor_home' %}" 
+   class="menu-box {% if request.resolver_match.url_name == 'mentor_home' %}active{% endif %}">멘토멘티</a>
+
+<a href="{% url 'accounts:my_page' %}" 
+   class="menu-box {% if request.resolver_match.url_name == 'my_page' %}active{% endif %}">마이페이지</a>
+
+<a href="{% url 'youth_policy:basic_page' %}" 
+   class="menu-box {% if request.resolver_match.url_name == 'basic_page' %}active{% endif %}">청년정책</a>
+
       </div>
-        <div style="position: absolute; right: 0; top: calc(100% + 8px);">
+
+    <div class="menu-right">      
+    {% if user.is_authenticated %}
+        <div class="login-info">{{ profile.nickname|default:user.username }}님 환영합니다</div>
+    {% else %}
+    
+    <!-- <div class="login-info">{{user.username}}님 환영합니다</div> -->
+    <a href="{% url 'accounts:login' %}" class="write-btn">로그인</a>
+    {% endif %}
+  </div>
+    </div>
+ 
+  <div class="main-wrapper">
+    <div class="top-section">
+      <div class="profile-box">
+        <div class="profile-upper">
+          <div class="left-profile">
+            <div class="avatar-wrapper">
+              {% if profile.avatar_image %}
+                <img src="{{ profile.avatar_image.url }}" alt="아바타">
+              {% elif profile.avatar_url %}
+                <img src="{{ profile.avatar_url }}" alt="아바타">
+              {% else %}
+                <span>아바타 없음</span>
+              {% endif %}
+            </div>
+            <div class="nickname-box">{{ profile.nickname|default:"닉네임 없음" }}</div>
+          </div>
+          <div class="right-profile">
+            <div class="action-buttons">
+              <a href="{% url 'mentor:question_create' %}" style="text-decoration: none;"><button class="mentor-button">멘토 신청</button></a>
+              <button class="review-button" onclick="showReviewModal()">후기</button>
+              <button class="recommend-button" onclick="toggleRecommend()">인기도 (<span id="recommendCount">{{ profile.popularity|default:0 }}</span>)</button>
+            </div>
+            <div class="info-group">
+              <div class="info-row"><div class="info-label">직업</div><div class="info-value">{{ profile.job|default:"없음" }}</div></div>
+              <div class="info-row"><div class="info-label">나이</div><div class="info-value">{{ profile.age|default:"없음" }}</div></div>
+              <div class="info-row"><div class="info-label">내공</div><div class="info-value">{{ profile.points|default:"00점" }}</div></div>
+              <div class="info-row"><div class="info-label">관심</div><div class="info-value">{{ profile.interests|default:"-" }}</div></div>
+              <div class="info-row"><div class="info-label">한줄 소개</div><div class="info-value">{{ profile.tagline|default:"-" }}</div></div>
+            </div>
+          </div>
+      </div>
+  {% if user == request.user %}
+  <div class="edit-button-container">
     <a href="{% url 'accounts:profile_edit' %}">
-      <button style="background-color: #8ecae6; border: 2px solid #444; border-radius: 6px; padding: 5px 12px; font-size: 12px; font-weight: bold; cursor: pointer; font-family: 'MyCustomFont';">수정하기</button>
+      <button class="edit-button">수정하기</button>
     </a>
   </div>
+  {% endif %}
 </div>
-        </a>
+
+  
+
+      <div class="policy-box">
+        <h3>📌 청년 정책 추천</h3>
+        <ul>
+          <li>🔍 지역과 관심사를 선택하면 맞춤 정책을 보여드려요</li>
+          <li>예: <strong>서울 청년 월세 지원</strong> - 최대 20만원</li>
+          <li>예: <strong>취업성공 패키지</strong> - 맞춤형 취업 지원</li>
+        </ul>
+        <form method="GET" action="#">
+          <label for="region">지역 선택</label><br>
+          <select name="region" id="region">
+            <option value="">-- 선택 --</option>
+            <option value="seoul">서울</option>
+            <option value="busan">부산</option>
+            <option value="etc">그 외 지역</option>
+          </select><br><br>
+
+          <label for="interest">관심사 선택</label><br>
+          <select name="interest" id="interest">
+            <option value="">-- 선택 --</option>
+            <option value="job">취업</option>
+            <option value="housing">주거</option>
+            <option value="finance">금융지원</option>
+          </select><br><br>
+          
+        </form>
+        
       </div>
+      
+  <div class="admin-extra-wrapper">
+    <div class="admin-box">
+      <h3>👩‍💼 관리자 추천</h3>
+      <p style="font-size: 13px;">- 매주 갱신되는 추천 콘텐츠<br>- 신뢰도 높은 정보만 선별!</p>
     </div>
-<!-- 기존: .policy-banner 대신 이 코드로 교체 -->
-<div class="policy-banner policy-box">
-  <h3>📌 청년 정책 추천</h3>
-
-  <!-- 예비 추천 리스트 -->
-  <ul id="policy-list">
-    <li>🔍 지역과 관심사를 선택하면 맞춤 정책을 보여드려요</li>
-    <li>예: <strong>서울 청년 월세 지원</strong> - 최대 20만원</li>
-    <li>예: <strong>취업성공 패키지</strong> - 맞춤형 취업 지원</li>
-  </ul>
-
-  <!-- 정책 선택 폼은 나중에 연동할 수 있게 기본 구조만 둠 -->
-  <form method="GET" action="#">
-    <label for="region">지역 선택</label><br>
-    <select name="region" id="region">
-      <option value="">-- 선택 --</option>
-      <option value="seoul">서울</option>
-      <option value="busan">부산</option>
-      <option value="etc">그 외 지역</option>
-    </select><br><br>
-
-    <label for="interest">관심사 선택</label><br>
-    <select name="interest" id="interest">
-      <option value="">-- 선택 --</option>
-      <option value="job">취업</option>
-      <option value="housing">주거</option>
-      <option value="finance">금융지원</option>
-    </select><br><br>
-
-    <button type="button" disabled>맞춤 정책 보기 (준비중)</button>
-  </form>
-</div>
-
-  <!-- 제출 버튼 -->
-  <div class="edit-button-container" style="position: static; text-align: right; margin-top: 12px;">
-    <button type="submit">추천받기</button>
+    <div class="extra-box">
+      <h3>🎯 새로운 콘텐츠</h3>
+      <p style="font-size: 13px;">- 커뮤니티 인기 게시물<br>- 이번 주 추천 활동!</p>
+    </div>
   </div>
-  </form>
-
-  <!-- 추천된 정책 예시 -->
-  <ul style="margin-top: 12px; font-size: 13px;">
-    <li><strong>청년내일채움공제:</strong> 중소기업 재직 청년에게 목돈 마련 지원</li>
-    <li><strong>청년 월세 지원:</strong> 만 19~34세, 최대 월 20만원</li>
-  </ul>
 </div>
-
-  <div class="middle-section">
-    <h2>🎲 나의 인생 여정</h2>
-    <div class="board-map">
+<div class="board-section" style="background: radial-gradient(2px 2px at 20px 30px, #fff, transparent), radial-gradient(2px 2px at 40px 70px, #fff, transparent), radial-gradient(1px 1px at 90px 40px, #fff, transparent), radial-gradient(1px 1px at 130px 80px, #fff, transparent), radial-gradient(2px 2px at 160px 30px, #fff, transparent), radial-gradient(1px 1px at 200px 60px, #fff, transparent), radial-gradient(2px 2px at 240px 90px, #fff, transparent), radial-gradient(1px 1px at 280px 20px, #fff, transparent), radial-gradient(1px 1px at 320px 70px, #fff, transparent), radial-gradient(2px 2px at 360px 40px, #fff, transparent); background-repeat: repeat; background-size: 400px 100px; background-color: #1a1a2e;">
+  <h2 class="section-title-box">인생여정</h2>
+  <div class="life-journey-wrapper">
+    <div class="life-journey smooth-line">
       {% for event in life_events %}
-      <div class="tile">
-        <div class="year">{{ event.date }}</div>
-        <div class="event">{{ event.title }}</div>
-        <div class="note">{{ event.note }}</div>
-        <div class="metrics"><span>{{ event.feeling }}</span><span>{{ event.score }}</span></div>
-        <div class="detail">{{ event.detail }}</div>
-      </div>
+        <div class="life-event">
+          <div class="life-event-tile" onclick="showEventDetail('{{ event.title }}', '{{ event.date }}', '{{ event.note|default:"" }}', '{{ event.detail|default:"" }}')" {% if user == request.user %}oncontextmenu="showDeleteMenu(event, {{ event.id }})"{% endif %}>
+            <h4 class="life-event-title">{{ event.title }}</h4>
+            <span class="life-event-date">{{ event.date }}</span>
+            <div class="event-scores">
+              <div class="score-item">
+                <span class="score-label">💖 행복도</span>
+                <div class="score-bar happiness-bar">
+                  <div class="score-fill" style="width: {{ event.feeling|default:"0" }}%;"></div>
+                  <span class="score-text">{{ event.feeling|default:"0" }}/100</span>
+                </div>
+              </div>
+              <div class="score-item">
+                <span class="score-label">🏆 성취도</span>
+                <div class="score-bar achievement-bar">
+                  <div class="score-fill" style="width: {{ event.score|default:"0" }}%;"></div>
+                  <span class="score-text">{{ event.score|default:"0" }}/100</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       {% endfor %}
+      <svg class="life-journey-line" xmlns="http://www.w3.org/2000/svg"></svg>
     </div>
   </div>
+</div>
 
-  <div class="form-section">
-    <h3>➕ 새로운 인생 이벤트 추가하기</h3>
-    <form action="{% url 'accounts:add_life_event' %}" method="post">
-      {% csrf_token %}
-      <input type="text" name="date" placeholder="예: 2025년 4월" required />
-      <input type="text" name="title" placeholder="이벤트 제목" required />
-      <input type="text" name="note" placeholder="간단 메모" />
-      <input type="text" name="feeling" placeholder="기분점수" />
-      <input type="text" name="score" placeholder="성과점수" />
-      <textarea name="detail" placeholder="상세 내용" rows="2"></textarea>
-      <button type="submit">이벤트 추가하기</button>
-    </form>
+<!-- 이벤트 세부정보 모달 -->
+<div class="modal-overlay" id="modalOverlay" onclick="hideEventDetail()"></div>
+<div class="event-detail-modal" id="eventDetailModal">
+  <button class="close-btn" onclick="hideEventDetail()">×</button>
+  <h3 id="modalTitle"></h3>
+  <p><strong>날짜:</strong> <span id="modalDate"></span></p>
+  <p><strong>메모:</strong> <span id="modalNote"></span></p>
+  <p><strong>상세 내용:</strong></p>
+  <p id="modalDetail"></p>
+</div>
+
+<!-- 후기 모달 -->
+<div class="modal-overlay" id="reviewModalOverlay" onclick="hideReviewModal()"></div>
+<div class="event-detail-modal" id="reviewModal">
+  <button class="close-btn" onclick="hideReviewModal()">×</button>
+  <h3>후기 작성</h3>
+  <form id="reviewForm" onsubmit="submitReview(event)">
+    <input type="text" id="reviewNickname" value="{{ user.profile.nickname|default:user.username }}" class="event-input" readonly style="background: #f0f0f0;" />
+    <textarea id="reviewContent" placeholder="후기 내용을 입력하세요" rows="4" class="event-textarea" required></textarea>
+    <button type="submit" class="event-submit-btn">후기 등록</button>
+  </form>
+  <div id="reviewList">
+    <h4>등록된 후기</h4>
+    <div id="reviewItems"></div>
   </div>
+</div>
+
+<!-- 커스텀 우클릭 메뉴 -->
+<div id="customMenu" class="custom-menu" style="display:none;">
+  <form id="deleteForm" method="POST">
+    {% csrf_token %}
+    <button type="submit" class="delete-button">🗑️ 삭제하기</button>
+  </form>
+</div>
+
+    {% if user == request.user %}
+    <div class="add-event-box">
+      <button type="submit" form="eventForm" class="add-event-title">➕ 새로운 인생 이벤트 추가하기</button>
+      <form action="{% url 'accounts:add_life_event' %}" method="post" class="add-event-form" id="eventForm" onsubmit="return validateDateFormat()">
+        {% csrf_token %}
+        <input type="text" name="date" id="dateInput" placeholder="예: 25년 03월 21살" class="event-input" required />
+        <div id="dateError" class="error-message" style="display: none;">💬 날짜를 00년 00월 00살 형식으로 적어주세요!</div>
+        <input type="text" name="title" placeholder="이벤트 제목" class="event-input" required />
+        <input type="text" name="note" placeholder="간단 메모" class="event-input" />
+        <input type="text" name="feeling" placeholder="행복점수 (0-100)" class="event-input" />
+        <input type="text" name="score" placeholder="성과점수 (0-100)" class="event-input" />
+        <textarea name="detail" placeholder="상세 내용" rows="3" class="event-textarea"></textarea>
+
+      </form>
+    </div>
+    {% endif %}
+  </div>
+  <script>
+  document.addEventListener("click", function () {
+    document.getElementById("customMenu").style.display = "none";
+  });
+
+  function showDeleteMenu(e, eventId) {
+    e.preventDefault();
+    const menu = document.getElementById("customMenu");
+    menu.style.top = e.pageY + "px";
+    menu.style.left = e.pageX + "px";
+    menu.style.display = "block";
+    const form = document.getElementById("deleteForm");
+    form.action = `/accounts/life_event/delete/${eventId}/`;
+  }
+
+  function validateDateFormat() {
+    const dateInput = document.getElementById('dateInput');
+    const errorDiv = document.getElementById('dateError');
+    const datePattern = /^\d{2}년 \d{1,2}월 \d{1,2}살$/;
+    
+    if (!datePattern.test(dateInput.value)) {
+      errorDiv.style.display = 'block';
+      dateInput.focus();
+      return false;
+    }
+    errorDiv.style.display = 'none';
+    return true;
+  }
+</script>
+<script>
+function showEventDetail(title, date, note, detail) {
+  document.getElementById('modalTitle').innerText = title;
+  document.getElementById('modalDate').innerText = date;
+  document.getElementById('modalNote').innerText = note || '메모 없음';
+  document.getElementById('modalDetail').innerText = detail || '상세 내용 없음';
+  document.getElementById('modalOverlay').style.display = 'block';
+  document.getElementById('eventDetailModal').style.display = 'block';
+}
+
+function hideEventDetail() {
+  document.getElementById('modalOverlay').style.display = 'none';
+  document.getElementById('eventDetailModal').style.display = 'none';
+}
+
+function showReviewModal() {
+  document.getElementById('reviewModalOverlay').style.display = 'block';
+  document.getElementById('reviewModal').style.display = 'block';
+  loadReviews();
+  checkUserReview();
+}
+
+function checkUserReview() {
+  const currentUser = document.getElementById('reviewNickname').value;
+  const reviews = JSON.parse(localStorage.getItem('reviews') || '[]');
+  const hasReviewed = reviews.some(review => review.nickname === currentUser);
+  
+  const form = document.getElementById('reviewForm');
+  if (hasReviewed) {
+    form.style.display = 'none';
+  } else {
+    form.style.display = 'block';
+  }
+}
+
+function hideReviewModal() {
+  document.getElementById('reviewModalOverlay').style.display = 'none';
+  document.getElementById('reviewModal').style.display = 'none';
+}
+
+function submitReview(event) {
+  event.preventDefault();
+  const nickname = document.getElementById('reviewNickname').value;
+  const content = document.getElementById('reviewContent').value;
+  
+  const reviews = JSON.parse(localStorage.getItem('reviews') || '[]');
+  const hasReviewed = reviews.some(review => review.nickname === nickname);
+  
+  if (hasReviewed) {
+    alert('이미 후기를 작성하셨습니다.');
+    return;
+  }
+  
+  reviews.push({nickname, content, date: new Date().toISOString()});
+  localStorage.setItem('reviews', JSON.stringify(reviews));
+  
+  document.getElementById('reviewForm').reset();
+  loadReviews();
+  checkUserReview();
+}
+
+function loadReviews() {
+  const reviews = JSON.parse(localStorage.getItem('reviews') || '[]');
+  const reviewItems = document.getElementById('reviewItems');
+  const currentUser = document.getElementById('reviewNickname').value;
+  reviewItems.innerHTML = '';
+  
+  reviews.forEach((review, index) => {
+    const reviewItem = document.createElement('div');
+    reviewItem.style.cssText = 'border: 2px solid #2c1810; padding: 8px; margin: 5px 0; background: rgba(255,255,255,0.8); position: relative;';
+    
+    let deleteButton = '';
+    if (review.nickname === currentUser) {
+      deleteButton = `<button onclick="deleteReview(${index})" style="position: absolute; right: 5px; top: 5px; background: #ff6b6b; color: white; border: 1px solid #2c1810; padding: 2px 6px; font-size: 10px; cursor: pointer;">삭제</button>`;
+    }
+    
+    reviewItem.innerHTML = `<strong>${review.nickname}:</strong> ${review.content}${deleteButton}`;
+    reviewItems.appendChild(reviewItem);
+  });
+}
+
+function deleteReview(index) {
+  const reviews = JSON.parse(localStorage.getItem('reviews') || '[]');
+  reviews.splice(index, 1);
+  localStorage.setItem('reviews', JSON.stringify(reviews));
+  loadReviews();
+  checkUserReview();
+}
+
+function toggleRecommend() {
+  const countElement = document.getElementById('recommendCount');
+  const currentCount = parseInt(countElement.textContent);
+  const hasRecommended = localStorage.getItem('hasRecommended') === 'true';
+  
+  if (hasRecommended) {
+    countElement.textContent = currentCount - 1;
+    localStorage.setItem('hasRecommended', 'false');
+  } else {
+    countElement.textContent = currentCount + 1;
+    localStorage.setItem('hasRecommended', 'true');
+  }
+}
+
+(function () {
+  const svg = document.querySelector('.life-journey-line');
+  const journey = document.querySelector('.life-journey');
+  const events = document.querySelectorAll('.life-event');
+  if (!svg || events.length < 2) return;
+
+  const svgWidth = journey.scrollWidth;
+  const svgHeight = journey.offsetHeight;
+  svg.setAttribute('width', svgWidth);
+  svg.setAttribute('height', svgHeight);
+  svg.style.position = 'absolute';
+  svg.style.top = '0';
+  svg.style.left = '0';
+  svg.innerHTML = '';
+
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  let d = '';
+
+  const baseLeft = journey.getBoundingClientRect().left;
+  const baseTop = journey.getBoundingClientRect().top;
+
+  for (let i = 0; i < events.length - 1; i++) {
+    const currRect = events[i].getBoundingClientRect();
+    const nextRect = events[i + 1].getBoundingClientRect();
+
+    const currX = currRect.left - baseLeft + currRect.width / 2;
+    const currY = currRect.top - baseTop + currRect.height / 2;
+
+    const nextX = nextRect.left - baseLeft + nextRect.width / 2;
+    const nextY = nextRect.top - baseTop + nextRect.height / 2;
+
+    if (i === 0) {
+      d += `M ${currX},${currY} `;
+    }
+
+    const curveOffset = 40;
+    const controlX1 = currX + curveOffset;
+    const controlY1 = currY;
+    const controlX2 = nextX - curveOffset;
+    const controlY2 = nextY;
+
+    d += `C ${controlX1},${controlY1} ${controlX2},${controlY2} ${nextX},${nextY} `;
+  }
+
+  path.setAttribute('d', d);
+  path.setAttribute('fill', 'none');
+  path.setAttribute('stroke', '#fff');
+  path.setAttribute('stroke-width', '3');
+  path.setAttribute('stroke-linecap', 'round');
+
+  svg.appendChild(path);
+})();
+</script>
 </body>
 </html>
