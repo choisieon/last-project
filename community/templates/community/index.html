@@ -277,6 +277,63 @@
       color: #555;
     }
 
+    /* 인기글 배너 스타일 */
+    .popular-posts-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .popular-section {
+      background-color: rgba(255, 255, 255, 0.7);
+      border: 2px solid #5a4a2f;
+      box-shadow: 2px 2px 0 #b9a782;
+      padding: 12px;
+      border-radius: 0;
+    }
+
+    .section-title {
+      margin: 0 0 8px 0;
+      font-size: 14px;
+      font-weight: bold;
+      color: #3c2e1e;
+      border-bottom: 1px solid #5a4a2f;
+      padding-bottom: 4px;
+    }
+
+    .mini-post-item {
+      margin-bottom: 8px;
+      padding: 6px 0;
+      border-bottom: 1px dotted #ccc;
+    }
+
+    .mini-post-item:last-child {
+      border-bottom: none;
+    }
+
+    .mini-post-item h5 {
+      margin: 0 0 4px 0;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .mini-post-item h5 a {
+      color: #3c2e1e;
+      text-decoration: none;
+    }
+
+    .mini-post-item h5 a:hover {
+      color: #007aff;
+    }
+
+    .mini-meta {
+      font-size: 10px;
+      color: #666;
+      display: flex;
+      gap: 8px;
+    }
+
     @media screen and (max-width: 768px) {
       .main-container {
         flex-direction: column;
@@ -332,19 +389,37 @@
       <div class="left-content">
         <div class="post-banner">
           <div class="post-item"><strong>🔥 인기 게시글 배너</strong></div>
-          {% for post in popular_posts %}
-          <div class="post-item">
-            <h4><a href="{% url 'board:post_detail' post.id %}">{{ post.title }}</a></h4>
-            <p>{{ post.content|truncatechars:80 }}</p>
-            <div class="meta-info">
-              <span>{{ post.created_at|date:"Y-m-d H:i" }}</span>
-              <div class="icons">
-                <span class="icon-like">❤️ {{ post.likes.count }}</span>
-                <span class="icon-comment">💬 {{ post.comments.count }}</span>
+          
+          <!-- 세로로 나눈 인기글 섹션 -->
+          <div class="popular-posts-container">
+            <!-- 커뮤니티 인기글 -->
+            <div class="popular-section">
+              <h4 class="section-title">💬 커뮤니티 인기글</h4>
+              {% for post in popular_community_posts %}
+              <div class="mini-post-item">
+                <h5><a href="{% url 'board:post_detail' post.id %}">{{ post.title|truncatechars:25 }}</a></h5>
+                <div class="mini-meta">
+                  <span>❤️ {{ post.likes.count }}</span>
+                  <span>💬 {{ post.comments.count }}</span>
+                </div>
               </div>
+              {% endfor %}
+            </div>
+            
+            <!-- 멘토멘티 인기글 -->
+            <div class="popular-section">
+              <h4 class="section-title">🎓 멘토멘티 인기글</h4>
+              {% for question in popular_mentor_questions %}
+              <div class="mini-post-item">
+                <h5><a href="{% url 'mentor:question_detail' question.id %}">{{ question.title|truncatechars:25 }}</a></h5>
+                <div class="mini-meta">
+                  <span>❤️ {{ question.likes.count }}</span>
+                  <span>💬 {{ question.answers.count }}</span>
+                </div>
+              </div>
+              {% endfor %}
             </div>
           </div>
-          {% endfor %}
         </div>
       </div>
       <div class="right-content">

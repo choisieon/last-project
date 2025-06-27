@@ -269,14 +269,33 @@
   font-size: 11px;
   padding: 4px 8px;
   margin-right: 6px;
-  background-color: #eee;
   border: 2px solid #5a4a2f;
   box-shadow: 2px 2px 0 #999;
   cursor: pointer;
   border-radius: 4px;
 }
-.eval-button.selected {
-  background-color: #5baeff;
+.eval-button[value="good"] {
+  background-color: #c8e6c9;
+  color: #2e7d32;
+}
+.eval-button[value="good"].selected {
+  background-color: #4caf50;
+  color: white;
+}
+.eval-button[value="soso"] {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+.eval-button[value="soso"].selected {
+  background-color: #ff9800;
+  color: white;
+}
+.eval-button[value="bad"] {
+  background-color: #ffcdd2;
+  color: #d32f2f;
+}
+.eval-button[value="bad"].selected {
+  background-color: #f44336;
   color: white;
 }
 .avatar-box-question {
@@ -526,7 +545,7 @@
   </div>
 </div>
 
-      <div class="answer-box">
+      <div class="answer-box" id="answer-{{ answer.id }}">
         <div class="answer-meta">
  <div class="answer-meta">
    {{ answer.author.job|default:"없음" }} | {{ answer.author.age }}세 | {{ answer.author.points }}점 | {{ answer.created_at|date:"Y-m-d H:i" }}
@@ -559,8 +578,8 @@
   </form>
 {% endif %}
 
-<div class="evaluation-box" data-answer-id="{{ answer.id }}">
-  <form method="post" action="{% url 'mentor:answer_evaluate' answer.id %}" style="display: inline;">
+<div class="evaluation-box" data-answer-id="{{ answer.id }}" id="eval-{{ answer.id }}">
+  <form method="post" action="{% url 'mentor:answer_evaluate' answer.id %}#eval-{{ answer.id }}" style="display: inline;">
     {% csrf_token %}
     <button type="submit" name="evaluation" value="good" class="eval-button {% if user in answer.good_users.all %}selected{% endif %}">
       👍 유용해요 ({{ answer.good_count }})
