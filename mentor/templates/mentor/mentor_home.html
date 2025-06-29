@@ -11,6 +11,7 @@
       font-family: 'MyCustomFont';
       src: url("{% static 'fonts/픽셀.woff2' %}") format('woff2');
     }
+
     body {
       font-family: 'MyCustomFont', sans-serif;
       margin: 0;
@@ -19,11 +20,13 @@
       background-size: 105%;
       background-color: #cde4c7;
     }
+
     .wrapper {
       max-width: 900px;
       margin: 0 auto;
       padding: 30px 20px;
     }
+
     .top-nav {
       display: flex;
       justify-content: space-between;
@@ -37,17 +40,17 @@
     .menu-box {
       background-color: rgba(250, 235, 180, 0.9);
       background-image: url("{% static 'images/pixel-paper.png' %}");
-      border: 2px solid #5A4A2F;
+      border: 2px solid #5a4a2f;
       padding: 6px 12px;
-      box-shadow: 3px 3px 0 #B9A782;
+      box-shadow: 3px 3px 0 #b9a782;
       font-size: 14px;
-      color: #3C2E1E;
+      color: #3c2e1e;
       font-weight: bold;
       text-decoration: none;
     }
-    .menu-box.active { color: #007AFF; }
+    .menu-box.active { color: #007aff; }
     .write-button {
-      background-color: #007AFF;
+      background-color: #007aff;
       color: white;
       margin-left: auto;
     }
@@ -61,21 +64,22 @@
     .sub-category-bar button {
       background-color: rgba(250, 235, 180, 0.9);
       background-image: url("{% static 'images/pixel-paper.png' %}");
-      border: 2px solid #5A4A2F;
+      border: 2px solid #5a4a2f;
       padding: 6px 10px;
       font-size: 12px;
       font-family: 'MyCustomFont';
-      box-shadow: 2px 2px 0 #B9A782;
+      box-shadow: 2px 2px 0 #b9a782;
       cursor: pointer;
     }
+
     .filter-bar {
       margin-bottom: 10px;
     }
     .filter-trigger {
-      background-color: #FFEB99;
+      background-color: #ffeb99;
       padding: 4px 8px;
       font-size: 13px;
-      border: 2px solid #5A4A2F;
+      border: 2px solid #5a4a2f;
       cursor: pointer;
       font-family: 'MyCustomFont';
       box-shadow: 2px 2px 0 #aaa;
@@ -90,7 +94,7 @@
       display: flex;
     }
     .filter-options button {
-      background-color: #F9E3A1;
+      background-color: #f9e3a1;
       border: 2px solid #333;
       padding: 4px 8px;
       font-family: 'MyCustomFont';
@@ -98,6 +102,7 @@
       box-shadow: 2px 2px 0 #999;
       font-size: 12px;
     }
+
     .category-badge {
       display: inline-block;
       padding: 1px 6px;
@@ -106,18 +111,19 @@
       color: white;
       width: fit-content;
     }
-    .college { background-color: #7F78D2; }
-    .life { background-color: #6AAA64; }
-    .love { background-color: #E36BAE; }
-    .house { background-color: #C58C55; }
-    .job { background-color: #4B9CD3; }
-    .money { background-color: #E3B041; }
-    .fitness { background-color: #E45757; }
+    .college { background-color: #7f78d2; }
+    .life { background-color: #6aaa64; }
+    .love { background-color: #e36bae; }
+    .house { background-color: #c58c55; }
+    .job { background-color: #4b9cd3; }
+    .money { background-color: #e3b041; }
+    .fitness { background-color: #e45757; }
     .etc { background-color: #999999; }
+
     .post-item {
       background-color: rgba(250, 235, 180, 0.95);
-      border: 2px solid #5A4A2F;
-      box-shadow: 2px 2px 0 #B9A782;
+      border: 2px solid #5a4a2f;
+      box-shadow: 2px 2px 0 #b9a782;
       padding: 4px;
       margin-bottom: 8px;
       font-size: 11px;
@@ -126,8 +132,8 @@
     .post-preview { font-size: 11px; color: #555; margin: 2px 0; }
     .post-footer { font-size: 10px; display: flex; justify-content: space-between; flex-wrap: wrap; }
     .mentor-profile-btn {
-      background: #FFCC00;
-      border: 1px solid #5A4A2F;
+      background: #ffcc00;
+      border: 1px solid #5a4a2f;
       cursor: pointer;
       padding: 2px 5px;
       font-size: 10px;
@@ -135,8 +141,8 @@
     .metrics { margin-top: 2px; font-size: 10px; color: #333; }
     .fun-box {
       margin-top: 30px;
-      background: #FEF3C7;
-      border: 2px dashed #5A4A2F;
+      background: #fef3c7;
+      border: 2px dashed #5a4a2f;
       padding: 12px;
       box-shadow: 2px 2px 0 #aaa;
       font-size: 13px;
@@ -163,33 +169,39 @@
       </div>
       <a href="{% url 'mentor:question_create' %}" class="menu-box write-button">글쓰기</a>
     </div>
+
 <div class="sub-category-bar">
   {% for code, label in categories.items %}
     <button
       onclick="location.href='{% url 'mentor:mentor_home' %}?category={{ code }}{% if sort %}&sort={{ sort }}{% endif %}'"
-      {% if current_category == code %}style="color: #007AFF;"{% endif %}
+      {% if current_category == code %}style="color: #007aff;"{% endif %}
     >
       {{ label }}
     </button>
   {% endfor %}
   <button onclick="location.href='{% url 'mentor:mentor_list' %}'">👤 선배 구경하기</button>
 </div>
+
+
+
+
     <div class="filter-bar">
-      <button class="filter-trigger" onclick="toggleFilters()">:클립보드: 정렬 옵션</button>
+      <button class="filter-trigger" onclick="toggleFilters()">📋 정렬 옵션</button>
     </div>
     <div class="filter-options" id="filterOptions">
-      <a href="?sort=latest"><button class="{% if sort == 'latest' %}active{% endif %}">:새_항목: 최신순</button></a>
-      <a href="?sort=views"><button class="{% if sort == 'views' %}active{% endif %}">:두_눈: 조회순</button></a>
-      <a href="?sort=likes"><button class="{% if sort == 'likes' %}active{% endif %}">:하트2: 공감순</button></a>
+      <a href="?sort=latest"><button class="{% if sort == 'latest' %}active{% endif %}">🆕 최신순</button></a>
+      <a href="?sort=views"><button class="{% if sort == 'views' %}active{% endif %}">👀 조회순</button></a>
+      <a href="?sort=likes"><button class="{% if sort == 'likes' %}active{% endif %}">❤️ 공감순</button></a>
     </div>
+
     <div class="post-list">
       {% for question in questions %}
         <div class="post-item {% if question.is_promoted_to_mentoring %}mentoring{% endif %}">
           <span class="category-badge {{ question.category }}">
-            {% if question.category == 'college' %}:학교: 대학선배{% elif question.category == 'life' %}:새싹: 인생선배
-            {% elif question.category == 'love' %}:큐피드: 연애선배{% elif question.category == 'house' %}:집: 자취선배
-            {% elif question.category == 'job' %}:서류_가방: 취업선배{% elif question.category == 'money' %}:신용_카드: 지갑선배
-            {% elif question.category == 'fitness' %}:근육: 운동선배{% else %}:압정: 기타{% endif %}
+            {% if question.category == 'college' %}🏫 대학선배{% elif question.category == 'life' %}🌱 인생선배
+            {% elif question.category == 'love' %}💘 연애선배{% elif question.category == 'house' %}🏠 자취선배
+            {% elif question.category == 'job' %}💼 취업선배{% elif question.category == 'money' %}💳 지갑선배
+            {% elif question.category == 'fitness' %}💪 운동선배{% else %}📌 기타{% endif %}
           </span>
           <h4 class="post-title">
             <a href="{% url 'mentor:question_detail' question.id %}">{{ question.title }}</a>
@@ -214,8 +226,9 @@
         <p>아직 질문이 없습니다.</p>
       {% endfor %}
     </div>
+
     <div class="fun-box">
-      :전구: <strong>선배팁:</strong> 오늘의 꿀팁! 자취방 냉장고엔 물과 계란, 그리고 냉동만두는 필수야!
+      💡 <strong>선배팁:</strong> 오늘의 꿀팁! 자취방 냉장고엔 물과 계란, 그리고 냉동만두는 필수야!
     </div>
   </div>
 </body>

@@ -582,8 +582,10 @@
   box-shadow: 6px 6px 0 #b9a782;
   border-radius: 0;
   padding: 20px;
-  min-width: 300px;
-  max-width: 500px;
+  min-width: 400px;
+  max-width: 700px;
+  max-height: 80vh;
+  overflow-y: auto;
   font-family: 'MyCustomFont';
   display: none;
   z-index: 1001;
@@ -600,7 +602,19 @@
 .event-detail-modal p {
   margin: 8px 0;
   color: #4a3b28;
-  line-height: 1.4;
+  line-height: 1.6;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+#modalDetail {
+  max-height: 300px;
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 10px;
+  border: 2px solid #5a4a2f;
+  margin-top: 10px;
+  font-size: 13px;
 }
 
 .event-detail-modal .close-btn {
@@ -621,16 +635,24 @@
 .life-event-tile {
   cursor: pointer;
   transition: transform 0.2s ease;
+  position: relative;
+  z-index: 15;
 }
 
 .life-event-tile:hover {
   transform: scale(1.05);
+  z-index: 20;
 }
 .life-journey {
-  position: relative;  /* SVG가 겹치게 만들기 위해 필요 */
+  position: relative;
 }
 .life-event {
-  z-index: 1;  /* SVG보다 위에 나오도록 */
+  position: relative;
+  z-index: 10;
+}
+.life-journey-line {
+  z-index: 1;
+  pointer-events: none;
 }
 .menu-left, .menu-right {
   display: flex;
@@ -770,6 +792,18 @@
   border-bottom: 1px solid #5a4a2f;
   padding-bottom: 5px;
 }
+
+.policy-link {
+  color: #007aff;
+  text-decoration: none;
+  font-weight: bold;
+  border-bottom: 1px dotted #007aff;
+}
+
+.policy-link:hover {
+  color: #005cbf;
+  text-decoration: underline;
+}
   </style>
 </head>
 <body>
@@ -878,7 +912,10 @@
   <div class="admin-extra-wrapper">
     <div class="admin-box">
       <h3>👩‍💼 관리자 추천</h3>
-      <p style="font-size: 13px;">- 매주 갱신되는 추천 콘텐츠<br>- 신뢰도 높은 정보만 선별!</p>
+      <p style="font-size: 13px;">
+        - 인생이 무엇인가? <a href="https://youth.seoul.go.kr/youthConts.do?key=2310200020&sc_pbancSeCd=013&sc_bbsStngSn=2212200001&sc_bbsCtgrySn=2310200012&sc_qnaCtgryCd=&sc_faqCtgryCd=008" target="_blank" class="policy-link">서울시 청년인생설계학교</a><br>
+         <br>- 3년 저축, 최대 720만 원 추가 지원! <a href="https://www.bokjiro.go.kr/ssis-tbu/twataa/wlfareInfo/moveTWAT52011M.do?wlfareInfoId=WLF00000060" target="_blank" class="policy-link">청년내일저축계좌</a>
+      </p>
     </div>
     <div class="extra-box">
       <h3>🎯 새로운 콘텐츠</h3>
@@ -953,6 +990,9 @@
     <button type="submit" class="delete-button">🗑️ 삭제하기</button>
   </form>
 </div>
+
+<!-- CSRF 토큰 -->
+{% csrf_token %}
 
     {% if user == request.user %}
     <div class="add-event-box">
@@ -1090,17 +1130,22 @@ function deleteReview(index) {
 }
 
 function toggleRecommend() {
-  const countElement = document.getElementById('recommendCount');
-  const currentCount = parseInt(countElement.textContent);
-  const hasRecommended = localStorage.getItem('hasRecommended') === 'true';
+  const userId = {{ user.id }};
   
-  if (hasRecommended) {
-    countElement.textContent = currentCount - 1;
-    localStorage.setItem('hasRecommended', 'false');
-  } else {
-    countElement.textContent = currentCount + 1;
-    localStorage.setItem('hasRecommended', 'true');
-  }
+  fetch(`/accounts/toggle-popularity/${userId}/`, {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+      'Content-Type': 'application/json'
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      document.getElementById('recommendCount').textContent = data.popularity;
+    }
+  })
+  .catch(error => console.error('Error:', error));
 }
 
 (function () {

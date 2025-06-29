@@ -7,7 +7,7 @@ class Command(BaseCommand):
     help = '바탕화면의 엑셀 파일을 읽어 데이터베이스에 저장합니다.'
 
     def handle(self, *args, **options):
-        excel_file = r'C:/Users/1-05/OneDrive/Desktop/시군구 코드_전국.xlsx'
+        excel_file = r'/Users/choesieon/Desktop/시군구 코드_전국.xlsx'
 
         try:
             df = pd.read_excel(excel_file)

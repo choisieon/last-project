@@ -2,55 +2,282 @@
 {% load static %}
 
 {% block content %}
-  <h2>프로필 수정</h2>
+<div class="main-wrapper">
+  <div class="title-box">
+    <h1>프로필 수정</h1>
+  </div>
 
-  <form method="POST">
-    {% csrf_token %}
-
-    <!-- 아바타 생성용 프롬프트 입력 -->
-<p>
-  <label for="avatar_prompt">아바타 생성 프롬프트</label><br>
-  <input type="text" name="avatar_prompt" id="avatar_prompt"
-         placeholder="예: 큰 눈, 단정한 머리, 교복 스타일"
-         style="width: 80%;"
-         {% if user.userprofile.avatar_edit_count >= 1 %}disabled value="아바타는 한 번만 생성 가능합니다."{% endif %}>
-</p>
+  <!-- 아바타 생성 섹션 -->
+  <div class="avatar-section">
+    <div class="section-title-box">
+      <h2>🎨 아바타 생성</h2>
+    </div>
     
-    <p>
-      <label for="nickname">닉네임</label><br>
-      <input type="text" name="nickname" id="nickname" value="{{ form.nickname.value|default_if_none:'' }}" required>
-    </p>
+    <div class="avatar-info-box">
+      <p><strong>아바타 생성은 두 번 가능합니다.</strong> 상세하게 써야 본인이 원하는 아바타가 나옵니다.</p>
+      <p><strong>꼭 적어야 할 말:</strong></p>
+      <p>1. 딱 한 명 서있게 만들어줘. 그 다음부턴 자유입니다.</p>
+      <p><strong>예시:</strong> "딱 한 명 서있게 만들어줘, 큰 눈, 단정한 머리, 교복 스타일, 미소 짓고 있는"</p>
+      <p><strong>남은 생성 횟수:</strong> {{ 3|add:user.profile.avatar_edit_count|add:"-3" }}회</p>
+    </div>
 
-    <p>
-      <label for="age">나이</label><br>
-      <input type="text" name="age" id="age" value="{{ form.age.value|default_if_none:'' }}">
-    </p>
+    <form method="POST" id="avatarForm">
+      {% csrf_token %}
+      <div class="avatar-form">
+        {% if not user.profile.avatar_image %}
+          <textarea name="avatar_prompt" id="avatar_prompt" 
+                    placeholder="딱 한 명 서있게 만들어줘, 큰 눈, 단정한 머리, 교복 스타일, 미소 짓고 있는" 
+                    class="event-textarea"
+                    {% if user.profile.avatar_edit_count >= 3 %}disabled{% endif %}></textarea>
+        {% endif %}
+        
+        {% if user.profile.avatar_edit_count >= 3 %}
+          <div class="limit-message">아바타 생성 횟수를 모두 사용했습니다.</div>
+        {% elif not user.profile.avatar_image %}
+          <button type="submit" name="action" value="generate_avatar" class="avatar-btn">🎨 아바타 생성하기</button>
+        {% endif %}
+      </div>
+    </form>
 
-    <p>
-      <label for="job">직업</label><br>
-      <input type="text" name="job" id="job" value="{{ form.job.value|default_if_none:'' }}">
-    </p>
+    {% if user.profile.avatar_image %}
+      <div class="avatar-preview">
+        <h3>내 아바타</h3>
+        <img src="{{ user.profile.avatar_image.url }}" alt="내 아바타">
+        
+        {% if user.profile.avatar_edit_count < 3 %}
+        <form method="POST" class="avatar-edit-form">
+          {% csrf_token %}
+          <div class="edit-input-group">
+            <textarea name="avatar_prompt" placeholder="딱 한 명 서있게 만들어줘, 수정하고 싶은 부분 입력" class="event-textarea"></textarea>
+            <button type="submit" name="action" value="edit_avatar" class="edit-avatar-btn">✏️ 수정하기</button>
+          </div>
+        </form>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
 
-    <p>
-      <label for="points">내공</label><br>
-      <input type="number" name="points" id="points" value="{{ form.points.value|default_if_none:'' }}">
-    </p>
+  <!-- 프로필 정보 섹션 -->
+  <div class="profile-section">
+    <div class="section-title-box">
+      <h2>👤 프로필 정보</h2>
+    </div>
+    
+    <form method="POST" id="profileForm">
+      {% csrf_token %}
+      <div class="profile-form">
+        <input type="text" name="nickname" placeholder="닉네임" 
+               value="{{ form.nickname.value|default_if_none:'' }}" 
+               class="event-input" required>
+        
+        <input type="text" name="age" placeholder="나이" 
+               value="{{ form.age.value|default_if_none:'' }}" 
+               class="event-input">
+        
+        <input type="text" name="job" placeholder="직업" 
+               value="{{ form.job.value|default_if_none:'' }}" 
+               class="event-input">
+        
+        <input type="text" name="interests" placeholder="관심 키워드 (예: 자취, 운동, 취업)" 
+               value="{{ form.interests.value|default_if_none:'' }}" 
+               class="event-input">
+        
+        <input type="text" name="tagline" placeholder="한줄 소개 (예: 나만의 인생설계를 찾아서)" 
+               value="{{ form.tagline.value|default_if_none:'' }}" 
+               class="event-input">
+        
+        <button type="submit" name="action" value="save_profile" class="profile-save-btn">💾 프로필 저장하기</button>
+      </div>
+    </form>
+  </div>
+</div>
 
-    <p>
-      <label for="interests">관심 키워드</label><br>
-      <input type="text" name="interests" id="interests" placeholder="예: 자취, 운동, 취업" value="{{ form.interests.value|default_if_none:'' }}">
-    </p>
+<style>
+.main-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
 
-    <p>
-      <label for="tagline">한줄 소개</label><br>
-      <input type="text" name="tagline" id="tagline" placeholder="예: 나만의 인생설계를 찾아서" value="{{ form.tagline.value|default_if_none:'' }}">
-    </p>
+.title-box {
+  background-color: #f3f3f3;
+  border: 4px solid #444;
+  box-shadow: inset 0 0 0 4px #c2a178;
+  border-radius: 12px;
+  padding: 20px 40px;
+  width: fit-content;
+  margin: 0 auto;
+  font-family: 'MyCustomFont';
+}
 
-    <button type="submit">저장 / 아바타 생성하기</button>
-  </form>
+.title-box h1 {
+  margin: 0;
+  font-size: 28px;
+  text-align: center;
+  color: #2f2f2f;
+}
 
-  {% if user.userprofile.avatar_image %}
-    <h3>내 아바타 미리보기</h3>
-    <img src="{{ user.userprofile.avatar_image.url }}" alt="내 아바타" width="256" height="256" style="border: 2px solid #888; border-radius: 8px;">
-  {% endif %}
+.avatar-section, .profile-section {
+  position: relative;
+  background-color: rgba(250, 235, 180, 0.95);
+  background-image: url("{% static 'images/pixel-paper.png' %}");
+  background-size: 8px 8px;
+  background-repeat: repeat;
+  border: 4px solid #2c1810;
+  box-shadow: 6px 6px 0 #8b7355;
+  border-radius: 0;
+  padding: 40px 20px 20px 20px;
+  margin-top: 40px;
+}
+
+.section-title-box {
+  position: absolute;
+  top: -20px;
+  left: 20px;
+  background-color: #fffef9;
+  border: 3px solid #444;
+  box-shadow: inset 0 0 0 3px #c2a178;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-family: 'MyCustomFont';
+}
+
+.section-title-box h2 {
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+}
+
+.avatar-info-box {
+  background: rgba(255, 255, 255, 0.9);
+  border: 3px solid #2c1810;
+  box-shadow: 3px 3px 0 #8b7355;
+  padding: 15px;
+  margin-bottom: 20px;
+  font-family: 'MyCustomFont';
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.avatar-info-box p {
+  margin: 5px 0;
+  color: #2c1810;
+}
+
+.avatar-form, .profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.event-input, .event-textarea {
+  background: #ffffff;
+  border: 3px solid #2c1810;
+  box-shadow: inset 2px 2px 0 #e0e0e0;
+  padding: 12px;
+  font-family: 'MyCustomFont';
+  font-size: 14px;
+  color: #2c1810;
+  border-radius: 0;
+}
+
+.event-textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.avatar-btn, .profile-save-btn {
+  background: linear-gradient(135deg, #ffd700 0%, #ffb300 100%);
+  border: 4px solid #2c1810;
+  box-shadow: 4px 4px 0 #8b7355, inset 1px 1px 0 #fff176;
+  color: #2c1810;
+  font-family: 'MyCustomFont';
+  font-size: 16px;
+  font-weight: bold;
+  padding: 15px 30px;
+  cursor: pointer;
+  border-radius: 0;
+  text-shadow: 1px 1px 0 #fff9c4;
+  transition: all 0.1s ease;
+}
+
+.avatar-btn:hover, .profile-save-btn:hover {
+  background: linear-gradient(135deg, #ffb300 0%, #ff8f00 100%);
+  transform: translate(1px, 1px);
+  box-shadow: 3px 3px 0 #8b7355, inset 1px 1px 0 #fff176;
+}
+
+.limit-message {
+  background: #ffebee;
+  border: 2px solid #f44336;
+  color: #c62828;
+  padding: 12px;
+  font-size: 14px;
+  font-family: 'MyCustomFont';
+  text-align: center;
+  border-radius: 0;
+}
+
+.avatar-preview {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.avatar-preview h3 {
+  color: #2c1810;
+  font-family: 'MyCustomFont';
+  margin-bottom: 10px;
+}
+
+.avatar-preview img {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  border: 4px solid #2c1810;
+  box-shadow: 4px 4px 0 #8b7355;
+}
+
+.avatar-edit-form {
+  margin-top: 15px;
+}
+
+.edit-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+.edit-input-group .event-textarea {
+  width: 100%;
+  max-width: 300px;
+  min-height: 60px;
+}
+
+.edit-input-group .edit-avatar-btn {
+  align-self: center;
+}
+
+.edit-avatar-btn {
+  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+  border: 3px solid #2c1810;
+  box-shadow: 3px 3px 0 #8b7355;
+  color: white;
+  font-family: 'MyCustomFont';
+  font-size: 14px;
+  font-weight: bold;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 0;
+  transition: all 0.1s ease;
+}
+
+.edit-avatar-btn:hover {
+  background: linear-gradient(135deg, #45a049 0%, #388e3c 100%);
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0 #8b7355;
+}
+</style>
 {% endblock %}

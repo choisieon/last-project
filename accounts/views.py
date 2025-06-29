@@ -66,16 +66,16 @@ def logout(request):
 @login_required
 def profile_edit(request):
     profile, created = UserProfile.objects.get_or_create(user=request.user)
+    form = UserProfileForm(instance=profile)
 
     if request.method == 'POST':
-        form = UserProfileForm(request.POST, request.FILES, instance=profile)
-        if form.is_valid():
-            form.save()
-
-            # 👉 프롬프트로 아바타 생성 추가
+        action = request.POST.get('action')
+        
+        if action == 'generate_avatar':
+            # 아바타 생성 처리
             avatar_prompt = request.POST.get('avatar_prompt', '').strip()
             if avatar_prompt and profile.avatar_edit_count < 3:
-                full_prompt = "pixel art character, full body, Korean appearance, moderately handsome, facing and looking toward front-right diagonal direction"
+                full_prompt = "pixel art style, full body, one person standing, Korean appearance, decent-looking, white background, facing slightly to the right, eyes looking toward front-right direction, proportions similar to MapleStory character"
                 full_prompt += f", {avatar_prompt}"
 
                 try:
@@ -96,11 +96,23 @@ def profile_edit(request):
                         profile.save()
                 except Exception as e:
                     print(f"[아바타 생성 오류] {str(e)}")
-
+        
+        elif action == 'save_profile':
+            # 프로필 저장 처리
+            profile.nickname = request.POST.get('nickname', '')
+            profile.age = request.POST.get('age', '') or None
+            profile.job = request.POST.get('job', '')
+            profile.interests = request.POST.get('interests', '')
+            profile.tagline = request.POST.get('tagline', '')
+            profile.save()
             return redirect('/accounts/profile/')
-
-    else:
-        form = UserProfileForm(instance=profile)
+        
+        elif action == 'delete_avatar':
+            # 아바타 삭제 처리
+            if profile.avatar_image:
+                profile.avatar_image.delete()
+                profile.avatar_edit_count = max(0, profile.avatar_edit_count - 1)
+                profile.save()
 
     return render(request, 'profile_edit.html', {'form': form})
 
@@ -261,6 +273,39 @@ def upload_avatar(request):
 
     return HttpResponseBadRequest("Invalid method")
 
+@login_required
+def toggle_popularity(request, user_id):
+    if request.method == 'POST':
+        try:
+            target_user = User.objects.get(id=user_id)
+            profile = target_user.userprofile
+            
+            # 현재 사용자가 이미 추천했는지 확인
+            session_key = f'recommended_{user_id}'
+            
+            if request.session.get(session_key, False):
+                # 이미 추천한 경우 - 추천 취소
+                profile.popularity = max(0, profile.popularity - 1)
+                request.session[session_key] = False
+                action = 'removed'
+            else:
+                # 추천하지 않은 경우 - 추천 추가
+                profile.popularity += 1
+                request.session[session_key] = True
+                action = 'added'
+            
+            profile.save()
+            
+            return JsonResponse({
+                'success': True,
+                'popularity': profile.popularity,
+                'action': action
+            })
+            
+        except User.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'User not found'})
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
 @login_required
 def practice_page(request):

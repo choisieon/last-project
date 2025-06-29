@@ -19,10 +19,7 @@ urlpatterns = [
     path('life_event/delete/<int:event_id>/', views.delete_life_event, name='delete_life_event'),  # ✅ 삭제
     path('social/', include('allauth.urls')),  # ✅ 요거 추가해야 {% provider_login_url %}이 동작함
     path('profile/<int:user_id>/', views.view_profile, name='view_profile'),
-
-
-    
-    
+    path('toggle-popularity/<int:user_id>/', views.toggle_popularity, name='toggle_popularity'),
 
     # 필요 시 추후 소셜 로그인 연결도 여기에 추가
     # path('social/kakao/login/', views.social_login, name='social_login'),
