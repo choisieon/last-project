@@ -11,7 +11,7 @@
             {{ post.content|truncatechars:60 }}
           </div>
           <div style="font-size:0.97em; color:#1976d2;">
-            작성자: {{ post.author }} |
+            작성자: {{ post.author.username }} |
             댓글: {{ post.comments.count }}
           </div>
         </li>
