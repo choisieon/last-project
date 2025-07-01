@@ -27,7 +27,7 @@ def post_list(request):
     category = request.GET.get('category', '')
     page = request.GET.get('page', 1)
     tag_filter = request.GET.getlist('tag', [])
-    posts = Post.objects.all()
+    posts = Post.objects.select_related('author', 'author__boardprofile').all()
     
     # 카테고리 필터링
     if category:

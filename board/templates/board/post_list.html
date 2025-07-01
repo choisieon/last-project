@@ -117,7 +117,7 @@
               {% endif %}
 
             </div>
-            <div class="popular-post-author">{{ post.author.nickname }}</div>
+            <div class="popular-post-author">{{ post.author.boardprofile.nickname }}</div>
             <div class="popular-post-date">{{ post.created_at|date:"m.d" }}</div>
             <div class="popular-post-views">{{ post.views }}</div>
             <div class="popular-post-likes">{{ post.likes.count }}</div>
@@ -138,7 +138,7 @@
               <a href="{% url 'board:post_detail' post.pk %}?category={{ category }}">{{ post.title }}</a>
             </h4>
             <div class="post-meta">
-              <span>작성자: {{ post.author.nickname }}</span>
+              <span>작성자: {{ post.author.boardprofile.nickname }}</span>
               <span> | {{ post.created_at|date:"Y-m-d H:i" }}</span>
               <span> | 조회수: {{ post.views }}</span>
               <span> | ♥ {{ post.likes.count }}</span>
@@ -168,7 +168,7 @@
             <img src="{{ post.thumbnail.url }}" alt="{{ post.title }}">
             <div class="review-card-body">
               <h3>{{ post.title }}</h3>
-              <p>👤 {{ post.author.nickname }}</p>
+              <p>👤 {{ post.author.boardprofile.nickname }}</p>
               <p>📅 {{ post.created_at|date:"Y.m.d" }}</p>
             </div>
           </a>
@@ -185,7 +185,7 @@
                 <a href="{% url 'board:post_detail' post.pk %}?category={{ category }}{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}">{{ post.title }}</a>
               </h4>
               <div class="post-meta">
-                <span>작성자: {{ post.author.nickname }}</span>
+                <span>작성자: {{ post.author.boardprofile.nickname }}</span>
                 <span> | {{ post.created_at|date:"Y-m-d H:i" }}</span>
                 <span> | 조회수: {{ post.views }}</span>
                 <span> | ♥ {{ post.likes.count }}</span>
@@ -246,7 +246,7 @@
             {% endif %}
 
           </div>
-          <div class="post-author">{{ post.author.nickname }}</div>
+          <div class="post-author">{{ post.author.boardprofile.nickname }}</div>
           <div class="post-date">{{ post.created_at|date:"m.d" }}</div>
           <div class="post-views">{{ post.views }}</div>
           <div class="post-likes">{{ post.likes.count }}</div>
@@ -284,7 +284,7 @@
             {% endif %}
 
           </div>
-          <div class="post-author">{{ post.author.nickname }}</div>
+          <div class="post-author">{{ post.author.boardprofile.nickname }}</div>
           <div class="post-date">{{ post.created_at|date:"m.d" }}</div>
           <div class="post-views">{{ post.views }}</div>
           <div class="post-likes">{{ post.likes.count }}</div>
