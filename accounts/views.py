@@ -16,15 +16,23 @@ import os
 import io
 from .models import LifeEvent
 
+from django.contrib.auth import authenticate, login as auth_login
+
 def signup(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            UserProfile.objects.create(user=user)  # 필수!
-            auth_login(request, user)  # 저장 후 자동 로그인
-            return redirect('accounts:edit_profile')  # 마이페이지 입력으로 이동
-            
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+
+            # 인증을 통해 backend 정보 포함된 user 객체 획득
+            user = authenticate(request, username=username, password=raw_password)
+
+            if user is not None:
+                UserProfile.objects.create(user=user)
+                auth_login(request, user)
+                return redirect('accounts:login')
     else:
         form = CustomUserCreationForm()
 
@@ -41,14 +49,14 @@ def login(request):
             user = form.get_user()
             auth_login(request, user)
 
-            try:
-                profile = user.userprofile
-            except UserProfile.DoesNotExist:
-                profile = UserProfile.objects.create(user=user)
+            # 안전하게 프로필 가져오거나 생성
+            profile, _ = UserProfile.objects.get_or_create(user=user)
 
+            # 닉네임이 비어있으면 프로필 입력 페이지로
             if not profile.nickname or profile.nickname.strip() == "":
-                return redirect('accounts:edit_profile')
+                return redirect('accounts:profile_edit')
 
+            # 로그인 성공 후 이동할 경로
             next_url = request.GET.get('next')
             return redirect(next_url or 'community:index')
     else:
