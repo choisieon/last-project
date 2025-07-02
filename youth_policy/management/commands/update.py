@@ -1,68 +1,63 @@
+import requests
+import time
 import pandas as pd
-from django.core.management.base import BaseCommand
-from youth_policy.models import YouthPolicy, Sigungu
 
-class Command(BaseCommand):
-    help = '엑셀 파일로부터 정책별 시군구 다대다 연결 수행'
+# 공공데이터포털 API 키
+SERVICE_KEY = "여기에_발급받은_API_키_입력"
 
-    def add_arguments(self, parser):
-        parser.add_argument('policy_excel_path', type=str, help=r'C:/Users/1-05/OneDrive/Desktop/Final_Merge')
-        parser.add_argument('sigungu_code_excel_path', type=str, help=r'C:/Users/1-05/OneDrive/Desktop/시군구 코드_전국')
+# 시도 목록 요청 URL
+SIDO_URL = f"https://apis.data.go.kr/1741000/StanReginCd/getStanReginCdList?serviceKey={SERVICE_KEY}&type=json&locatadd_nm="
 
-    def handle(self, *args, **options):
-        policy_excel = options['policy_excel_path']
-        sigungu_excel = options['sigungu_code_excel_path']
+# 시군구 목록 요청 URL (시도코드 기준)
+SIGUNGU_URL = f"https://apis.data.go.kr/1741000/StanReginCd/getStanReginCdList?serviceKey={SERVICE_KEY}&type=json&locatadd_nm={{}}"
 
-        # 1. 시군구 코드 매핑 딕셔너리 생성
-        sigungu_df = pd.read_excel(sigungu_excel)
-        sigungu_map = {
-            str(row['시군구 명']).strip(): str(int(row['시군구 코드']))
-            for _, row in sigungu_df.iterrows()
-        }
+def fetch_sido_list():
+    print("[시도 목록 수집 시작]")
+    response = requests.get(SIDO_URL)
+    data = response.json()
+    sido_list = []
 
-        # 2. 정책 엑셀 읽기
-        df = pd.read_excel(policy_excel)
+    for item in data['StanReginCd'][1]['row']:
+        if item['up_locat_code'] == '0':  # 상위 코드가 0이면 시도
+            sido_list.append({
+                'sido_name': item['locatadd_nm'],
+                'sido_code': item['locat_code']
+            })
 
-        if '정책명' not in df.columns or '시군구명' not in df.columns:
-            self.stderr.write("엑셀에 '정책명' 또는 '시군구명' 열이 없습니다.")
-            return
+    print(f"[완료] 시도 수: {len(sido_list)}")
+    return sido_list
 
-        updated = 0
-        skipped = 0
+def fetch_sigungu_list(sido):
+    print(f"[시군구 수집: {sido['sido_name']}]")
+    url = SIGUNGU_URL.format(sido['sido_name'])
+    response = requests.get(url)
+    data = response.json()
+    sigungu_list = []
 
-        for _, row in df.iterrows():
-            policy_name = row['정책명']
-            sigungu_string = str(row['시군구명'])
+    for item in data['StanReginCd'][1]['row']:
+        if item['up_locat_code'] == sido['sido_code']:
+            sigungu_list.append({
+                'sigungu_name': item['locatadd_nm'],
+                'sigungu_code': item['locat_code'],
+                'sido_name': sido['sido_name'],
+                'sido_code': sido['sido_code']
+            })
 
-            try:
-                policy = YouthPolicy.objects.get(정책명=policy_name)
-            except YouthPolicy.DoesNotExist:
-                self.stderr.write(f"[스킵] DB에 정책 없음: {policy_name}")
-                skipped += 1
-                continue
+    print(f" → 수집된 시군구 수: {len(sigungu_list)}")
+    return sigungu_list
 
-            if pd.isna(sigungu_string) or sigungu_string.strip() == '':
-                self.stderr.write(f"[스킵] 시군구명 없음: {policy_name}")
-                continue
+def main():
+    sido_list = fetch_sido_list()
+    total_sigungu = []
 
-            sigungu_names = [name.strip() for name in sigungu_string.split(',')]
-            sigungu_objects = []
+    for sido in sido_list:
+        sigungu_list = fetch_sigungu_list(sido)
+        total_sigungu.extend(sigungu_list)
+        time.sleep(0.5)  # 요청 간격 제한
 
-            for name in sigungu_names:
-                code = sigungu_map.get(name)
-                if not code:
-                    self.stderr.write(f"[경고] 시군구 매핑 실패: '{name}' (정책: {policy_name})")
-                    continue
-                try:
-                    sigungu = Sigungu.objects.get(code=code)
-                    sigungu_objects.append(sigungu)
-                except Sigungu.DoesNotExist:
-                    self.stderr.write(f"[에러] Sigungu(code={code}) 존재하지 않음 - {name}")
-                    continue
+    df = pd.DataFrame(total_sigungu)
+    df.to_excel("시군구_코드_목록.xlsx", index=False)
+    print("\n[완료] 시군구 목록 엑셀로 저장 완료")
 
-            if sigungu_objects:
-                policy.sigungu.add(*sigungu_objects)
-                updated += 1
-
-        self.stdout.write(self.style.SUCCESS(f"시군구 매핑 완료: {updated}건"))
-        self.stdout.write(self.style.WARNING(f"정책명 불일치 스킵: {skipped}건"))
+if __name__ == "__main__":
+    main()

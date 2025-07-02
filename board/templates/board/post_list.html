@@ -85,6 +85,12 @@
     <div class="popular-posts-section">
       <div class="popular-posts-header">
         <span>🔥 이번 주 인기글</span>
+      <div class="header-category">탭</div>
+      <div class="header-title">제목</div>
+      <div class="header-author">작성자</div>
+      <div class="header-date">작성일</div>
+      <div class="header-views">조회수</div>
+      <div class="header-likes">좋아요</div>
       </div>
       <div class="popular-posts-table">
         {% for post in weekly_top_posts|slice:":5" %}
@@ -100,6 +106,7 @@
                 <span class="category-tab">전체</span>
               {% endif %}
             </div>
+            
             <div class="popular-post-title">
               <a href="{% url 'board:post_detail' post.pk %}">{{ post.title }}</a>
               <!-- 2. 제목 바로 옆에 댓글 수 표시 -->
@@ -218,7 +225,7 @@
       <div class="header-title">제목</div>
       <div class="header-author">작성자</div>
       <div class="header-date">작성일</div>
-      <div class="header-views">조회</div>
+      <div class="header-views">조회수</div>
       <div class="header-likes">좋아요</div>
     </div>
 
