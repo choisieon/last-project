@@ -15,10 +15,10 @@
     <div class="post-header">
       <h1 class="post-title">{{ post.title }}</h1>
       <div class="post-meta">
-        👤 {{ post.author.boardprofile.nickname }} | 📅 {{ post.created_at|date:"Y.m.d H:i" }} | 조회수: {{ post.views }}
+        👤 {{ post.author.profile.nickname }} | 📅 {{ post.created_at|date:"Y.m.d H:i" }} | 조회수: {{ post.views }}
       </div>
       <div class="author-info">
-        <strong>작성자: {{ author.username }}</strong>
+        <strong>작성자: {{ author.profile.nickname }}</strong>
         <span>팔로워: {{ author.followers.count }} | 팔로잉: {{ author.followings.count }}</span>
         {% if request.user.is_authenticated and request.user != author %}
           <form method="post" action="{% url 'board:follow_toggle' author.username %}" class="follow-form">

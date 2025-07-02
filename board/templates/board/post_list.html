@@ -117,7 +117,7 @@
               {% endif %}
 
             </div>
-            <div class="popular-post-author">{{ post.author.boardprofile.nickname }}</div>
+            <div class="popular-post-author">{{ post.author.profile.nickname }}</div>
             <div class="popular-post-date">{{ post.created_at|date:"m.d" }}</div>
             <div class="popular-post-views">{{ post.views }}</div>
             <div class="popular-post-likes">{{ post.likes.count }}</div>
@@ -246,7 +246,7 @@
             {% endif %}
 
           </div>
-          <div class="post-author">{{ post.author.boardprofile.nickname }}</div>
+          <div class="post-author">{{ author.profile.nickname }}</div>
           <div class="post-date">{{ post.created_at|date:"m.d" }}</div>
           <div class="post-views">{{ post.views }}</div>
           <div class="post-likes">{{ post.likes.count }}</div>
@@ -284,7 +284,7 @@
             {% endif %}
 
           </div>
-          <div class="post-author">{{ post.author.boardprofile.nickname }}</div>
+          <div class="post-author">{{ post.author.profile.nickname }}</div>
           <div class="post-date">{{ post.created_at|date:"m.d" }}</div>
           <div class="post-views">{{ post.views }}</div>
           <div class="post-likes">{{ post.likes.count }}</div>
@@ -688,10 +688,17 @@ document.addEventListener('click', function(event) {
   text-decoration: underline;
 }
 
-.popular-post-author, .popular-post-date, .popular-post-views, .popular-post-likes {
+.popular-post-author,
+.popular-post-date,
+.popular-post-views,
+.popular-post-likes {
   color: #666;
   font-size: 0.88rem;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
 }
 
 /* 테이블 형태 게시판 스타일 */
@@ -806,25 +813,17 @@ document.addEventListener('click', function(event) {
   white-space: nowrap;
 }
 
-.post-author {
+.post-author,
+.post-date,
+.post-views,
+.post-likes {
   color: #666;
   font-size: 0.88rem;
   text-align: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.post-date {
-  color: #666;
-  font-size: 0.88rem;
-  text-align: center;
-}
-
-.post-views, .post-likes {
-  color: #666;
-  font-size: 0.88rem;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
 }
 
 .post-table-empty {
