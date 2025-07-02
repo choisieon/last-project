@@ -688,23 +688,19 @@ document.addEventListener('click', function(event) {
   text-decoration: underline;
 }
 
-.popular-post-author,
-.popular-post-date,
-.popular-post-views,
-.popular-post-likes {
+.popular-post-author, .popular-post-date, .popular-post-views, .popular-post-likes {
   color: #666;
   font-size: 0.88rem;
   text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
 }
 
 /* 테이블 형태 게시판 스타일 */
 .post-table-header {
   display: grid;
-  grid-template-columns: 60px 1fr 100px 80px 60px 60px;
+  grid-template-columns: 60px minmax(300px, 1fr) 100px 80px 60px 60px;
+            </div>
+            <p><code>minmax(300px, 1fr)</code>를 사용하여 제목 컬럼의 최소 너비를 보장하면서 유연성을 유지합니다.</p>
+        </div>
   gap: 9px;
   padding: 11px 15px;
   background: #f8f9fa;
@@ -813,17 +809,25 @@ document.addEventListener('click', function(event) {
   white-space: nowrap;
 }
 
-.post-author,
-.post-date,
-.post-views,
-.post-likes {
+.post-author {
   color: #666;
   font-size: 0.88rem;
   text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.post-date {
+  color: #666;
+  font-size: 0.88rem;
+  text-align: center;
+}
+
+.post-views, .post-likes {
+  color: #666;
+  font-size: 0.88rem;
+  text-align: center;
 }
 
 .post-table-empty {
