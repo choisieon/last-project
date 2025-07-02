@@ -40,7 +40,7 @@ def basic_page(request):
     if selected_sido:
         policies = policies.filter(sido_id=selected_sido)
     if selected_sigungu:
-        policies = policies.filter(sigungu_id=selected_sigungu)
+        policies = policies.filter(sigungu__code=selected_sigungu)
     if selected_category != 'all':
         
         if selected_category == 'job':
