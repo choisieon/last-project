@@ -419,7 +419,7 @@
   <div class="question-meta">
       {{ question.author.job|default:"없음" }} | {{ question.author.age }}세 | {{ question.author.points }}점 | {{ question.created_at|date:"Y-m-d H:i" }}
   </div>
-  <p>{{ question.content }}</p>
+  <p>{{ question.content|linebreaks }}</p>
 {% load static %}
 <div class="like-box-wrapper" style="
   position: absolute;
@@ -536,7 +536,7 @@
 </div>
 </div>
 
-        <p>{{ answer.content }}</p>
+        <p>{{ answer.content|linebreaks }}</p>
   {% if request.user == question.author.user %}
   <form method="post" action="{% url 'mentor:answer_adopt' answer.pk %}" style="margin-top: 6px; text-align: right;">
     {% csrf_token %}

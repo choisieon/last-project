@@ -6,7 +6,7 @@ from django.contrib.auth import logout as auth_logout
 from .models import User, UserProfile
 import requests
 from django.core.files.base import ContentFile
-from .utils import generate_avatar 
+# from .utils import generate_avatar  # 임시 주석 처리 
 import base64
 import openai
 from django.http import JsonResponse
@@ -30,8 +30,9 @@ def signup(request):
             user = authenticate(request, username=username, password=raw_password)
 
             if user is not None:
-                UserProfile.objects.create(user=user)
-                auth_login(request, user)
+                # UserProfile 생성
+                UserProfile.objects.get_or_create(user=user)
+                # 회원가입 완료 후 로그인 페이지로 리다이렉트
                 return redirect('accounts:login')
     else:
         form = CustomUserCreationForm()
@@ -50,9 +51,9 @@ def login(request):
             auth_login(request, user)
 
             # 안전하게 프로필 가져오거나 생성
-            profile, _ = UserProfile.objects.get_or_create(user=user)
+            profile, created = UserProfile.objects.get_or_create(user=user)
 
-            # 닉네임이 비어있으면 프로필 입력 페이지로
+            # 닉네임이 비어있으면 프로필 수정 페이지로
             if not profile.nickname or profile.nickname.strip() == "":
                 return redirect('accounts:profile_edit')
 
@@ -82,7 +83,7 @@ def profile_edit(request):
         if action == 'generate_avatar':
             # 아바타 생성 처리
             avatar_prompt = request.POST.get('avatar_prompt', '').strip()
-            if avatar_prompt and profile.avatar_edit_count < 3:
+            if avatar_prompt:
                 full_prompt = "pixel art style, full body, one person standing, Korean appearance, decent-looking, white background, facing slightly to the right, eyes looking toward front-right direction, proportions similar to MapleStory character"
                 full_prompt += f", {avatar_prompt}"
 
@@ -113,13 +114,38 @@ def profile_edit(request):
             profile.interests = request.POST.get('interests', '')
             profile.tagline = request.POST.get('tagline', '')
             profile.save()
-            return redirect('/accounts/profile/')
+            return redirect('accounts:my_page')
+        
+        elif action == 'edit_avatar':
+            # 아바타 수정 처리
+            avatar_prompt = request.POST.get('avatar_prompt', '').strip()
+            if avatar_prompt:
+                full_prompt = "pixel art style, full body, one person standing, Korean appearance, decent-looking, white background, facing slightly to the right, eyes looking toward front-right direction, proportions similar to MapleStory character"
+                full_prompt += f", {avatar_prompt}"
+
+                try:
+                    response = openai.images.generate(
+                        model="dall-e-3",
+                        prompt=full_prompt,
+                        size="1024x1024",
+                        quality="standard",
+                        n=1
+                    )
+                    image_url = response.data[0].url
+                    image_response = requests.get(image_url)
+
+                    if image_response.status_code == 200:
+                        file_name = f"{request.user.username}_avatar.png"
+                        profile.avatar_image.save(file_name, ContentFile(image_response.content), save=True)
+                        profile.avatar_edit_count += 1
+                        profile.save()
+                except Exception as e:
+                    print(f"[아바타 수정 오류] {str(e)}")
         
         elif action == 'delete_avatar':
             # 아바타 삭제 처리
             if profile.avatar_image:
                 profile.avatar_image.delete()
-                profile.avatar_edit_count = max(0, profile.avatar_edit_count - 1)
                 profile.save()
 
     return render(request, 'profile_edit.html', {'form': form})
@@ -236,8 +262,7 @@ def upload_avatar(request):
     if request.method == 'POST':
         profile = request.user.profile
 
-        if profile.avatar_edit_count >= 3:
-            return HttpResponseBadRequest("You have reached the maximum number of avatar edits (3 times).")
+        # 아바타 수정 횟수 제한 제거
 
         # ✅ 기본 프롬프트
         base_prompt = (

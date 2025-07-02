@@ -18,7 +18,7 @@
       <p><strong>꼭 적어야 할 말:</strong></p>
       <p>1. 딱 한 명 서있게 만들어줘. 그 다음부턴 자유입니다.</p>
       <p><strong>예시:</strong> "딱 한 명 서있게 만들어줘, 큰 눈, 단정한 머리, 교복 스타일, 미소 짓고 있는"</p>
-      <p><strong>남은 생성 횟수:</strong> {{ 3|add:user.profile.avatar_edit_count|add:"-3" }}회</p>
+      <p><strong>아바타 생성 및 수정이 무제한으로 가능합니다.</strong></p>
     </div>
 
     <form method="POST" id="avatarForm">
@@ -27,13 +27,10 @@
         {% if not user.profile.avatar_image %}
           <textarea name="avatar_prompt" id="avatar_prompt" 
                     placeholder="딱 한 명 서있게 만들어줘, 큰 눈, 단정한 머리, 교복 스타일, 미소 짓고 있는" 
-                    class="event-textarea"
-                    {% if user.profile.avatar_edit_count >= 3 %}disabled{% endif %}></textarea>
+                    class="event-textarea"></textarea>
         {% endif %}
         
-        {% if user.profile.avatar_edit_count >= 3 %}
-          <div class="limit-message">아바타 생성 횟수를 모두 사용했습니다.</div>
-        {% elif not user.profile.avatar_image %}
+        {% if not user.profile.avatar_image %}
           <button type="submit" name="action" value="generate_avatar" class="avatar-btn">🎨 아바타 생성하기</button>
         {% endif %}
       </div>
@@ -44,7 +41,6 @@
         <h3>내 아바타</h3>
         <img src="{{ user.profile.avatar_image.url }}" alt="내 아바타">
         
-        {% if user.profile.avatar_edit_count < 3 %}
         <form method="POST" class="avatar-edit-form">
           {% csrf_token %}
           <div class="edit-input-group">
@@ -52,7 +48,6 @@
             <button type="submit" name="action" value="edit_avatar" class="edit-avatar-btn">✏️ 수정하기</button>
           </div>
         </form>
-        {% endif %}
       </div>
     {% endif %}
   </div>

@@ -330,17 +330,36 @@ def chat_room(request, room_id):
     if request.method == 'POST':
         content = request.POST.get('content')
         if content:
-            ChatMessage.objects.create(
+            try:
+                profile = request.user.profile
+            except:
+                profile = UserProfile.objects.get(user=request.user)
+            
+            message = ChatMessage.objects.create(
                 room=room,
-                sender=request.user.mentor_profile,
+                sender=profile,
                 content=content
             )
+            # AJAX 요청인 경우 JSON 응답
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': True,
+                    'message': {
+                        'content': message.content,
+                        'sender': message.sender.nickname,
+                        'timestamp': message.timestamp.strftime('%H:%M'),
+                        'is_mine': True
+                    }
+                })
         return redirect('mentor:chat_room', room_id=room.id)
 
+    last_message_id = messages[-1].id if messages else 0
+    
     return render(request, 'mentor/chat_room.html', {
         'room': room,
         'chatroom' : room,
-        'messages': messages
+        'messages': messages,
+        'last_message_id': last_message_id
     })
 
 
@@ -547,3 +566,32 @@ def answer_evaluate(request, answer_id):
             answer.bad_users.add(user)
 
     return redirect('mentor:question_detail', pk=answer.question.id)
+
+@login_required
+def get_messages(request, room_id):
+    """새 메시지 가져오기 (AJAX용)"""
+    room = get_object_or_404(ChatRoom, id=room_id)
+    last_id = request.GET.get('last_id', '0')
+    
+    # undefined 처리
+    try:
+        last_id = int(last_id)
+    except (ValueError, TypeError):
+        last_id = 0
+    
+    messages = ChatMessage.objects.filter(
+        room=room, 
+        id__gt=last_id
+    ).order_by('timestamp')
+    
+    message_list = []
+    for msg in messages:
+        message_list.append({
+            'id': msg.id,
+            'content': msg.content,
+            'sender': msg.sender.nickname,
+            'timestamp': msg.timestamp.strftime('%H:%M'),
+            'is_mine': msg.sender.user == request.user
+        })
+    
+    return JsonResponse({'messages': message_list})
