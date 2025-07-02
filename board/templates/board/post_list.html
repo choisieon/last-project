@@ -83,14 +83,12 @@
   <!-- 인기글 리스트 (탭 색상 구분 적용) -->
   {% if weekly_top_posts %}
     <div class="popular-posts-section">
-      <div class="popular-posts-header">
-        <span>🔥 이번 주 인기글</span>
-      <div class="header-category">탭</div>
-      <div class="header-title">제목</div>
-      <div class="header-author">작성자</div>
-      <div class="header-date">작성일</div>
-      <div class="header-views">조회수</div>
-      <div class="header-likes">좋아요</div>
+      <div class="popular-posts-header" style="display: grid; grid-template-columns: 1fr repeat(4, 80px); align-items: center; gap: 8px;">
+        <span style="font-weight: bold; color: #fff;">🔥 이번 주 인기글</span>
+        <div class="header-author" style="text-align: center;">작성자</div>
+        <div class="header-date" style="text-align: center;">작성일</div>
+        <div class="header-views" style="text-align: center;">조회수</div>
+        <div class="header-likes" style="text-align: center;">좋아요</div>
       </div>
       <div class="popular-posts-table">
         {% for post in weekly_top_posts|slice:":5" %}
@@ -307,19 +305,19 @@
   <!-- 페이지네이션 -->
   <div class="pagination">
     {% if page_obj.has_previous %}
-    <a href="?page=1{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if search_type %}&search_type={{ search_type }}{% endif %}{% for tag in tag_filter %}&tag={{ tag }}{% endfor %}">« 처음</a>
-    <a href="?page={{ page_obj.previous_page_number }}{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if search_type %}&search_type={{ search_type }}{% endif %}{% for tag in tag_filter %}&tag={{ tag }}{% endfor %}">‹ 이전</a>
+    <a href="?category={{ category }}&page=1{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if search_type %}&search_type={{ search_type }}{% endif %}{% for tag in tag_filter %}&tag={{ tag }}{% endfor %}">« 처음</a>
+    <a href="?category={{ category }}&page={{ page_obj.previous_page_number }}{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if search_type %}&search_type={{ search_type }}{% endif %}{% for tag in tag_filter %}&tag={{ tag }}{% endfor %}">‹ 이전</a>
     {% endif %}
     {% for num in page_obj.paginator.page_range %}
     {% if page_obj.number == num %}
     <strong>{{ num }}</strong>
     {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-    <a href="?page={{ num }}{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if search_type %}&search_type={{ search_type }}{% endif %}{% for tag in tag_filter %}&tag={{ tag }}{% endfor %}">{{ num }}</a>
+    <a href="?category={{ category }}&page={{ num }}{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if search_type %}&search_type={{ search_type }}{% endif %}{% for tag in tag_filter %}&tag={{ tag }}{% endfor %}">{{ num }}</a>
     {% endif %}
     {% endfor %}
     {% if page_obj.has_next %}
-    <a href="?page={{ page_obj.next_page_number }}{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if search_type %}&search_type={{ search_type }}{% endif %}{% for tag in tag_filter %}&tag={{ tag }}{% endfor %}">다음 ›</a>
-    <a href="?page={{ page_obj.paginator.num_pages }}{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if search_type %}&search_type={{ search_type }}{% endif %}{% for tag in tag_filter %}&tag={{ tag }}{% endfor %}">마지막 »</a>
+    <a href="?category={{ category }}&page={{ page_obj.next_page_number }}{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if search_type %}&search_type={{ search_type }}{% endif %}{% for tag in tag_filter %}&tag={{ tag }}{% endfor %}">다음 ›</a>
+    <a href="?category={{ category }}&page={{ page_obj.paginator.num_pages }}{% if sort %}&sort={{ sort }}{% endif %}{% if keyword %}&keyword={{ keyword }}{% endif %}{% if search_type %}&search_type={{ search_type }}{% endif %}{% for tag in tag_filter %}&tag={{ tag }}{% endfor %}">마지막 »</a>
     {% endif %}
   </div>
 </div>
