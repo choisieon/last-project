@@ -31,6 +31,8 @@ class UserProfileForm(forms.ModelForm):
             'job',
             'points',
             'tagline',
+            'sido', 
+            'sigungu',
         ]
 
     def __init__(self, *args, **kwargs):

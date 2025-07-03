@@ -80,6 +80,25 @@
         <input type="text" name="tagline" placeholder="한줄 소개 (예: 나만의 인생설계를 찾아서)" 
                value="{{ form.tagline.value|default_if_none:'' }}" 
                class="event-input">
+
+        <select name="sido" class="event-input" required>
+          <option value="">시도 선택</option>
+          {% for s in form.sido.field.queryset %}
+            <option value="{{ s.id }}" {% if form.sido.value == s.id|stringformat:"s" %}selected{% endif %}>
+              {{ s.name }}
+            </option>
+          {% endfor %}
+        </select>
+
+        <select name="sigungu" class="event-input">
+          <option value="">시군구 선택</option>
+          {% for sg in form.sigungu.field.queryset %}
+            <option value="{{ sg.id }}" {% if form.sigungu.value == sg.id|stringformat:"s" %}selected{% endif %}>
+              {{ sg.name }}
+            </option>
+          {% endfor %}
+        </select>
+
         
         <button type="submit" name="action" value="save_profile" class="profile-save-btn">💾 프로필 저장하기</button>
       </div>

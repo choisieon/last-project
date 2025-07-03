@@ -48,7 +48,9 @@ class UserProfile(models.Model):
     avatar_image = models.ImageField(upload_to='avatar/', blank=True, null=True)
     avatar_edit_count = models.IntegerField(default=0)
 
-
+    sido = models.ForeignKey('youth_policy.Sido', on_delete=models.SET_NULL, null=True, blank=True)
+    sigungu = models.ForeignKey('youth_policy.Sigungu', on_delete=models.SET_NULL, null=True, blank=True)
+    
     def __str__(self):
         return self.nickname or self.user.username
 
