@@ -93,10 +93,10 @@
     <div class="post-actions">
       <div class="action-buttons-row">
         <!-- 사용자 액션 버튼들 -->
-        <form class="bookmark-form" method="post" data-post-id="{{ post.id }}">
+        <form class="advice-form" method="post" action="{% url 'board:request_advice' post.id %}">
           {% csrf_token %}
-          <button type="button" class="action-btn btn-bookmark bookmark-btn">
-            {% if is_bookmarked %}★ 저장됨{% else %}☆ 저장하기{% endif %}
+          <button type="submit" class="action-btn btn-advice">
+            💬 조언구하기
           </button>
         </form>
         
@@ -543,13 +543,13 @@
   color: #fff;
 }
 
-/* 수정/저장됨 = 초록색 */
-.btn-edit, .btn-bookmark {
+/* 수정/조언구하기 = 초록색 */
+.btn-edit, .btn-advice {
   border-color: #27ae60;
   color: #27ae60;
 }
 
-.btn-edit:hover, .btn-bookmark:hover {
+.btn-edit:hover, .btn-advice:hover {
   background: #27ae60;
   color: #fff;
 }

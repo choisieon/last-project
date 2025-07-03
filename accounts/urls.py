@@ -20,6 +20,8 @@ urlpatterns = [
     path('social/', include('allauth.urls')),  # ✅ 요거 추가해야 {% provider_login_url %}이 동작함
     path('profile/<int:user_id>/', views.view_profile, name='view_profile'),
     path('toggle-popularity/<int:user_id>/', views.toggle_popularity, name='toggle_popularity'),
+    path('get-random-policies/', views.get_random_policies, name='get_random_policies'),
+    path('get-policies-by-lifecycle/', views.get_policies_by_lifecycle, name='get_policies_by_lifecycle'),
 
     # 필요 시 추후 소셜 로그인 연결도 여기에 추가
     # path('social/kakao/login/', views.social_login, name='social_login'),

@@ -215,7 +215,11 @@
           </div>
           
           <div class="button-container">
-            <a href="{% url 'mentor:mentor_request_direct' mentor.id %}" class="apply-btn">멘토링 신청</a>
+            {% if request.GET.post_id %}
+              <a href="{% url 'mentor:mentor_request_direct' mentor.id %}?post_id={{ request.GET.post_id }}&post_title={{ request.GET.post_title }}" class="apply-btn">조언구하기</a>
+            {% else %}
+              <a href="{% url 'mentor:mentor_request_direct' mentor.id %}" class="apply-btn">멘토링 신청</a>
+            {% endif %}
             <a href="{% url 'mentor:mentor_profile' mentor.id %}" class="view-profile-btn">프로필 보기</a>
           </div>
         </div>

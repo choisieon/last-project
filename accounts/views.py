@@ -364,11 +364,44 @@ def delete_life_event(request, event_id):
         event.delete()
     return redirect('accounts:my_page')
 
-@login_required
-def recommend_policy(request):
-    if request.method == 'POST':
-        region = request.POST.get('region')
-        interest = request.POST.get('interest')
-        # 정책 필터링 로직
-        policies = Policy.objects.filter(region__icontains=region, category__icontains=interest)
-        return render(request, 'accounts/mypage.html', {'policies': policies})
+from youth_policy.models import YouthPolicy
+import random
+
+def get_random_policies(request):
+    try:
+        all_policies = list(YouthPolicy.objects.all())
+        if len(all_policies) >= 3:
+            random_policies = random.sample(all_policies, 3)
+        else:
+            random_policies = all_policies
+        
+        policies_data = []
+        for policy in random_policies:
+            policies_data.append({
+                'id': policy.id,
+                'name': policy.정책명,
+                'description': policy.정책설명요약 or policy.정책설명[:100] if policy.정책설명 else '설명 없음'
+            })
+        
+        return JsonResponse({'policies': policies_data})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+def get_policies_by_lifecycle(request):
+    lifecycle = request.GET.get('lifecycle')
+    if not lifecycle:
+        return JsonResponse({'policies': []})
+    
+    try:
+        policies = YouthPolicy.objects.filter(생애주기단계=lifecycle)[:5]
+        policies_data = []
+        for policy in policies:
+            policies_data.append({
+                'id': policy.id,
+                'name': policy.정책명,
+                'description': policy.정책설명요약 or policy.정책설명[:100] if policy.정책설명 else '설명 없음'
+            })
+        
+        return JsonResponse({'policies': policies_data})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

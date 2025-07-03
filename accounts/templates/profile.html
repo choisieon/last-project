@@ -857,9 +857,8 @@
           </div>
           <div class="right-profile">
             <div class="action-buttons">
-              <a href="{% url 'mentor:question_create' %}" style="text-decoration: none;"><button class="mentor-button">멘토 신청</button></a>
+              <a href="{% url 'mentor:mentor_request_direct' profile.id %}" style="text-decoration: none;"><button class="mentor-button">멘토링 신청</button></a>
               <button class="review-button" onclick="showReviewModal()">후기</button>
-              <button class="recommend-button" onclick="toggleRecommend()">인기도 (<span id="recommendCount">{{ profile.popularity|default:0 }}</span>)</button>
             </div>
             <div class="info-group">
               <div class="info-row"><div class="info-label">직업</div><div class="info-value">{{ profile.job|default:"없음" }}</div></div>
@@ -879,32 +878,23 @@
   {% endif %}
 </div>
 
-      <div class="policy-box">
-        <h3>📌 청년 정책 추천</h3>
-        <ul>
-          <li>🔍 지역과 관심사를 선택하면 맞춤 정책을 보여드려요</li>
-          <li>예: <strong>서울 청년 월세 지원</strong> - 최대 20만원</li>
-          <li>예: <strong>취업성공 패키지</strong> - 맞춤형 취업 지원</li>
-        </ul>
-        <form method="GET" action="#">
-          <label for="region">지역 선택</label><br>
-          <select name="region" id="region">
-            <option value="">-- 선택 --</option>
-            <option value="seoul">서울</option>
-            <option value="busan">부산</option>
-            <option value="etc">그 외 지역</option>
-          </select><br><br>
 
-          <label for="interest">관심사 선택</label><br>
-          <select name="interest" id="interest">
-            <option value="">-- 선택 --</option>
-            <option value="job">취업</option>
-            <option value="housing">주거</option>
-            <option value="finance">금융지원</option>
-          </select><br><br>
-          
-        </form>
-        
+      <div class="policy-box">
+        <h3>📋 생애주기별 청년정책</h3>
+        <div class="lifecycle-selector">
+          <select id="lifecycleSelect" onchange="loadPoliciesByLifecycle()">
+            <option value="">생애주기 선택</option>
+            <option value="진로 탐색기">진로 탐색기</option>
+            <option value="구직 준비기">구직 준비기</option>
+            <option value="초기 취업기">초기 취업기</option>
+            <option value="생활 기반 마련기">생활 기반 마련기</option>
+            <option value="자기계발/이직기">자기계발/이직기</option>
+            <option value="가족 형성기">가족 형성기</option>
+          </select>
+        </div>
+        <div id="lifecycle-policies">
+          <p>생애주기를 선택하면 관련 정책을 보여드립니다.</p>
+        </div>
       </div>
       
   <div class="admin-extra-wrapper">
@@ -915,10 +905,7 @@
          <br>- 3년 저축, 최대 720만 원 추가 지원! <a href="https://www.bokjiro.go.kr/ssis-tbu/twataa/wlfareInfo/moveTWAT52011M.do?wlfareInfoId=WLF00000060" target="_blank" class="policy-link">청년내일저축계좌</a>
       </p>
     </div>
-    <div class="extra-box">
-      <h3>🎯 새로운 콘텐츠</h3>
-      <p style="font-size: 13px;">- 커뮤니티 인기 게시물<br>- 이번 주 추천 활동!</p>
-    </div>
+
   </div>
 </div>
 <div class="board-section" style="background: radial-gradient(2px 2px at 20px 30px, #fff, transparent), radial-gradient(2px 2px at 40px 70px, #fff, transparent), radial-gradient(1px 1px at 90px 40px, #fff, transparent), radial-gradient(1px 1px at 130px 80px, #fff, transparent), radial-gradient(2px 2px at 160px 30px, #fff, transparent), radial-gradient(1px 1px at 200px 60px, #fff, transparent), radial-gradient(2px 2px at 240px 90px, #fff, transparent), radial-gradient(1px 1px at 280px 20px, #fff, transparent), radial-gradient(1px 1px at 320px 70px, #fff, transparent), radial-gradient(2px 2px at 360px 40px, #fff, transparent); background-repeat: repeat; background-size: 400px 100px; background-color: #1a1a2e;">
@@ -1127,24 +1114,7 @@ function deleteReview(index) {
   checkUserReview();
 }
 
-function toggleRecommend() {
-  const userId = {{ user.id }};
-  
-  fetch(`/accounts/toggle-popularity/${userId}/`, {
-    method: 'POST',
-    headers: {
-      'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-      'Content-Type': 'application/json'
-    }
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      document.getElementById('recommendCount').textContent = data.popularity;
-    }
-  })
-  .catch(error => console.error('Error:', error));
-}
+
 
 (function () {
   const svg = document.querySelector('.life-journey-line');
@@ -1198,6 +1168,38 @@ function toggleRecommend() {
 
   svg.appendChild(path);
 })();
+
+// 생애주기별 정책 로드
+function loadPoliciesByLifecycle() {
+  const lifecycle = document.getElementById('lifecycleSelect').value;
+  const container = document.getElementById('lifecycle-policies');
+  
+  if (!lifecycle) {
+    container.innerHTML = '<p>생애주기를 선택하면 관련 정책을 보여드립니다.</p>';
+    return;
+  }
+  
+  container.innerHTML = '<p>로딩 중...</p>';
+  
+  fetch(`/accounts/get-policies-by-lifecycle/?lifecycle=${encodeURIComponent(lifecycle)}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.policies && data.policies.length > 0) {
+        let html = '<ul>';
+        data.policies.forEach(policy => {
+          html += `<li><a href="/youth_policy/${policy.id}/" class="policy-link">${policy.name}</a></li>`;
+        });
+        html += '</ul>';
+        container.innerHTML = html;
+      } else {
+        container.innerHTML = '<p>해당 생애주기에 맞는 정책이 없습니다.</p>';
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      container.innerHTML = '<p>정책을 불러오는 중 오류가 발생했습니다.</p>';
+    });
+}
 </script>
 </body>
 </html>

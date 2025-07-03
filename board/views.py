@@ -234,24 +234,19 @@ def post_detail(request, pk):
     # ★★★ 태그 전처리 추가 ★★★
     processed_tags = []
     for tag in post.tags.all():
-        if hasattr(tag, 'name'):  # name 속성이 있는 경우
-            processed_tags.append(tag.name)
-        elif isinstance(tag, str):  # 문자열인 경우 (JSON 등)
-            # JSON 파싱 시도: [{"value":"태그명"}] → "태그명"
-            if tag.startswith('['):
-                try:
-                    import json
-                    tag_data = json.loads(tag)
-                    if isinstance(tag_data, list) and tag_data:
-                        processed_tags.append(tag_data[0].get('value', tag))
-                    else:
-                        processed_tags.append(tag)
-                except json.JSONDecodeError:
-                    processed_tags.append(tag)
-            else:
-                processed_tags.append(tag)
-        else:  # 기타 경우
-            processed_tags.append(str(tag))
+        tag_name = tag.name
+        # JSON 형태 파싱: [{"value":"태그명"}] → "태그명"
+        if tag_name.startswith('['):
+            try:
+                tag_data = json.loads(tag_name)
+                if isinstance(tag_data, list) and tag_data and 'value' in tag_data[0]:
+                    processed_tags.append(tag_data[0]['value'])
+                else:
+                    processed_tags.append(tag_name)
+            except (json.JSONDecodeError, KeyError, IndexError):
+                processed_tags.append(tag_name)
+        else:
+            processed_tags.append(tag_name)
 
     return render(request, 'board/post_detail.html', {
         'post': post,
@@ -579,4 +574,33 @@ def comment_report(request, pk):
             return JsonResponse({'success': False, 'message': f'서버 오류: {str(e)}'}, status=500)
     
     return JsonResponse({'success': False, 'message': '잘못된 요청입니다.'}, status=400)
+
+@login_required
+def request_advice(request, post_id):
+    """게시글 작성자에게 바로 멘토링 신청"""
+    from mentor.models import MentorRequest, UserProfile
+    from django.utils import timezone
+    
+    post = get_object_or_404(Post, pk=post_id)
+    
+    # 자신의 글에는 신청 불가
+    if post.author == request.user:
+        messages.error(request, '자신의 글에는 조언을 구할 수 없습니다.')
+        return redirect('board:post_detail', pk=post_id)
+    
+    # UserProfile 가져오기 또는 생성
+    mentee_profile, _ = UserProfile.objects.get_or_create(user=request.user)
+    mentor_profile, _ = UserProfile.objects.get_or_create(user=post.author)
+    
+    # 멘토링 신청 생성
+    mentor_request = MentorRequest.objects.create(
+        mentee=mentee_profile,
+        mentor=mentor_profile,
+        category='etc',
+        message=f'"{post.title}" 게시글에 대한 조언을 구하고 싶습니다.',
+        created_at=timezone.now()
+    )
+    
+    messages.success(request, f'{post.author.username}님에게 조언 요청을 보냈습니다!')
+    return redirect('board:post_detail', pk=post_id)
 
