@@ -357,7 +357,7 @@ def chat_room(request, room_id):
     
     return render(request, 'mentor/chat_room.html', {
         'room': room,
-        'chatroom' : room,
+        'chatroom': room,
         'messages': messages,
         'last_message_id': last_message_id
     })
@@ -593,5 +593,8 @@ def get_messages(request, room_id):
             'timestamp': msg.timestamp.strftime('%H:%M'),
             'is_mine': msg.sender.user == request.user
         })
+    
+    # 디버깅용 (필요시 주석 해제)
+    # print(f"폴링 요청: room_id={room_id}, last_id={last_id}, 새 메시지 수={len(message_list)}")
     
     return JsonResponse({'messages': message_list})
