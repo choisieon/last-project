@@ -22,7 +22,7 @@
     }
 
     .wrapper {
-      max-width: 900px;
+      max-width: 850px;
       margin: 0 auto;
       padding: 30px 20px;
     }
@@ -105,11 +105,13 @@
 
     .category-badge {
       display: inline-block;
-      padding: 1px 6px;
-      font-size: 11px;
+      padding: 1px 4px;
+      font-size: 10px;
       font-weight: bold;
       color: white;
-      width: fit-content;
+      border-radius: 8px;
+      margin-bottom: 1px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     .college { background-color: #7f78d2; }
     .life { background-color: #6aaa64; }
@@ -121,24 +123,93 @@
     .etc { background-color: #999999; }
 
     .post-item {
-      background-color: rgba(250, 235, 180, 0.95);
+      background-color: rgba(248, 248, 248, 0.95);
       border: 2px solid #5a4a2f;
-      box-shadow: 2px 2px 0 #b9a782;
-      padding: 4px;
+      border-radius: 0;
+      box-shadow: 3px 3px 0 #b9a782;
+      padding: 2px;
       margin-bottom: 8px;
-      font-size: 11px;
+      font-size: 14px;
+      transition: transform 0.2s ease;
+      image-rendering: pixelated;
     }
-    .post-title { font-size: 16px; font-weight: bold; color: #222; margin: 2px 0; }
-    .post-preview { font-size: 11px; color: #555; margin: 2px 0; }
-    .post-footer { font-size: 10px; display: flex; justify-content: space-between; flex-wrap: wrap; }
+    .post-item:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 4px 4px 0 #b9a782;
+    }
+    .title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 0;
+      padding-bottom: 0;
+      border-bottom: 1px dashed #ccc;
+    }
+    .post-title { 
+      font-size: 18px; 
+      font-weight: bold; 
+      color: #1a1a1a; 
+      line-height: 1.4;
+      flex: 1;
+    }
+    .post-title a {
+      color: #1a1a1a;
+      text-decoration: none;
+    }
+    .post-title a:hover {
+      color: #007aff;
+    }
+    .post-preview { 
+      font-size: 13px; 
+      color: #666; 
+      margin: 8px 0; 
+      line-height: 1.5;
+    }
+    .post-footer { 
+      font-size: 12px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+      flex-wrap: wrap; 
+      margin-top: 0;
+      padding-top: 0;
+      border-top: 1px dashed #ccc;
+    }
+    .author-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #555;
+    }
+    .author-name {
+      font-weight: bold;
+      color: #333;
+    }
     .mentor-profile-btn {
       background: #ffcc00;
       border: 1px solid #5a4a2f;
       cursor: pointer;
-      padding: 2px 5px;
-      font-size: 10px;
+      padding: 4px 8px;
+      font-size: 11px;
+      border-radius: 4px;
     }
-    .metrics { margin-top: 2px; font-size: 10px; color: #333; }
+    .metrics { 
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px; 
+      color: #666;
+    }
+    .metric-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .post-date {
+      font-size: 12px;
+      color: #888;
+      margin-top: 4px;
+    }
     .fun-box {
       margin-top: 30px;
       background: #fef3c7;
@@ -147,6 +218,74 @@
       box-shadow: 2px 2px 0 #aaa;
       font-size: 13px;
       font-family: 'MyCustomFont';
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #666;
+      font-size: 16px;
+    }
+    
+    .empty-state i {
+      font-size: 48px;
+      margin-bottom: 16px;
+      color: #ccc;
+    }
+
+    /* 반응형 디자인 */
+    @media (max-width: 768px) {
+      .wrapper {
+        padding: 20px 15px;
+      }
+      
+      .top-nav {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .menu-left {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
+      .post-item {
+        padding: 12px;
+        margin-bottom: 12px;
+      }
+      
+      .post-title {
+        font-size: 16px;
+      }
+      
+      .post-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      
+      .metrics {
+        gap: 8px;
+      }
+      
+      .sub-category-bar {
+        justify-content: center;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .post-title {
+        font-size: 15px;
+      }
+      
+      .category-badge {
+        font-size: 11px;
+        padding: 4px 8px;
+      }
+      
+      .metrics {
+        flex-wrap: wrap;
+      }
     }
   </style>
   <script>
@@ -203,27 +342,46 @@
             {% elif question.category == 'job' %}💼 취업선배{% elif question.category == 'money' %}💳 지갑선배
             {% elif question.category == 'fitness' %}💪 운동선배{% else %}📌 기타{% endif %}
           </span>
-          <h4 class="post-title">
-            <a href="{% url 'mentor:question_detail' question.id %}">{{ question.title }}</a>
-          </h4>
-
-          <div class="post-footer" style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              👤 <strong>{{ question.author.nickname }}</strong> |
-              {{ question.author.job|default:"직장 정보 없음" }}
+          <div class="title-row">
+            <h4 class="post-title">
+              <a href="{% url 'mentor:question_detail' question.id %}">{{ question.title }}</a>
+            </h4>
+            <div class="metrics">
+              <div class="metric-item">
+                <span>좋아요 {{ question.likes.count }}</span>
+              </div>
+              <div class="metric-item">
+                <span>댓글 {{ question.answers.count }}</span>
+              </div>
+              <div class="metric-item">
+                <span>조회수 {{ question.views }}</span>
+              </div>
             </div>
-            <div class="metrics" style="display: flex; align-items: center; gap: 6px;">
-              <span style="font-size: 11px;">좋아요 {{ question.likes.count }}</span>
-              <span>| 댓글 {{ question.answers.count }}</span>
-              <span>| 조회수 {{ question.views }}</span>
+          </div>
+
+          <div class="post-footer">
+            <div class="author-info">
+              <span>👤</span>
+              <span class="author-name">{{ question.author.nickname }}</span>
+              <span>•</span>
+              <span>{{ question.author.job|default:"직장 정보 없음" }}</span>
+            </div>
+            <div>
+              <div class="post-date">
+                {{ question.created_at|date:"Y.m.d H:i" }}
+              </div>
               {% if question.is_promoted_to_mentoring %}
-                <span class="apply-mentoring-btn" style="margin-left: 8px;">멘토링 진행중..</span>
+                <span class="apply-mentoring-btn">멘토링 진행중</span>
               {% endif %}
             </div>
           </div>
         </div>
       {% empty %}
-        <p>아직 질문이 없습니다.</p>
+        <div class="empty-state">
+          <i class="fas fa-question-circle"></i>
+          <p>아직 질문이 없습니다.</p>
+          <p>첫 번째 질문을 올려보세요!</p>
+        </div>
       {% endfor %}
     </div>
 
