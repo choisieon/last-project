@@ -27,7 +27,7 @@ def post_list(request):
     category = request.GET.get('category', '')
     page = request.GET.get('page', 1)
     tag_filter = request.GET.getlist('tag', [])
-    posts = Post.objects.all()
+    posts = Post.objects.select_related('author', 'author__boardprofile').all()
     
     # 카테고리 필터링
     if category:
@@ -199,23 +199,27 @@ def post_detail(request, pk):
     
     # 댓글 폼 처리
     comment_form = CommentForm(request.POST or None)
-    if request.method == 'POST' and comment_form.is_valid():
-        parent_id = request.POST.get('parent_id')
-        parent = Comment.objects.get(id=parent_id) if parent_id else None
-        new_comment = Comment.objects.create(
-            post=post,
-            author=request.user,
-            content=comment_form.cleaned_data['content'],
-            parent=parent
-        )
-        # 알림 생성 (작성자와 다른 경우)
-        if post.author != request.user:
-            Notification.objects.create(
-                user=post.author,
-                message=f"'{post.title}' 글에 새로운 댓글이 달렸습니다.",
-                url=reverse('board:post_detail', args=[post.pk])
+    if request.method == 'POST':
+        if not request.user.is_authenticated:
+            messages.error(request, "댓글을 작성하려면 로그인해야 합니다.")
+            return redirect('accounts:login')
+
+        if comment_form.is_valid():
+            parent_id = request.POST.get('parent_id')
+            parent = Comment.objects.filter(id=parent_id).first() if parent_id else None
+            new_comment = Comment.objects.create(
+                post=post,
+                author=request.user,
+                content=comment_form.cleaned_data['content'],
+                parent=parent
             )
-        return redirect(f'{reverse("board:post_detail", kwargs={"pk": pk})}#comment-{new_comment.id}')
+            if post.author != request.user:
+                Notification.objects.create(
+                    user=post.author,
+                    message=f"'{post.title}' 글에 새로운 댓글이 달렸습니다.",
+                    url=reverse('board:post_detail', args=[post.pk])
+                )
+            return redirect(f'{reverse("board:post_detail", kwargs={"pk": pk})}#comment-{new_comment.id}')
     
     # 팔로우 상태 확인
     is_following = False
