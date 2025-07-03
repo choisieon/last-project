@@ -80,6 +80,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'board.context_processors.notification_counts',
+                'chungsulmo_project.context_processors.popular_posts',
             ],
         },
     },

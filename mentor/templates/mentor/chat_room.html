@@ -170,10 +170,18 @@
     }
   }
 
+  let addedMessageIds = new Set(); // 중복 방지용
+  
   function addMessage(message) {
+    // 이미 추가된 메시지면 무시
+    if (addedMessageIds.has(message.id)) {
+      return;
+    }
+    
     const chatLog = document.getElementById('chat-log');
     const messageDiv = document.createElement('div');
     messageDiv.className = message.is_mine ? 'message you' : 'message';
+    messageDiv.setAttribute('data-message-id', message.id);
     
     const alignment = message.is_mine ? 'flex-direction: row-reverse; text-align: right;' : '';
     messageDiv.innerHTML = `
@@ -186,6 +194,7 @@
     chatLog.appendChild(messageDiv);
     scrollToBottom();
     lastMessageId = message.id;
+    addedMessageIds.add(message.id); // 추가된 메시지 ID 기록
   }
   
   // 새 메시지 확인 (지속적 폴링)
@@ -196,7 +205,10 @@
       .then(data => {
         if (data.messages && data.messages.length > 0) {
           data.messages.forEach(message => {
-            addMessage(message);
+            // 자신이 방금 보낸 메시지는 제외 (중복 방지)
+            if (!message.is_mine || !addedMessageIds.has(message.id)) {
+              addMessage(message);
+            }
           });
         }
       })
@@ -242,6 +254,9 @@
         if (data.success) {
           addMessage(data.message);
           messageInput.value = '';
+          // 전송 후 잠시 폴링 중단 (1초)
+          stopPolling();
+          setTimeout(startPolling, 1000);
         }
       })
       .catch(error => {
