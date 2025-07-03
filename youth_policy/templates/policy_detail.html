@@ -316,8 +316,10 @@ h1 {
     {% endfor %}
   </div>
 {% endfor %}
-    <a href="{% url 'youth_policy:basic_page' %}" class="back-btn">← 목록으로 돌아가기</a>
-  </div>
+<div style="margin-top: 2rem;">
+  <a href="{% url 'youth_policy:basic_page' %}" class="back-btn" style="display: block;">← 목록으로 돌아가기</a>
+  <a href="{% url 'youth_policy:calendar_view' %}" class="back-btn" style="display: block; margin-left: 2px;">← 달력으로 돌아가기</a>
+</div>
 </div>
 <script>
 function toggleReplyForm(commentId) {

@@ -12,4 +12,6 @@ urlpatterns = [
     path('comment/<int:comment_id>/delete/', views.delete_policy_comment, name='delete_policy_comment'),
 
     path('calendar/', views.calendar_view, name='calendar_view'),
+    path('active-policies/', views.active_policy_list, name='active_policy_list'),
+
 ]

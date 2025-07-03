@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <style>
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      background-color: rgba(255, 255, 255, 0.95);  /* 반투명 흰색 박스 */
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
+      color: #2f1b0c;
+      font-family: 'MyCustomFont', sans-serif;
+    }
+
+    .container h2 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #bfa163;
+      padding-bottom: 6px;
+      color: #3b2a1e;
+    }
+
+    .container ul {
+      padding-left: 20px;
+      list-style-type: disc;
+      line-height: 1.8;
+      font-size: 15px;
+    }
+
+    .container li {
+      margin-bottom: 6px;
+    }
+
+    .container .btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 8px 14px;
+      background-color: #ffe082;
+      color: #4e2801;
+      font-weight: bold;
+      border: 1px solid #c3a76f;
+      border-radius: 6px;
+      text-decoration: none;
+      box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    .container .btn:hover {
+      background-color: #ffecb3;
+    }
+
+    .container a {
+      color: #2f1b0c;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .container a:hover {
+      color: #b95b00;
+      text-decoration: underline;
+    }
+  </style>
+
+  <div class="container">
+    <h2>🔥 현재 진행 중인 정책</h2>
+    <ul>
+      {% for policy in policies %}
+        <li>
+          <a href="{% url 'youth_policy:policy_detail' policy_id=policy.id %}">
+            {{ policy.정책명 }}
+          </a> (마감일: {{ policy.application_end|date:"Y년 m월 d일" }})
+        </li>
+      {% empty %}
+        <li>진행 중인 정책이 없습니다.</li>
+      {% endfor %}
+    </ul>
+    <a href="{% url 'youth_policy:calendar_view' %}" class="btn">← 달력으로 돌아가기</a>
+  </div>
+{% endblock %}

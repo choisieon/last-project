@@ -8,6 +8,7 @@ from collections import Counter
 from datetime import date, datetime
 from calendar import monthrange
 import calendar
+from django.utils import timezone
 from datetime import timedelta
 from collections import defaultdict
 import json
@@ -168,6 +169,15 @@ def get_calendar(year, month):
     cal = calendar.Calendar(firstweekday=6)
     return cal.monthdatescalendar(year, month)
 
+from datetime import date
+from collections import defaultdict
+from django.utils.dateformat import format as django_date_format
+from django.core.serializers.json import DjangoJSONEncoder
+from django.shortcuts import render
+from .models import YouthPolicy
+import calendar
+import json
+
 def calendar_view(request):
     today = date.today()
 
@@ -178,21 +188,28 @@ def calendar_view(request):
     start_of_month = date(year, month, 1)
     end_of_month = date(year, month, calendar.monthrange(year, month)[1])
 
+    # 이번 달에 시작 또는 마감되는 정책
     policies = YouthPolicy.objects.filter(
         application_start__lte=end_of_month,
         application_end__gte=start_of_month
     )
+
+    # 현재 진행 중인 정책: today가 신청 기간 사이에 포함되는 경우
+    active_policies = YouthPolicy.objects.filter(
+        application_start__lte=today,
+        application_end__gte=today
+    ).order_by('application_end')
 
     start_dict = {}
     end_dict = {}
 
     for policy in policies:
         if policy.application_start and start_of_month <= policy.application_start <= end_of_month:
-            key = policy.application_start.date() if isinstance(policy.application_start, datetime) else policy.application_start
+            key = policy.application_start
             start_dict.setdefault(key, []).append(policy)
 
         if policy.application_end and start_of_month <= policy.application_end <= end_of_month:
-            key = policy.application_end.date() if isinstance(policy.application_end, datetime) else policy.application_end
+            key = policy.application_end
             end_dict.setdefault(key, []).append(policy)
 
     calendar_data = get_calendar(year, month)
@@ -203,12 +220,15 @@ def calendar_view(request):
         for p in policies_list:
             calendar_json_dict[date_str].append({
                 'id': p.id,
-                '정책명': p.정책명})
+                '정책명': p.정책명
+            })
 
     for date_obj, policies_list in end_dict.items():
         date_str = django_date_format(date_obj, 'Y-m-d')
         for p in policies_list:
-            calendar_json_dict[date_str].append({'정책명': p.정책명})
+            calendar_json_dict[date_str].append({
+                '정책명': p.정책명
+            })
 
     context = {
         'year': year,
@@ -219,6 +239,19 @@ def calendar_view(request):
         'start_dict': start_dict,
         'end_dict': end_dict,
         'calendar_data_json': json.dumps(calendar_json_dict, cls=DjangoJSONEncoder),
+        'active_policies': active_policies,  # ← 추가
     }
 
     return render(request, 'calendar.html', context)
+
+def active_policy_list(request):
+    today = timezone.localdate()
+    policies = YouthPolicy.objects.filter(
+        application_start__lte=today,
+        application_end__gte=today
+    ).order_by('application_end')
+
+    return render(request, 'active_policy_list.html', {
+        'policies': policies,
+        'today': today
+    })

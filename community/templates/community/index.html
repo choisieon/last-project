@@ -436,20 +436,13 @@
         </div>
       </div>
       <div class="right-content">
-        <div class="box">
-          <h3>🔥 인기 검색어</h3>
-          <ul>
-            <li>#청년지원금</li>
-            <li>#청년정책</li>
-            <li>#취업지원제도</li>
-            <li>#연애</li>
-            <li>#대외활동 추천</li>
-          </ul>
-        </div>
-        <div class="box">
-          <h3>🧭 청년 정책</h3>
-          <p>💡 서울시 청년월세 지원 신청 중!</p>
-          <p>📅 내일청년통장 신청 마감: 6/10</p>
+        <div class="box" style="height:auto;">
+          <h3>🧭 인기 청년 정책</h3>
+          {% for policy in top_policies %}
+            <p>🔥 {{ policy.정책명|truncatechars:30 }}</p>
+          {% empty %}
+            <p>정책 정보가 없습니다.</p>
+          {% endfor %}
         </div>
       </div>
     </div>
